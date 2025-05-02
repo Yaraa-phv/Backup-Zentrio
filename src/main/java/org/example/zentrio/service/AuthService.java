@@ -17,7 +17,7 @@ public interface AuthService {
 
     void verify(String email, String otp);
 
-    void resend(@Valid String email);
+    void resend(String email);
 
     UUID getCurrentAppUserId();
 
