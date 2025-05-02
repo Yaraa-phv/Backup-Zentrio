@@ -87,12 +87,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse login(AuthRequest request) {
-        authenticate(request.getIdentifier(), request.getPassword());
-        AppUser appUser = appUserRepository.getUserByEmail(request.getIdentifier());
+        authenticate(request.getEmail(), request.getPassword());
+        AppUser appUser = appUserRepository.getUserByEmail(request.getEmail());
         if (!appUser.getIsVerified()) {
             throw new BadRequestException("Your email isn't verified to use try again");
         }
-        String token = jwtService.generateToken(request.getIdentifier());
+        String token = jwtService.generateToken(request.getEmail());
         return TokenResponse.builder()
                 .token(token)
                 .build();
