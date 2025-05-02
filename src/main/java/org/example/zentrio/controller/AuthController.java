@@ -49,7 +49,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "Verify a user", description = "Verify user with email and OTP")
+    @Operation(summary = "Verify otp for user", description = "Verify user with email and OTP")
     @PostMapping("/verify")
     public ResponseEntity<ApiResponse<?>> verify(@Valid @RequestParam String email, @RequestParam String otp) {
         authService.verify(email, otp);
@@ -107,12 +107,26 @@ public class AuthController {
 
     @Operation(summary = "Reset password", description = "Reset password for user that are forgot the password")
     @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<ResetPasswordRequest>> resetPassword(@Valid @RequestBody ResetPasswordRequest request,String email) {
+    public ResponseEntity<ApiResponse<ResetPasswordRequest>> resetPassword(@Valid @RequestBody ResetPasswordRequest request,String email, String otp) {
         ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
                 .success(true)
                 .message("Reset password successfully.")
                 .status(HttpStatus.CREATED)
-                .payload(authService.resetPassword(request,email))
+                .payload(authService.resetPassword(request,email,otp))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @Operation(summary = "Request OTP reset-password", description = "Reset password for user that are forgot the password")
+    @PostMapping("/request-reset-password")
+    public ResponseEntity<ApiResponse<ResetPasswordRequest>> requestOtpReset(@Valid String email) {
+        authService.otpResetPassword(email);
+        ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
+                .success(true)
+                .message("Request otp for reset password successfully.")
+                .status(HttpStatus.CREATED)
+                .payload(null)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
