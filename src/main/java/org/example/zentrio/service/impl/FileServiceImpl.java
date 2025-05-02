@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
 
     @Value("${minio.bucket.name}")
@@ -32,7 +32,6 @@ public class FileServiceImpl implements FileService {
     @SneakyThrows
     @Override
     public FileMetadata uploadFile(MultipartFile file) {
-
         System.out.println("file: " + file.getOriginalFilename());
         List<String> imageExtensions = new ArrayList<>();
 

@@ -24,6 +24,7 @@ public class FileController {
     @Operation(summary = "Upload a file", description = "Uploads a file and returns metadata about the uploaded file.")
     @PostMapping(value = "/upload-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileMetadata>> uploadFile(@RequestParam MultipartFile file) {
+        System.out.println("Uploading file " + file.getOriginalFilename());
         FileMetadata fileMetadata = fileService.uploadFile(file);
         ApiResponse<FileMetadata> apiResponse = ApiResponse.<FileMetadata>builder()
                 .success(true)
