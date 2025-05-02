@@ -2,6 +2,8 @@ package org.example.zentrio.service;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface AppUserService extends UserDetailsService {
+import java.util.UUID;
 
+public interface AppUserService extends UserDetailsService {
+    UUID getCurrentUserId();
 }

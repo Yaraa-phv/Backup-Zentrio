@@ -17,7 +17,7 @@ public class AuthRequest {
     @NotNull
     @NotBlank
     @Email
-    private String email;
+    private String identifier;
 
     @NotNull
     @NotBlank
