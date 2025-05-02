@@ -29,6 +29,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -78,9 +80,20 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
+
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         AppUser appUser = authRepository.register(request);
         String otp = otpService.generateOtp(appUser.getEmail());
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("otp", otp);
+
+        emailService.sendDynamicEmail(
+                appUser.getEmail(),
+                "index", // You can rename this to "verification-otp" if needed
+                "Verify Your Email - OTP Code",
+                variables
+        );
+
         emailService.sendEmail(otp, appUser.getEmail());
         return modelMapper.map(appUser, AppUserResponse.class);
     }
@@ -177,11 +190,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResetPasswordRequest resetPassword(ResetPasswordRequest request, String email) {
+    public ResetPasswordRequest resetPassword(ResetPasswordRequest request, String email, String otp) {
         AppUser appUser = appUserRepository.getUserByEmail(email);
         if (appUser == null) {
-            throw new BadRequestException("This email does not exist");
+            throw new BadRequestException("This email does not matched");
         }
+        appUser.setIsReset(false);
+
+        Boolean validateOtp = otpService.validateOtp(email, otp);
+        if (!validateOtp) {
+            throw new BadRequestException("The OTP entered is invalid or has expired");
+        }
+
         String password = (request.getPassword());
         String confirmPassword = (request.getConfirmPassword());
 
@@ -194,5 +214,24 @@ public class AuthServiceImpl implements AuthService {
         return authRepository.resetPassword(request, email);
     }
 
+    @Override
+    public void otpResetPassword(String email) {
+        AppUser appUser = appUserRepository.getUserByEmail(email);
+        if (appUser == null) {
+            throw new BadRequestException("This email does not login");
+        }
+
+        String otp = otpService.generateOtp(appUser.getEmail());
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("otp", otp);
+
+        emailService.sendDynamicEmail(
+                email,
+                "reset-password-email",
+                "Your OTP for Password Reset",
+                variables
+        );
+    }
 
 }

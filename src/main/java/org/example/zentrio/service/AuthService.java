@@ -25,5 +25,7 @@ public interface AuthService {
 
     TokenResponse loginThirdParty(AuthThirdPartyRequest request) throws GeneralSecurityException, IOException;
 
-    ResetPasswordRequest resetPassword(ResetPasswordRequest request, String email);
+    ResetPasswordRequest resetPassword(ResetPasswordRequest request,String otp, String email);
+
+    void otpResetPassword(String email);
 }
