@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.example.zentrio.model.AppUser;
 
+import java.util.UUID;
+
 @Mapper
 public interface AppUserRepository {
     @Select("""
@@ -31,4 +33,9 @@ public interface AppUserRepository {
         UPDATE users SET is_verified = true
     """)
     void updateVerify();
+
+    @Select("""
+        SELECT users.user_id FROM users WHERE email = #{email}
+    """)
+    UUID getCurrentUserId(String email);
 }

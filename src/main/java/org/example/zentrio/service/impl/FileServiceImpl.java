@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
 
     @Value("${minio.bucket.name}")
