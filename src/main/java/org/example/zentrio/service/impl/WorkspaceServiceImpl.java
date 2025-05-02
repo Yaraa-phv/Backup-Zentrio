@@ -37,6 +37,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     }
 
+
     @Override
     public Workspace createWorkspace(WorkspaceRequest workspaceRequest) {
 
@@ -101,5 +102,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         request.setUpdatedAt(LocalDateTime.now());
         return workspaceRepository.updateWorkspaceTitleByWorkspaceId(request);
 
+    }
+
+    @Override
+    public Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId) {
+
+        checkExistedWorkspaceId(workspaceId);
+        return workspaceRepository.deleteWorkspaceByWorkspaceId(workspaceId, currentUserId());
     }
 }

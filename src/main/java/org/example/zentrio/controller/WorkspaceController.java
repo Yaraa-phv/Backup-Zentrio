@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.DeleteApiResponse;
 import org.example.zentrio.model.Workspace;
 import org.example.zentrio.service.WorkspaceService;
 import org.springframework.http.HttpStatus;
@@ -102,7 +103,7 @@ public class WorkspaceController {
     public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceTitleByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String title){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
-                .message("Update workspace by title successfully!")
+                .message("Update workspace title by workspace id successfully!")
                 .status(HttpStatus.OK)
                 .payload(workspaceService.updateWorkspaceTitleByWorkspaceId(workspaceId, title))
                 .timestamp(LocalDateTime.now())
@@ -116,9 +117,25 @@ public class WorkspaceController {
     public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceDescriptionByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String description){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
-                .message("Update workspace by title successfully!")
+                .message("Update workspace description by workspace id successfully!")
                 .status(HttpStatus.OK)
                 .payload(workspaceService.updateWorkspaceDescriptionByWorkspaceId(workspaceId, description))
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Delete workspace by workspace id")
+    @DeleteMapping("delete/workspace-id/{workspace-id}")
+    public ResponseEntity<DeleteApiResponse<Workspace>> deleteWorkspaceByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId){
+
+        workspaceService.deleteWorkspaceByWorkspaceId(workspaceId);
+
+        DeleteApiResponse<Workspace> response = DeleteApiResponse.<Workspace>builder()
+                .success(true)
+                .message("Delete workspace by workspace id successfully!")
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
 

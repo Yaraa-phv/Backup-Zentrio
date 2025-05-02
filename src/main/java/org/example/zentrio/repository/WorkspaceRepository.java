@@ -59,6 +59,11 @@ public interface WorkspaceRepository {
     @ResultMap("workspaceMapper")
     Workspace updateWorkspaceTitleByWorkspaceId(@Param("request") Workspace titleRequest);
 
+    @Select("""
+        DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
+    """)
+    @ResultMap("workspaceMapper")
+    Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId, UUID userId);
 }
 
 

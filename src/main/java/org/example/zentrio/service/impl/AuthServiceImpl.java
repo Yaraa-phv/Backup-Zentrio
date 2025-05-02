@@ -55,10 +55,27 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Email is required");
         }
 
-        if (request.getGender().equals(Gender.MALE)) {
-            request.setProfileImage("https://i.pinimg.com/736x/3e/9f/08/3e9f085ce52735854f9f2d4742f86659.jpg");
+        String profileImage = request.getProfileImage();
+
+        if (request.getGender().equals(Gender.FEMALE)){
+            if (!profileImage.isEmpty()){
+                request.setProfileImage(profileImage);
+            }else {
+                request.setProfileImage("https://i.pinimg.com/736x/60/a4/04/60a4046baaa616fd41ee84cf3ccc7953.jpg");
+            }
+        } else if (request.getGender().equals(Gender.MALE)) {
+            if (!profileImage.isEmpty()){
+                request.setProfileImage(profileImage);
+            }else {
+                request.setProfileImage("https://i.pinimg.com/736x/3e/9f/08/3e9f085ce52735854f9f2d4742f86659.jpg");
+            }
         } else {
-            request.setProfileImage("https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg");
+            request.setGender(Gender.RATHER_NOT_TO_SAY);
+            if (!profileImage.isEmpty()){
+                request.setProfileImage(profileImage);
+            }else {
+                request.setProfileImage("https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg");
+            }
         }
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
