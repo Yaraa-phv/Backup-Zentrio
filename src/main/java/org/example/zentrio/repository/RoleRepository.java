@@ -9,31 +9,44 @@ import java.util.UUID;
 @Mapper
 public interface RoleRepository {
 
-    @Select("""
-        SELECT * FROM roles
-    """)
-    @Results(id = "roleMapper", value = {
-            @Result(property = "roleId", column = "role_id"),
-            @Result(property = "roleName", column = "role_name")
-    })
-    List<Role> getAllRoles();
+//    @Select("""
+//        SELECT * FROM roles
+//    """)
+//    @Results(id = "roleMapper", value = {
+//            @Result(property = "roleId", column = "role_id"),
+//            @Result(property = "roleName", column = "role_name")
+//    })
+//    List<Role> getAllRoles();
+
+//    @Select("""
+//        SELECT * FROM roles WHERE role_id = #{roleId}
+//    """)
+//    @ResultMap("roleMapper")
+//    @Result(property = "roleId", column = "role_id")
+//    Role getRoleNameByRoleId(UUID roleId);
+
+//    @Select("""
+//        SELECT * FROM roles WHERE role_name LIKE #{roleName}
+//    """)
+//    @ResultMap("roleMapper")
+//    Role getRoleIdByRoleName(String roleName);
+
+//    @Select("""
+//        SELECT role_id FROM roles WHERE role_name = #{roleName}
+//    """)
+//    @ResultMap("roleMapper")
+//    UUID getRoleId(String roleName);
 
     @Select("""
-        SELECT * FROM roles WHERE role_id = #{roleId}
+        SELECT role_id FROM roles WHERE role_name = #{roleName}
     """)
-    @ResultMap("roleMapper")
-    @Result(property = "roleId", column = "role_id")
-    Role getRoleNameByRoleId(UUID roleId);
+    UUID getRoleNameByRoleId(String roleName);
 
     @Select("""
-        SELECT * FROM roles WHERE role_name LIKE #{roleName}
+        SELECT r.role_name FROM roles r INNER JOIN members m
+        ON r.role_id = m.role_id
+        WHERE board_id = #{boardId}
+        AND user_id = #{userId}
     """)
-    @ResultMap("roleMapper")
-    Role getRoleIdByRoleName(String roleName);
-
-    @Select("""
-        SELECT role_id FROM roles WHERE role_name LIKE #{roleName}
-    """)
-    @ResultMap("roleMapper")
-    UUID getRoleId(String roleName);
+    String getRoleNameByUserIdAndBoardId(UUID boardId, UUID userId);
 }

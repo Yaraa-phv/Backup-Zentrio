@@ -1,6 +1,7 @@
 package org.example.zentrio.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class BoardRequest {
-    @NotBlank(message = "Title cannot be blank!")
+
+    @NotNull
+    @NotBlank
     private String title;
+
+    @NotNull
+    @NotBlank
     private String description;
+
     private String cover;
+    private Boolean isFavourite;
     private Boolean isVerified;
-    private UUID workspaceId;
 }

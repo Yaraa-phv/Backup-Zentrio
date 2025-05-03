@@ -19,5 +19,4 @@ public class Board {
     private LocalDateTime updatedAt;
     private Boolean isFavourite;
     private Boolean isVerified;
-    private UUID workspaceId;
 }
