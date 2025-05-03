@@ -16,9 +16,8 @@ public class GanttBarRequest {
     @NotNull(message = "title cannot null")
     @NotBlank
     private String title;
-
     private LocalDateTime startAt;
-    private LocalDateTime finshedAt;
+    private LocalDateTime finishedAt;
 
 
 }

@@ -70,4 +70,13 @@ public class GanttBarServiceImpl implements GanttBarService {
         }
         ganttBarRepository.deleteGanttBarByGanttBarId(geanttbarId);
     }
+
+    @Override
+    public GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId) {
+
+        if (ganttBarId == null){
+            throw new NotFoundException("Gantt Bar Id not found!");
+        }
+        return ganttBarRepository.getGanttBarByGanttChartIdAndGanttBarId(ganttChartId, ganttBarId);
+    }
 }

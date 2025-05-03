@@ -17,7 +17,7 @@ public class GanttBar {
     private UUID ganttBarId;
     private String title;
     private LocalDateTime startAt;
-    private LocalDateTime finshedAt;
+    private LocalDateTime finishedAt;
     private UUID ganttChartId;
 
 }

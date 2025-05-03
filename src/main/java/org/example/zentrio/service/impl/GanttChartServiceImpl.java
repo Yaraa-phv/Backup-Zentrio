@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.GanttChartRequest;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.GanttChart;
 import org.example.zentrio.repository.GanttChartRepository;
+import org.example.zentrio.service.BoardService;
 import org.example.zentrio.service.GanttChartService;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class GanttChartServiceImpl implements GanttChartService {
 
     private final GanttChartRepository ganttChartRepository;
+    private final BoardService boardService;
 
 
     @Override
@@ -26,9 +28,13 @@ public class GanttChartServiceImpl implements GanttChartService {
         return  ganttChartRepository.createGanttChart(boardId, ganttChartRequest, LocalDateTime.now());
     }
 
+
     @Override
-    public List<GanttChart> getAllGanttChartByBoardId(UUID boardId) {
-        return ganttChartRepository.getAllGanttChartByBoardId(boardId);
+    public GanttChart getGanttChartByBoardId(UUID boardId) {
+
+        UUID existedBoardId = boardService.checkExistedBoardId(boardId);
+
+        return ganttChartRepository.getGanttChartByBoardId(existedBoardId);
     }
 
     @Override
@@ -54,4 +60,5 @@ public class GanttChartServiceImpl implements GanttChartService {
         }
         return  ganttChart;
     }
+
 }

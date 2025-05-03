@@ -27,10 +27,10 @@ public interface GanttChartRepository {
     GanttChart createGanttChart(UUID boardId, @Param("request") GanttChartRequest ganttChartRequest, LocalDateTime localDateTime);
 
     @Select("""
-    SELECT * FROM gantt_charts  WHERE board_id= #{boardId}
+    SELECT * FROM gantt_charts  WHERE board_id = #{boardId}
          """)
     @ResultMap("ganttChartMapper")
-    List<GanttChart> getAllGanttChartByBoardId(UUID boardId);
+    GanttChart getGanttChartByBoardId(UUID boardId);
 
 
     @Select("""
@@ -44,7 +44,7 @@ public interface GanttChartRepository {
     @Select("""
         
         UPDATE gantt_charts SET  title= #{request.title},
-                                 updated_at=#{now}
+                                 updated_at = #{now}
         WHERE gantt_chart_id=#{ganttChartId}
         RETURNING *
         """)

@@ -39,4 +39,10 @@ public interface BoardRepository {
     """)
     @ResultMap("boardMapper")
     Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId);
+
+    @Select("""
+        SELECT * FROM boards WHERE board_id = #{boardId}
+    """)
+    @ResultMap("boardMapper")
+    Board getBoardByBoardId(UUID boardId);
 }

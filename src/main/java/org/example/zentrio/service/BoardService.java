@@ -13,4 +13,6 @@ public interface BoardService {
     List<Board> getAllBoardsByWorkspaceId(UUID workspaceId);
 
     Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId);
+
+    UUID checkExistedBoardId(UUID boardId);
 }

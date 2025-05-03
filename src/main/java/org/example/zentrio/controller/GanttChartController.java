@@ -46,13 +46,13 @@ public class GanttChartController {
 
     @Operation(summary = "Get All GanttChart By BoardID")
     @GetMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<List<GanttChart>>> getAllGanttChartByBoardId(@PathVariable("boardId") UUID boardId){
+    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByBoardId(@PathVariable("boardId") UUID boardId){
 
-        ApiResponse<List<GanttChart>> response = ApiResponse.<List<GanttChart>> builder()
+        ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
                 .message("Get All GanttChart successfully!")
                 .status(HttpStatus.CREATED)
-                .payload(ganttChartService.getAllGanttChartByBoardId(boardId))
+                .payload(ganttChartService.getGanttChartByBoardId(boardId))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);}

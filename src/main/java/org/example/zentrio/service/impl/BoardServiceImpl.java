@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.BoardRequest;
+import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.repository.BoardRepository;
 import org.example.zentrio.service.BoardService;
@@ -17,6 +18,25 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final WorkspaceService workspaceService;
+
+    @Override
+    public UUID checkExistedBoardId(UUID boardId) {
+
+        if (boardId == null){
+            throw new NotFoundException("Request Board Id not found!");
+        }
+        Board boardById = boardRepository.getBoardByBoardId(boardId);
+        if (boardById == null){
+            throw new NotFoundException("Board Id is not found!");
+        }
+//        UUID existedBoardId = boardById.getBoardId();
+        if (!boardId.equals(boardById.getBoardId())){
+            throw new NotFoundException("Board Id can not find!");
+        } else {
+            return boardById.getBoardId();
+        }
+
+    }
 
     @Override
     public Board createBoard(BoardRequest boardRequest) {

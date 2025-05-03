@@ -10,12 +10,13 @@ import java.util.UUID;
 public interface GanttChartService {
     GanttChart createGanttChart(UUID boardId, GanttChartRequest ganttChartRequest);
 
-    List<GanttChart> getAllGanttChartByBoardId(UUID boardId);
+    GanttChart getGanttChartByBoardId(UUID boardId);
 
     GanttChart updateGannntCjhartById(UUID ganttChartId, GanttChartRequest ganttChartRequest);
 
     Void deleteGanttChartByID(UUID ganttChartId);
 
     GanttChart getGanttChartByID(UUID ganttChartId);
+
 
 }

@@ -19,4 +19,6 @@ public interface GanttBarService {
     GanttBar updateGanttBarByGanttBarId(UUID geanntbarId,  GanttBarRequest ganttBarRequest);
 
     void deleteGanttBarByGanttBarId(UUID geanttbarId);
+
+    GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
 }
