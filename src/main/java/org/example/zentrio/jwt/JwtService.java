@@ -55,7 +55,7 @@ public class JwtService {
     }
 
     //5. retrieve username from jwt token
-    public String extractIdentifier(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -69,9 +69,9 @@ public class JwtService {
         return extractExpirationDate(token).before(new Date());
     }
 
-    //8. validate token
+//    8. validate token
     public Boolean validateToken(String token, AppUser appUser) {
-        final String identifier = extractIdentifier(token);
-        return ((identifier.equals(appUser.getUsername()) || identifier.equals(appUser.getEmail())) && !isTokenExpired(token));
+        final String email = extractEmail(token);
+        return ((email.equals(appUser.getEmail())) && !isTokenExpired(token));
     }
 }

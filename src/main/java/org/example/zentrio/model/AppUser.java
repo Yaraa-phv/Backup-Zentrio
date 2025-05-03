@@ -34,13 +34,13 @@ public class AppUser implements UserDetails {
         return List.of();
     }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
+//    @Override
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    @Override
+//    public String getUsername() {
+//        return username;
+//    }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ProfileRequest;
 import org.example.zentrio.dto.response.AppUserResponse;
 import org.example.zentrio.model.AppUser;
+import org.example.zentrio.repository.AppUserRepository;
 import org.example.zentrio.repository.ProfileRepository;
 import org.example.zentrio.service.AuthService;
 import org.example.zentrio.service.ProfileService;
@@ -19,12 +20,17 @@ public class ProfileServiceImpl implements ProfileService {
     private final ModelMapper modelMapper;
     private final AuthService authService;
     private final ProfileRepository profileRepository;
+    private final AppUserRepository appUserRepository;
 
 
     @Override
     public AppUserResponse getProfile() {
-        AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("User: " + appUser);
+
+        AppUser appUser = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+//        AppUser appUser = appUserRepository.getUserByEmail(email);
+        System.out.println("appUser" + appUser.getUsername());
+
+        System.out.println("Email: " + appUser);
 
         return modelMapper.map(appUser, AppUserResponse.class);
     }
