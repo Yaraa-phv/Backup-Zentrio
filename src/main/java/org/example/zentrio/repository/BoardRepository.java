@@ -11,10 +11,16 @@ import java.util.UUID;
 public interface BoardRepository {
 
     @Select("""
-        INSERT INTO boards(title, description, cover, workspace_id, is_verified) 
-        VALUES (#{request.title}, #{request.description}, #{request.cover}, #{request.workspaceId}, #{request.isVerified})
-        RETURNING *
-    """)
+            INSERT INTO members(user_id,board_id,role_id)
+            VALUES(#{userId},#{boardId},#{roleId})
+            """)
+    void insertMember(UUID userId, UUID boardId,UUID roleId);
+
+    @Select("""
+                INSERT INTO boards(title,description,cover,is_favourite,workspace_id)
+                VALUES(#{req.title},#{req.description},#{req.cover},#{req.isFavourite}, #{workspaceId})
+                RETURNING *
+            """)
     @Results(id = "boardMapper", value = {
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "title", column = "title"),
@@ -23,10 +29,9 @@ public interface BoardRepository {
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "isFavourite", column = "is_favourite"),
-            @Result(property = "isVerified", column = "is_verified"),
-            @Result(property = "workspaceId", column = "workspace_id"),
+            @Result(property = "isVerified", column = "is_verified")
     })
-    Board createBoard(@Param("request") BoardRequest boardRequest);
+    Board createBoard(@Param("req") BoardRequest boardRequest,UUID workspaceId);
 
     @Select("""
         SELECT * FROM boards WHERE workspace_id = #{workspaceId}
@@ -41,8 +46,42 @@ public interface BoardRepository {
     Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId);
 
     @Select("""
+        UPDATE boards SET title = #{request.title},
+                          description = #{request.description},
+                          cover = #{request.cover},
+                          is_favourite = #{request.isFavourite},
+                          is_verified = #{request.isVerified}
+        WHERE board_id = #{boardId}
+        RETURNING *
+    """)
+    @ResultMap("boardMapper")
+    Board updateBoardByBoardId(@Param("request") BoardRequest boardRequest, UUID boardId);
+
+
+    @Select("""
+        DELETE FROM boards WHERE board_id = #{boardId}
+        RETURNING *
+    """)
+    @ResultMap("boardMapper")
+    Board deleteBoardByBoardId(UUID boardId);
+
+
+    @Select("""
         SELECT * FROM boards WHERE board_id = #{boardId}
     """)
     @ResultMap("boardMapper")
     Board getBoardByBoardId(UUID boardId);
+
+    @Select("""
+        SELECT * FROM boards WHERE title ILIKE '%' || #{boardTitle} || '%'
+    """)
+    @ResultMap("boardMapper")
+    List<Board> getBoardByTitle(String boardTitle);
+
+    @Select("""
+        UPDATE boards SET title = #{boardTitle} WHERE board_id = #{boardId}
+        RETURNING *
+    """)
+    @ResultMap("boardMapper")
+    Board updateBoardTitleByBoardId(UUID boardId, String boardTitle);
 }

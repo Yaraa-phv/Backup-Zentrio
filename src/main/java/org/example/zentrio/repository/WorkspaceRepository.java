@@ -44,12 +44,12 @@ public interface WorkspaceRepository {
     List<Workspace> getWorkspaceByTitle(String title, UUID userId);
 
     @Select("""
-        UPDATE workspaces SET title = #{request.title}, description = #{request.description}, updated_at = #{request.updatedAt}
+        UPDATE workspaces SET title = #{request.title}, description = #{request.description}, updated_at = #{updatedAt}
         WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
         RETURNING *
     """)
     @ResultMap("workspaceMapper")
-    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest, UUID userId);
+    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest, LocalDateTime updatedAt, UUID userId);
 
     @Select("""
         UPDATE workspaces SET title = #{request.title}, updated_at = #{request.updatedAt}
