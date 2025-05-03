@@ -28,8 +28,8 @@ public class AppUserRequest {
     @NotBlank
     private String password;
 
-    @NotNull
-    @NotBlank
-    private String provider;
+//    @NotNull
+//    @NotBlank
+//    private String provider;
     private String profileImage;
 }

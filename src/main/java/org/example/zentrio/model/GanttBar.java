@@ -9,13 +9,15 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class GanttChart {
-    private UUID ganttChartId;
+public class GanttBar {
+
+    private UUID ganttBarId;
     private String title;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private UUID board_id;
+    private LocalDateTime startAt;
+    private LocalDateTime finshedAt;
+    private UUID ganttChartId;
+
 }
