@@ -1,0 +1,23 @@
+package org.example.zentrio.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.example.zentrio.model.Board;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class GanttChartRequest {
+
+    @NotNull
+    @NotBlank
+    private String title;
+//    private LocalDateTime createdAt;
+//    private LocalDateTime updatedAt;
+
+}

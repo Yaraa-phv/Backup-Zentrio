@@ -1,0 +1,134 @@
+package org.example.zentrio.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.example.zentrio.dto.request.*;
+import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.AppUserResponse;
+import org.example.zentrio.dto.response.TokenResponse;
+import org.example.zentrio.service.AuthService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+
+@RestController
+@RequestMapping("api/v1/auths")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @Operation(summary = "Register a user", description = "Register user with credential")
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AppUserResponse>> createUser(@Valid @RequestBody AppUserRequest request) {
+            ApiResponse<AppUserResponse> response = ApiResponse.<AppUserResponse>builder()
+                    .success(true)
+                    .message("Crated successfully")
+                    .payload(authService.register(request))
+                    .status(HttpStatus.CREATED)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Login a user", description = "Login user with email verified")
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody AuthRequest request) {
+        ApiResponse<TokenResponse> response = ApiResponse.<TokenResponse>builder()
+                .success(true)
+                .message("Logged in successfully")
+                .payload(authService.login(request))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "Verify otp for user", description = "Verify user with email and OTP")
+    @PostMapping("/verify")
+    public ResponseEntity<ApiResponse<?>> verify(@Valid @RequestParam String email, @RequestParam String otp) {
+        authService.verify(email, otp);
+        ApiResponse<?> response = ApiResponse.builder()
+                .success(true)
+                .message("Verified OTP successfully")
+                .payload(null)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "Resend OTP user", description = "Resend OTP for user verification")
+    @PostMapping("/resend")
+    public ResponseEntity<ApiResponse<?>> resend(@Valid @RequestParam String email) {
+        authService.resend(email);
+        ApiResponse<?> response = ApiResponse.builder()
+                .success(true)
+                .message("Resend OTP successfully")
+                .payload(null)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+
+    @Operation(summary = "Register with third party", description = "Register new user with third party provide for information")
+    @PostMapping("/register/third-party")
+    public ResponseEntity<ApiResponse<AppUserResponse>> registerThirdParty(@RequestBody @Valid ThirdPartyRequest request) {
+        ApiResponse<AppUserResponse> apiResponse = ApiResponse.<AppUserResponse>builder()
+                .success(true)
+                .message("User registered successfully! Please verify your email to complete the registration.")
+                .status(HttpStatus.CREATED)
+                .payload(authService.registerThirdParty(request))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @Operation(summary = "Login with third party", description = "Login user with third party with credential from third party are provided")
+    @PostMapping("/login/third-party")
+    public ResponseEntity<ApiResponse<TokenResponse>> loginThirdParty(@RequestBody @Valid AuthThirdPartyRequest request) throws GeneralSecurityException, IOException {
+        ApiResponse<TokenResponse> apiResponse = ApiResponse.<TokenResponse>builder()
+                .success(true)
+                .message("Login successful! Authentication token generated.")
+                .status(HttpStatus.CREATED)
+                .payload(authService.loginThirdParty(request))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @Operation(summary = "Reset password", description = "Reset password for user that are forgot the password")
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<ResetPasswordRequest>> resetPassword(@Valid @RequestBody ResetPasswordRequest request,String email, String otp) {
+        ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
+                .success(true)
+                .message("Reset password successfully.")
+                .status(HttpStatus.CREATED)
+                .payload(authService.resetPassword(request,email,otp))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @Operation(summary = "Request OTP reset-password", description = "Reset password for user that are forgot the password")
+    @PostMapping("/request-reset-password")
+    public ResponseEntity<ApiResponse<ResetPasswordRequest>> requestOtpReset(@Valid String email) {
+        authService.otpResetPassword(email);
+        ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
+                .success(true)
+                .message("Request otp for reset password successfully.")
+                .status(HttpStatus.CREATED)
+                .payload(null)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+}
