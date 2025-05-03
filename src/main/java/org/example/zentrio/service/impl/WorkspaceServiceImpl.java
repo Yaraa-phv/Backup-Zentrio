@@ -6,6 +6,7 @@ import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Workspace;
 import org.example.zentrio.repository.WorkspaceRepository;
 import org.example.zentrio.service.AppUserService;
+import org.example.zentrio.service.AuthService;
 import org.example.zentrio.service.WorkspaceService;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +20,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
     private final AppUserService appUserService;
+    private final AuthService authService;
 
     public UUID currentUserId(){
-        return appUserService.getCurrentUserId();
+        //System.out.println(appUserService.getCurrentUserId());
+        return authService.getCurrentAppUserId();
     }
 
     @Override
     public UUID checkExistedWorkspaceId(UUID existedWorkspaceId) {
 
-        UUID currentUserId = appUserService.getCurrentUserId();
+        UUID currentUserId = currentUserId();
+        System.out.println(currentUserId);
         Workspace workspaceById = workspaceRepository.getWorkspaceById(existedWorkspaceId, currentUserId);
         if ( !existedWorkspaceId.equals(workspaceById.getWorkspaceId())){
             throw new NotFoundException("Workspace Id not found");
@@ -48,6 +52,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         return create;
     }
+
+
 
     @Override
     public List<Workspace> getAllWorkspaces() {
@@ -77,8 +83,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Workspace updateWorkspaceById(UUID workspaceId, WorkspaceRequest workspaceRequest) {
 
         checkExistedWorkspaceId(workspaceId);
-        workspaceRequest.setUpdatedAt(LocalDateTime.now());
-        return workspaceRepository.updateWorkspaceById(workspaceId, workspaceRequest, currentUserId());
+//        workspaceRequest.setUpdatedAt(LocalDateTime.now());
+        return workspaceRepository.updateWorkspaceById(workspaceId, workspaceRequest, LocalDateTime.now(), currentUserId());
 
     }
 

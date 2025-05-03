@@ -12,11 +12,32 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
     private final SpringTemplateEngine templateEngine;
     private final JavaMailSender javaMailSender;
+
+    @Override
+    public void sendDynamicEmail(String toEmail, String templateName, String subject, Map<String, Object> variables) {
+        Context context = new Context();
+        context.setVariables(variables);  // set all variables dynamically
+
+        String htmlContent = templateEngine.process(templateName, context); // uses the given HTML file
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true); // true = HTML
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
 
     @SneakyThrows
     @Override
