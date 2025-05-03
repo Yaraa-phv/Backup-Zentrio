@@ -16,5 +16,5 @@ public class WorkspaceRequest {
     @NotBlank(message = "Title cannot be blank!")
     private String title;
     private String description;
-    private LocalDateTime updatedAt;
+//    private LocalDateTime updatedAt;
 }

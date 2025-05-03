@@ -73,7 +73,7 @@ public interface BoardRepository {
     Board getBoardByBoardId(UUID boardId);
 
     @Select("""
-        SELECT * FROM boards WHERE title ILIKE #{boardTitle}
+        SELECT * FROM boards WHERE title ILIKE '%' || #{boardTitle} || '%'
     """)
     @ResultMap("boardMapper")
     List<Board> getBoardByTitle(String boardTitle);
