@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,12 +47,18 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
-    public List<Feedback> getAllFeedback(UUID taskId) {
+    public HashMap<String,Feedback> getAllFeedback(UUID taskId) {
+        HashMap<String,Feedback> feedback = new HashMap<>();
         Task task= taskRepository.getTaskByTaskId(taskId);
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
-        return feedbackRepository.getAllFeedback(taskId);
+        for (Feedback f : feedbackRepository.getAllFeedback(taskId)){
+            feedback.put(f.getFeedbakId().toString(), f);
+        }
+
+
+        return feedback;
     }
 
     @Override

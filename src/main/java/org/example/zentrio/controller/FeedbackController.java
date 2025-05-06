@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,9 +41,9 @@ public class FeedbackController {
 
     @GetMapping("/{task-id}")
     @Operation(summary = "Geat all  feedback by taskId ")
-    public ResponseEntity<ApiResponse<List<Feedback>>>  getAllFeedback(
+    public ResponseEntity<ApiResponse<HashMap<String,Feedback>>>  getAllFeedback(
             @PathVariable("task-id") UUID taskId) {
-        ApiResponse response = ApiResponse.<List<Feedback>>builder()
+        ApiResponse response = ApiResponse.<HashMap<String,Feedback>>builder()
                 .success(true)
                 .status(HttpStatus.FOUND)
                 .message("Feedback Geat Successfully!")
