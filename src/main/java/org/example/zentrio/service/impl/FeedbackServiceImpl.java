@@ -38,6 +38,9 @@ public class FeedbackServiceImpl implements FeedbackService {
             throw new NotFoundException("Task not found");
         }
         String role= roleRepository.getRoleNameByUserIdAndBoardId(task.getBoardId(),appUser.getUserId());
+        if (role == null){
+            throw new BadRequestException("You don't have any role here...");
+        }
         System.out.println("role:"+role);
         if (!role.equals(RoleName.ROLE_MANAGER.name())) {
             throw new BadRequestException("only ROLE_MANAGER allowed...");
