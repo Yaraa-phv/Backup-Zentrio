@@ -51,7 +51,7 @@ public class GanttChartController {
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
                 .message("Get All GanttChart successfully!")
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.FOUND)
                 .payload(ganttChartService.getGanttChartByBoardId(boardId))
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -80,7 +80,7 @@ public class GanttChartController {
         ApiResponse<Void> response = ApiResponse.<Void> builder()
                 .success(true)
                 .message("Delete GanttChart BY GanttChartID successfully!")
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.ACCEPTED)
                 .payload(ganttChartService.deleteGanttChartByID(ganttChartId))
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -95,7 +95,7 @@ public class GanttChartController {
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
                 .message("Get GanttChart BY GanttChartID successfully!")
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.FOUND)
                 .payload(ganttChartService.getGanttChartByID(ganttChartId))
                 .timestamp(LocalDateTime.now())
                 .build();

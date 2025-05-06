@@ -53,7 +53,7 @@ public class GanttBarContrtoller {
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
                 .payload(ganttBarService.getAllGanttBarByGanttChartID(ganntChartId))
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -68,7 +68,7 @@ public class GanttBarContrtoller {
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
                 .payload( ganttBarService.getGanttBarByGanttBartID(geanntbarId))
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -99,7 +99,7 @@ public class GanttBarContrtoller {
         ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                 .success(true)
                 .message("Delete Gannt-bars by Gantt-barId Successfully")
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.ACCEPTED)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);

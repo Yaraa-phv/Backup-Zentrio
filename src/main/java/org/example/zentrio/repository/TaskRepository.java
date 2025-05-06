@@ -11,7 +11,8 @@ import java.util.UUID;
 public interface TaskRepository {
 
     @Select("""
-        INSERT INTO tasks(title, description, started_at, finished_at, stage, board_id, gantt_bar_id) VALUES(#{request.title}, #{request.description}, #{request.startedAt}, #{request.finishedAt}, 'TO DO', #{boardId}, #{ganttBarId})
+        INSERT INTO tasks(title, description, started_at, finished_at, stage, board_id, gantt_bar_id)
+        VALUES(#{request.title}, #{request.description}, #{request.startedAt}, #{request.finishedAt}, 'TO DO', #{boardId}, #{ganttBarId})
         RETURNING *
     """)
     @Results(id = "taskMapper", value = {
@@ -79,4 +80,11 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     Task deleteTaskByTaskId(UUID taskId);
+
+    @Select("""
+        SELECT * FROM tasks WHERE task_id = #{taskId}
+    """)
+    @ResultMap("taskMapper")
+    Task getTaskByTaskId(UUID taskId);
+
 }
