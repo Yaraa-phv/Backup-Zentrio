@@ -24,4 +24,8 @@ public interface TaskService {
 
     Task deleteTaskByTaskId(UUID boardId, UUID ganttBarId, UUID taskId);
 
+    Task assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId);
+
+    Task editRoleNameByBoardIdAndUserId(UUID boardId, String email);
+
 }

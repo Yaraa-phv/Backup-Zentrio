@@ -157,4 +157,33 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+
+    //From Fanau
+    @PostMapping("/assign-task-with-role")
+    public ResponseEntity<ApiResponse<Task>> assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId) {
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
+                .success(true)
+                .message("Assign task and role to user successfully")
+                .payload(taskService.assignUserToTaskWithRole(assignedByUserId,assignedToUserId,boardId,taskId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    //From Fanau
+    @Operation(summary = "Edit role by board id and email")
+    @PutMapping("/edit-role-name/board-id/{board-id}/email/{email}")
+    public ResponseEntity<ApiResponse<Task>> editRoleNameByBoardIdAndUserId(@PathVariable("board-id") UUID boardId, @PathVariable("email") String email ){
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
+                .success(true)
+                .message("Edit role by board id and email successfully")
+                .payload(taskService.editRoleNameByBoardIdAndUserId(boardId, email))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
 }

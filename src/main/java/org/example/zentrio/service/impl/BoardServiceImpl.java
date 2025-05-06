@@ -56,14 +56,18 @@ public class BoardServiceImpl implements BoardService {
         }
         Board board = boardRepository.createBoard(boardRequest,workspaceId);
         UUID boardId = board.getBoardId();
-        UUID roleId = roleRepository.getRoleNameByRoleId("ROLE_MANAGER");
+        UUID roleId = roleRepository.getRoleIdByRoleName("ROLE_MANAGER");
         boardRepository.insertMember(userId,boardId,roleId);
         return board;
     }
 
     @Override
     public List<Board> getAllBoardsByWorkspaceId(UUID workspaceId) {
-        UUID existedWorkspaceId = workspaceService.checkExistedWorkspaceId(workspaceId);
+        Workspace existedWorkspaceIdById = workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
+        if (existedWorkspaceIdById == null){
+            throw new NotFoundException("Workspace cannot found!");
+        }
+        UUID existedWorkspaceId = existedWorkspaceIdById.getWorkspaceId();
         return boardRepository.getAllBoardsByWorkspaceId(existedWorkspaceId);
     }
 
@@ -71,7 +75,11 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId) {
-        UUID existedWorkspaceId = workspaceService.checkExistedWorkspaceId(workspaceId);
+        Workspace existedWorkspaceIdById = workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
+        if (existedWorkspaceIdById == null){
+            throw new NotFoundException("Workspace cannot found!");
+        }
+        UUID existedWorkspaceId = existedWorkspaceIdById.getWorkspaceId();
         return boardRepository.getBoardByWorkspaceIdAndBoardId(existedWorkspaceId, boardId);
     }
 

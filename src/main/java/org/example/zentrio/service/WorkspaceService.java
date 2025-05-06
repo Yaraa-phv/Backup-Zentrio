@@ -3,6 +3,7 @@ package org.example.zentrio.service;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.model.Workspace;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,4 +26,9 @@ public interface WorkspaceService {
     UUID checkExistedWorkspaceId(UUID existedWorkspaceId);
 
     Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId);
+
+    HashMap<String, Workspace> getAllWorkspacesForAllUsers();
+
+    Workspace getWorkspaceByIdForAllUsers(UUID workspaceId);
+
 }

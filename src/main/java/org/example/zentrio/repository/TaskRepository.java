@@ -79,4 +79,16 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     Task deleteTaskByTaskId(UUID taskId);
+
+    @Select("""
+        INSERT INTO task_assignment(assigned_by, assigned_to, task_id)
+        VALUES (#{assignById}, #{assignedToId}, #{taskId})
+    """)
+    void assignMemberToTaskWithRole(UUID assignById,UUID assignedToId,UUID taskId);
+
+    @Select("""
+        SELECT * FROM tasks WHERE task_id = #{taskId}
+    """)
+    @ResultMap("taskMapper")
+    Task getTaskByTaskId(UUID taskId);
 }

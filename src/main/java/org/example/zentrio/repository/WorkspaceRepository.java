@@ -38,10 +38,10 @@ public interface WorkspaceRepository {
     Workspace getWorkspaceById(UUID workspaceId, UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces WHERE title ILIKE '%'|| #{title} ||'%' AND created_by = #{userId}
+        SELECT * FROM workspaces WHERE title ILIKE '%'|| #{title} ||'%'
     """)
     @ResultMap("workspaceMapper")
-    List<Workspace> getWorkspaceByTitle(String title, UUID userId);
+    List<Workspace> getWorkspaceByTitle(String title);
 
     @Select("""
         UPDATE workspaces SET title = #{request.title}, description = #{request.description}, updated_at = #{updatedAt}
@@ -64,6 +64,19 @@ public interface WorkspaceRepository {
     """)
     @ResultMap("workspaceMapper")
     Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId, UUID userId);
+
+    @Select("""
+        SELECT * FROM workspaces WHERE workspace_id = #{workspaceId}
+    """)
+    @ResultMap("workspaceMapper")
+    Workspace getWorkspaceByWorkspaceIdForAllUsers(UUID workspaceId);
+
+    @Select("""
+        SELECT * FROM workspaces
+    """)
+    @ResultMap("workspaceMapper")
+    List<Workspace> getAllWorkspacesForAllUsers();
+
 }
 
 

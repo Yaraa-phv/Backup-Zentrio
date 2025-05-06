@@ -30,6 +30,11 @@ public interface AppUserRepository {
     AppUser getUserByEmail(String email);
 
     @Select("""
+        SELECT user_id FROM users WHERE email = #{email}
+    """)
+    UUID getUserIdByEmail(String email);
+
+    @Select("""
         UPDATE users SET is_verified = true
     """)
     void updateVerify();

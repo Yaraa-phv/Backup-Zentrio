@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -135,6 +136,36 @@ public class WorkspaceController {
         DeleteApiResponse<Workspace> response = DeleteApiResponse.<Workspace>builder()
                 .success(true)
                 .message("Delete workspace by workspace id successfully!")
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all workspaces for all users")
+    @GetMapping("/for-all-users")
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspacesForAllUsers(){
+
+        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
+                .success(true)
+                .message("Get all workspaces for all users!")
+                .payload(workspaceService.getAllWorkspacesForAllUsers())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get workspace by workspace id for all users")
+    @GetMapping("/for-all-users/workspace-id/{workspace-id}")
+    public ResponseEntity<ApiResponse<Workspace>> getWorkspaceByIdForAllUsers(@PathVariable("workspace-id") UUID workspaceId){
+
+        ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()
+                .success(true)
+                .message("Get workspace by workspace id for all users!")
+                .payload(workspaceService.getWorkspaceByIdForAllUsers(workspaceId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
