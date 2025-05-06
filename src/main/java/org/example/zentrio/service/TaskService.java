@@ -12,17 +12,17 @@ public interface TaskService {
 
     List<Task> getAllTasks(UUID boardId, UUID ganttBarId);
 
-    Task getTaskById(UUID boardId, UUID ganttBarId, UUID taskId);
+    Task getTaskById( UUID taskId);
 
-    List<Task> getTaskByTitle(UUID boardId, UUID ganttBarId, String title);
+    List<Task> getTaskByTitle(UUID boardId,String title);
 
-    Task updateTaskById(UUID boardId, UUID ganttBarId, UUID taskId, @Valid TaskRequest taskRequest);
+    Task updateTaskById(UUID taskId, @Valid TaskRequest taskRequest);
 
-    Task updateTaskTitleByTaskId(UUID boardId, UUID ganttBarId, UUID taskId, String title);
+    Task updateTaskTitleByTaskId(UUID taskId, String title);
 
-    Task updateTaskDescriptionByTaskId(UUID boardId, UUID ganttBarId, UUID taskId, String description);
+    Task updateTaskDescriptionByTaskId(UUID taskId, String description);
 
-    Task deleteTaskByTaskId(UUID boardId, UUID ganttBarId, UUID taskId);
+    Task deleteTaskByTaskId( UUID taskId);
 
     Task assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId);
 

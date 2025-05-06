@@ -111,34 +111,49 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getTaskById(UUID boardId, UUID ganttBarId, UUID taskId) {
+    public Task getTaskById( UUID taskId) {
+        Task task = taskRepository.getTaskByTaskId(taskId);
 
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
         if (taskId == null){
             throw new NotFoundException("Task Id not found!");
         } else {
-            return taskRepository.getTaskById(boardId, ganttBarId, taskId);
+            return taskRepository.getTaskById(task.getBoardId(), task.getGanttBarId(), taskId);
         }
     }
 
     @Override
-    public List<Task> getTaskByTitle(UUID boardId, UUID ganttBarId, String title) {
+    public List<Task> getTaskByTitle(UUID boardId, String title) {
 
-        checkExistedBoardIdAndGanttBarId(boardId, ganttBarId);
+        if (boardId != null) {
+            boardService.checkExistedBoardId(boardId);
+        } else {
+            throw new NotFoundException("Board Id not found! Cannot create task!");
+        }
+
+        List<Task> tasks = taskRepository.getAllTaskByBoardIdAndTitle(boardId, title);
+
+        if (tasks == null){
+            throw new NotFoundException("Task title not found!");
+        }
         if (title == null){
             throw new NotFoundException("Task title not found!");
-        } else {
-         return taskRepository.getTaskByTitle(boardId, ganttBarId, title);
         }
+        return tasks;
     }
 
     @Override
-    public Task updateTaskById(UUID boardId, UUID ganttBarId, UUID taskId, TaskRequest taskRequest) {
+    public Task updateTaskById(UUID taskId, TaskRequest taskRequest) {
 
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task Id not found!");
+        }
+
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
         UUID currentUserId = authService.getCurrentAppUserId();
-        boardId = checkExistedBoardByUserId(currentUserId, boardId);
-        Task existedTask = taskRepository.getTaskById(boardId, ganttBarId, taskId);
+        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
+        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
         if (!taskId.equals(existedTask.getTaskId())){
             throw new NotFoundException("Task Id not found!");
         }else {
@@ -147,12 +162,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskTitleByTaskId(UUID boardId, UUID ganttBarId, UUID taskId, String title) {
+    public Task updateTaskTitleByTaskId( UUID taskId, String title) {
 
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task Id not found!");
+        }
+
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
         UUID currentUserId = authService.getCurrentAppUserId();
-        boardId = checkExistedBoardByUserId(currentUserId, boardId);
-        Task existedTask = taskRepository.getTaskById(boardId, ganttBarId, taskId);
+        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
+        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
         if (!taskId.equals(existedTask.getTaskId())){
             throw new NotFoundException("Task Id not found!");
         }else {
@@ -161,12 +181,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskDescriptionByTaskId(UUID boardId, UUID ganttBarId, UUID taskId, String description) {
+    public Task updateTaskDescriptionByTaskId(UUID taskId, String description) {
 
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task Id not found!");
+        }
+
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
         UUID currentUserId = authService.getCurrentAppUserId();
-        boardId = checkExistedBoardByUserId(currentUserId, boardId);
-        Task existedTask = taskRepository.getTaskById(boardId, ganttBarId, taskId);
+        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
+        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
         if (!taskId.equals(existedTask.getTaskId())){
             throw new NotFoundException("Task Id not found!");
         }else {
@@ -175,12 +200,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task deleteTaskByTaskId(UUID boardId, UUID ganttBarId, UUID taskId) {
+    public Task deleteTaskByTaskId( UUID taskId) {
 
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task Id not found!");
+        }
+
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
         UUID currentUserId = authService.getCurrentAppUserId();
-        boardId = checkExistedBoardByUserId(currentUserId, boardId);
-        Task existedTask = taskRepository.getTaskById(boardId, ganttBarId, taskId);
+        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
+        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
         if (!taskId.equals(existedTask.getTaskId())){
             throw new NotFoundException("Task Id not found!");
         }else {

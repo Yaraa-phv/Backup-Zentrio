@@ -13,7 +13,7 @@ public interface GanttBarRepository {
     @Select(
             """
             INSERT INTO gantt_bars(title,started_at,finished_at,gantt_chart_id)
-            VALUES (#{request.title},#{request.startAt}, #{request.finshedAt}, #{ganntChartId})
+            VALUES (#{request.title},#{request.startAt}, #{request.finishedAt}, #{ganntChartId})
             RETURNING *
             """)
     @Results(id = "ganttBarMapping", value = {

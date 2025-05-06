@@ -43,10 +43,10 @@ public interface TaskRepository {
     Task getTaskById(UUID boardId, UUID ganttBarId, UUID taskId);
 
     @Select("""
-        SELECT * FROM tasks WHERE board_id = #{boardId} AND gantt_bar_id = #{ganttBarId} AND title ILIKE '%' || #{title} || '%'
+        SELECT * FROM tasks WHERE  title ILIKE '%' || #{title} || '%'
     """)
     @ResultMap("taskMapper")
-    List<Task> getTaskByTitle(UUID boardId, UUID ganttBarId, String title);
+    List<Task> getTaskByTitle(String title);
 
     @Select("""
         UPDATE tasks SET 
@@ -91,4 +91,10 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     Task getTaskByTaskId(UUID taskId);
+
+    @Select("""
+        SELECT * FROM tasks WHERE board_id = #{boardId} AND  title ILIKE '%' || #{title} || '%'
+    """)
+    @ResultMap("taskMapper")
+    List<Task> getAllTaskByBoardIdAndTitle(UUID boardId, String title);
 }
