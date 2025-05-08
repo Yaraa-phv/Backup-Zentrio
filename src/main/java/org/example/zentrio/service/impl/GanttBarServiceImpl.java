@@ -79,4 +79,5 @@ public class GanttBarServiceImpl implements GanttBarService {
         }
         return ganttBarRepository.getGanttBarByGanttChartIdAndGanttBarId(ganttChartId, ganttBarId);
     }
+
 }

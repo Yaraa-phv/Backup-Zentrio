@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,8 +45,8 @@ public class TaskController {
 
     @Operation(summary = "Get all tasks by board id, and gantt bar id")
     @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId){
-        ApiResponse<List<Task>> response = ApiResponse.<List<Task>> builder()
+    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getAllTasks(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId){
+        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>> builder()
                 .success(true)
                 .message("Created tasks successfully!")
                 .status(HttpStatus.OK)
@@ -72,8 +73,8 @@ public class TaskController {
 
     @Operation(summary = "Get task by task title")
     @GetMapping("/board-id/{board-id}/task-title/{title}")
-    public ResponseEntity<ApiResponse<List<Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("title") String title){
-        ApiResponse<List<Task>> response = ApiResponse.<List<Task>> builder()
+    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("title") String title){
+        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>> builder()
                 .success(true)
                 .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)
@@ -151,31 +152,6 @@ public class TaskController {
 
 
     //From Fanau
-    @PostMapping("/assign-task-with-role")
-    public ResponseEntity<ApiResponse<Task>> assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId) {
-        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
-                .success(true)
-                .message("Assign task and role to user successfully")
-                .payload(taskService.assignUserToTaskWithRole(assignedByUserId,assignedToUserId,boardId,taskId))
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-    //From Fanau
-    @Operation(summary = "Edit role by board id and email")
-    @PutMapping("/edit-role-name/board-id/{board-id}/email/{email}")
-    public ResponseEntity<ApiResponse<Task>> editRoleNameByBoardIdAndUserId(@PathVariable("board-id") UUID boardId, @PathVariable("email") String email ){
-        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
-                .success(true)
-                .message("Edit role by board id and email successfully")
-                .payload(taskService.editRoleNameByBoardIdAndUserId(boardId, email))
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
 
 
 }

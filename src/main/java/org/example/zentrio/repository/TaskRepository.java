@@ -27,6 +27,7 @@ public interface TaskRepository {
             @Result(property = "stage", column = "stage"),
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
+            @Result(property = "ganttBarTitle", column = "gantt_bar_id", one = @One(select = "org.example.zentrio.repository.GanttBarRepository.getGanttBarName")),
     })
     Task createTask(UUID boardId, UUID ganttBarId, @Param("request") TaskRequest taskRequest);
 
@@ -97,4 +98,15 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     List<Task> getAllTaskByBoardIdAndTitle(UUID boardId, String title);
+
+
+    @Select("""
+                SELECT COUNT(*) FROM task_assignment
+                WHERE task_id = #{taskId}
+                AND assigned_to = #{memberId}
+            """)
+    boolean isMemberAlreadyAssignedToTask(UUID taskId, UUID memberId);
+
+    //From Fanau
+
 }

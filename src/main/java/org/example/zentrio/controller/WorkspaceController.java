@@ -45,8 +45,8 @@ public class WorkspaceController {
 
     @Operation(summary = "Get all workspaces")
     @GetMapping()
-    public ResponseEntity<ApiResponse<List<Workspace>>> getAllWorkspaces(){
-        ApiResponse<List<Workspace>> response = ApiResponse.<List<Workspace>> builder()
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(){
+        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>> builder()
                 .success(true)
                 .message("Created workspace successfully!")
                 .status(HttpStatus.OK)
@@ -73,8 +73,8 @@ public class WorkspaceController {
 
     @Operation(summary = "Get workspace by title")
     @GetMapping("title/{title}")
-    public ResponseEntity<ApiResponse<List<Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title){
-        ApiResponse<List<Workspace>> response = ApiResponse.<List<Workspace>> builder()
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title){
+        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>> builder()
                 .success(true)
                 .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)

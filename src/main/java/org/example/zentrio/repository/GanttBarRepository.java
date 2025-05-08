@@ -21,7 +21,7 @@ public interface GanttBarRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "startAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
-            @Result(property = "ganttChartId", column = "gantt_chart_id")
+            @Result(property = "ganttChartId", column = "gantt_chart_id"),
     })
     GanttBar creatGanntBar(UUID ganntChartId,@Param("request") GanttBarRequest ganttBarRequest);
 
@@ -62,4 +62,9 @@ public interface GanttBarRepository {
     """)
     @ResultMap("ganttBarMapping")
     GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
+
+    @Select("""
+        SELECT title FROM gantt_bars WHERE gantt_bar_id = #{ganttBarId}
+    """)
+    String getGanttBarName(UUID ganttBarId);
 }

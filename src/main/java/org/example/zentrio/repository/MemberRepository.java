@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ManagerRequest;
 import org.example.zentrio.model.Member;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Mapper
@@ -58,4 +60,22 @@ public interface MemberRepository {
     """)
     @ResultMap("memberMapper")
     Member getMemberByUserIdAndBoardId(UUID userId, UUID boardId);
+
+    @Select("""
+        SELECT * FROM members WHERE board_id = #{boardId}
+    """)
+    @ResultMap("memberMapper")
+    List<Member> getAllMembersByBoardId(UUID boardId);
+
+    @Select("""
+        SELECT member_id FROM members WHERE board_id = #{boardId} AND member_id = #{memberId}
+    """)
+    UUID getMemberIdByBoardIdAndMemberId(UUID boardId, UUID memberId);
+
+    @Select("""
+        UPDATE members SET role_id = #{roleId} WHERE member_id = #{memberId}
+        RETURNING*
+    """)
+    @ResultMap("memberMapper")
+    Member editRoleForMembersByBoardIdAndMemberId(UUID memberId, UUID roleId);
 }

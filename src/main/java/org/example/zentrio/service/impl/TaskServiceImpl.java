@@ -5,17 +5,13 @@ import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
-import org.example.zentrio.model.GanttBar;
-import org.example.zentrio.model.GanttChart;
-import org.example.zentrio.model.Member;
-import org.example.zentrio.model.Task;
-import org.example.zentrio.repository.AppUserRepository;
-import org.example.zentrio.repository.MemberRepository;
-import org.example.zentrio.repository.RoleRepository;
-import org.example.zentrio.repository.TaskRepository;
+import org.example.zentrio.model.*;
+import org.example.zentrio.repository.*;
 import org.example.zentrio.service.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +25,7 @@ public class TaskServiceImpl implements TaskService {
     private final GanttBarService ganttBarService;
     private final RoleRepository roleRepository;
     private final MemberRepository memberRepository;
-    private final AppUserRepository appUserRepository;
+    private final BoardRepository boardRepository;
     private final AuthService authService;
 
     public List<UUID> checkExistedBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId){
@@ -57,7 +53,7 @@ public class TaskServiceImpl implements TaskService {
         return List.of(boardId, ganttBarByGanttChartIdAndGanttBarId.getGanttBarId());
     }
 
-    public UUID checkExistedBoardByUserId(UUID curretUserId, UUID boardId){
+    public UUID checkExistedBoardByUserId(UUID currentUserId, UUID boardId){
 
         if (boardId != null) {
             boardService.checkExistedBoardId(boardId);
@@ -65,13 +61,17 @@ public class TaskServiceImpl implements TaskService {
             throw new NotFoundException("Board Id not found! Cannot create task!");
         }
 
-        Member checkMember = memberRepository.getMemberByUserIdAndBoardId(curretUserId, boardId);
+        Member checkMember = memberRepository.getMemberByUserIdAndBoardId(currentUserId, boardId);
+        System.out.println("checkMember : " + checkMember);
+        System.out.println("checkMember id : " + checkMember.getMemberId());
         if (checkMember == null){
             throw new BadRequestException("You are not a member here!");
         }
 
-        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(checkMember.getRoleId());
+        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(checkMember.getMemberId());
+        System.out.println("roleIdOfExistedMember : " + roleIdOfExistedMember);
         String roleOfExistedMember = roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
+        System.out.println("roleOfExistedMember : " + roleOfExistedMember);
         if (roleOfExistedMember.isEmpty()){
             throw new BadRequestException("You are not a member here!");
         }
@@ -83,6 +83,23 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return boardId;
+    }
+
+    public UUID checkExistedTaskByTaskId(UUID taskId){
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task Id not found!");
+        }
+        taskId = task.getTaskId();
+
+        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
+        UUID currentUserId = authService.getCurrentAppUserId();
+        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
+        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
+        if (!taskId.equals(existedTask.getTaskId())){
+            throw new NotFoundException("Task Id not found!");
+        }
+        return taskId;
     }
 
 
@@ -97,17 +114,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getAllTasks(UUID boardId, UUID ganttBarId) {
+    public HashMap<String, Task> getAllTasks(UUID boardId, UUID ganttBarId) {
 
         List<UUID> existedIds = checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
-//        UUID existedWorkspaceId = existedIds.get(0);
-//        System.out.println("workspace id : " + existedWorkspaceId);
         UUID existedBoardId = existedIds.get(0);
         System.out.println("board id : " + existedBoardId);
         UUID existedGanttBarId = existedIds.get(1);
         System.out.println("gantt bar id : " + existedGanttBarId);
 
-        return taskRepository.getAllTasks(existedBoardId, existedGanttBarId);
+        HashMap<String, Task> tasks = new HashMap<>();
+        for (Task t : taskRepository.getAllTasks(existedBoardId, existedGanttBarId)){
+            tasks.put(t.getTitle(), t);
+        }
+
+        return tasks;
     }
 
     @Override
@@ -123,7 +143,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTaskByTitle(UUID boardId, String title) {
+    public HashMap<String, Task> getTaskByTitle(UUID boardId, String title) {
 
         if (boardId != null) {
             boardService.checkExistedBoardId(boardId);
@@ -131,7 +151,10 @@ public class TaskServiceImpl implements TaskService {
             throw new NotFoundException("Board Id not found! Cannot create task!");
         }
 
-        List<Task> tasks = taskRepository.getAllTaskByBoardIdAndTitle(boardId, title);
+        HashMap<String, Task> tasks = new HashMap<>();
+        for (Task t : taskRepository.getAllTaskByBoardIdAndTitle(boardId, title)){
+         tasks.put(t.getTitle(), t);
+        }
 
         if (tasks == null){
             throw new NotFoundException("Task title not found!");
@@ -145,135 +168,138 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task updateTaskById(UUID taskId, TaskRequest taskRequest) {
 
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        if (task == null){
-            throw new NotFoundException("Task Id not found!");
-        }
-
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        UUID currentUserId = authService.getCurrentAppUserId();
-        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
-        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
-        if (!taskId.equals(existedTask.getTaskId())){
-            throw new NotFoundException("Task Id not found!");
-        }else {
-            return taskRepository.updateTaskById(taskId, taskRequest);
-        }
+        checkExistedTaskByTaskId(taskId);
+        return taskRepository.updateTaskById(taskId, taskRequest);
     }
 
     @Override
     public Task updateTaskTitleByTaskId( UUID taskId, String title) {
 
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        if (task == null){
-            throw new NotFoundException("Task Id not found!");
-        }
+        checkExistedTaskByTaskId(taskId);
+        return taskRepository.updateTaskTitleByTaskId(taskId, title);
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        UUID currentUserId = authService.getCurrentAppUserId();
-        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
-        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
-        if (!taskId.equals(existedTask.getTaskId())){
-            throw new NotFoundException("Task Id not found!");
-        }else {
-            return taskRepository.updateTaskTitleByTaskId(taskId, title);
-        }
     }
 
     @Override
     public Task updateTaskDescriptionByTaskId(UUID taskId, String description) {
 
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        if (task == null){
-            throw new NotFoundException("Task Id not found!");
-        }
+        checkExistedTaskByTaskId(taskId);
+        return taskRepository.updateTaskDescriptionByTaskId(taskId, description);
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        UUID currentUserId = authService.getCurrentAppUserId();
-        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
-        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
-        if (!taskId.equals(existedTask.getTaskId())){
-            throw new NotFoundException("Task Id not found!");
-        }else {
-            return taskRepository.updateTaskDescriptionByTaskId(taskId, description);
-        }
     }
 
     @Override
     public Task deleteTaskByTaskId( UUID taskId) {
 
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        if (task == null){
-            throw new NotFoundException("Task Id not found!");
-        }
+        checkExistedTaskByTaskId(taskId);
+        return taskRepository.deleteTaskByTaskId(taskId);
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        UUID currentUserId = authService.getCurrentAppUserId();
-        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
-        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
-        if (!taskId.equals(existedTask.getTaskId())){
-            throw new NotFoundException("Task Id not found!");
-        }else {
-            return taskRepository.deleteTaskByTaskId(taskId);
-        }
     }
 
     //From Fanau
     @Override
-    public Task assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId) {
+    public Task assignRole(UUID boardId, UUID assignToUserId) {
+        Board boardByBoardId = boardRepository.getBoardByBoardId(boardId);
+        if (boardByBoardId == null){
+            throw new NotFoundException("Board cannot found by board id!");
+        }
+        UUID getBoardId = boardByBoardId.getBoardId();
+        if (!boardId.equals(getBoardId)){
+            throw new BadRequestException("Board id is not existed!");
+        }
+
+        boolean isAlreadyAssignedRole = boardRepository.isMemberAlreadyAssignedRoleToBoard(boardId, assignToUserId);
+        if(isAlreadyAssignedRole) {
+            throw new BadRequestException("You are already member of this board");
+        }
+
+        if (getBoardId == null) {
+            throw new BadRequestException("Board " + boardId + " not found");
+        }
+
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
+        if (roleName == null) {
+            throw new BadRequestException("You are doesn't have a role to assign this task");
+        }
+
+        if (!roleName.equals(RoleName.ROLE_MANAGER.toString())) {
+            throw new BadRequestException("You are not PM can't assign role for member in this task");
+        }
+
+//        load roleId by passing roleName;
+        UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_LEADER.toString());
+        UUID targetBoardId = getBoardId;
+        System.out.println("targetBoardId = " + targetBoardId);
+//        input role for member that has invite
+//        roleRepository.insertUserRoles(userIdFromEmailInput, roleId);
+
+//        insert userId that have roleId = ROLE_LEADER into boardId
+        roleRepository.insertToMember(assignToUserId, targetBoardId, roleId);
+        return null;
+    }
+
+
+    @Override
+    public Task assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId) {
+
+        System.out.println("assignedToUserId = " + assignedToUserId);
+
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        UUID boardId = task.getBoardId();
+
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 
         // load user id input for sure id of the user are correct in current board
-        UUID assignUserId = roleRepository.getMemberIdByUserIdAndBoardId(boardId, assignedByUserId);
-        if (assignUserId == null) {
+        UUID assignUserIdInMemberTable = roleRepository.getMemberIdByUserIdAndBoardId(boardId, userId); // pm id assign
+
+        String managerRole = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
+//        System.out.println("managerRole = " + managerRole);
+
+        if (managerRole == null) {
+            throw new BadRequestException("You are doesn't have a role to assign this task");
+        }
+        if (!managerRole.equals(RoleName.ROLE_MANAGER.toString())) {
+            throw new BadRequestException("You are not PM can't assign member in this task");
+        }
+
+
+        System.out.println("assignUserIdInMemberTable = " + assignUserIdInMemberTable);
+        if (assignUserIdInMemberTable == null) {
             throw new BadRequestException("Assigned user does not exist");
         }
 
         // load role of the user that are assign in this task doesn't have role leader -> exist
-        UUID assignTo = roleRepository.getMemberIdByUserIdAndBoardId(boardId, assignedToUserId);
+        UUID assignTo = roleRepository.getMemberIdByUserIdAndBoardId(boardId, assignedToUserId); // assign to
+        System.out.println("assignTo = " + assignTo);
+
+        if(assignTo == null) {
+            throw new BadRequestException("User id that u was assign was " + assignedToUserId + " not exist");
+        }
 
         // load role for user using id of user input
         String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, assignedToUserId);
+        System.out.println("roleName = " + roleName);
+
+
         if (roleName == null) {
-            throw new BadRequestException("You do not have a role to assign this task");
+            throw new BadRequestException("You doesn't have role as a leader you should ");
         }
         // if user doesn't have any role in board with table member
         if (!roleName.equals(RoleName.ROLE_LEADER.toString())) {
             throw new BadRequestException("You should let's manager assign role first ");
         }
 
-        // insert assignerId , assignToId , and taskId , with role as a Leader
-        taskRepository.assignMemberToTaskWithRole(assignedByUserId, assignTo, taskId);
-        return null;
-    }
-
-    @Override
-    public Task editRoleNameByBoardIdAndUserId(UUID boardId, String email) {
-
-
-//        load user by email input
-        UUID userIdFromEmailInput = appUserRepository.getUserIdByEmail(email);
-
-        System.out.println("userIdFromEmailInput " + userIdFromEmailInput);
-//
-        if (userIdFromEmailInput == null) {
-            throw new BadRequestException("Email not found " + email + "please try again");
+        boolean alreadyAssigned = taskRepository.isMemberAlreadyAssignedToTask(taskId, assignTo);
+        if(alreadyAssigned) {
+            throw new BadRequestException("This team leader is already assigned to this task.");
         }
 
-//        boolean isAlreadyHasRole = roleRepository.existsByBoardIdAndUserId(boardId, userIdFromEmailInput);
-//        if (isAlreadyHasRole) {
-//            throw new BadRequestException("You already have a role to assign this task");
-//        }
-//
-////        load roleId by passing roleName;
-//        UUID roleId = roleRepository.getRoleIdByRoleName("ROLE_LEADER");
-//        UUID targetBoardId = boardRepository.existsByBoardId(boardId);
-//        System.out.println("targetBoardId = " + targetBoardId);
-////        input role for member that has invite
-////        roleRepository.insertUserRoles(userIdFromEmailInput, roleId);
-//
-////        insert userId that have roleId = ROLE_LEADER into boardId
-//        roleRepository.insertToMember(userIdFromEmailInput, targetBoardId, roleId);
-        return null;
+
+        // insert assignerId , assignToId , and taskId , with role as a Leader
+        taskRepository.assignMemberToTaskWithRole(assignUserIdInMemberTable, assignTo, taskId);
+        return task;
     }
+
 
 }

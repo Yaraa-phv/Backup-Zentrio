@@ -11,9 +11,9 @@ public interface WorkspaceService {
 
     Workspace createWorkspace(WorkspaceRequest workspaceRequest);
 
-    List<Workspace> getAllWorkspaces();
+    HashMap<String, Workspace> getAllWorkspaces();
 
-    List<Workspace> getWorkspaceByTitle(String title);
+    HashMap<String, Workspace> getWorkspaceByTitle(String title);
 
     Workspace getWorkspaceById(UUID workspaceId);
 

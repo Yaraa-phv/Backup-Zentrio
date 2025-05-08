@@ -23,6 +23,7 @@ public class Task {
     private String stage;
     private UUID boardId;
     private UUID ganttBarId;
+    private String ganttBarTitle;
 //    private Board boardId;
 //    private GanttBar ganttBarId;
 }

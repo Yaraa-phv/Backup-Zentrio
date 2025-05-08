@@ -4,17 +4,18 @@ import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.model.Task;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public interface TaskService {
     Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest);
 
-    List<Task> getAllTasks(UUID boardId, UUID ganttBarId);
+    HashMap<String, Task> getAllTasks(UUID boardId, UUID ganttBarId);
 
     Task getTaskById( UUID taskId);
 
-    List<Task> getTaskByTitle(UUID boardId,String title);
+    HashMap<String, Task> getTaskByTitle(UUID boardId,String title);
 
     Task updateTaskById(UUID taskId, @Valid TaskRequest taskRequest);
 
@@ -24,8 +25,11 @@ public interface TaskService {
 
     Task deleteTaskByTaskId( UUID taskId);
 
-    Task assignUserToTaskWithRole(UUID assignedByUserId, UUID assignedToUserId, UUID boardId, UUID taskId);
+    UUID checkExistedBoardByUserId(UUID currentUserId, UUID boardId);
 
-    Task editRoleNameByBoardIdAndUserId(UUID boardId, String email);
+    Task assignRole(UUID boardId,UUID assignToUserId);
+
+    Task assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId);
+
 
 }

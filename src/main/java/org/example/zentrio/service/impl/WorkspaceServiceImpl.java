@@ -67,9 +67,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
     @Override
-    public List<Workspace> getAllWorkspaces() {
+    public HashMap<String, Workspace> getAllWorkspaces() {
 
-        return workspaceRepository.getAllWorkspaces(currentUserId());
+        HashMap<String, Workspace> workspaces = new HashMap<>();
+        for (Workspace w : workspaceRepository.getAllWorkspaces(currentUserId())){
+            workspaces.put(w.getTitle(), w);
+        }
+
+        return workspaces;
     }
 
     @Override
@@ -84,13 +89,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<Workspace> getWorkspaceByTitle(String title) {
+    public HashMap<String, Workspace> getWorkspaceByTitle(String title) {
 
         if (title.isEmpty()){
             throw new NotFoundException("Workspace Title not found!");
-        }else {
-            return workspaceRepository.getWorkspaceByTitle(title);
         }
+        HashMap<String, Workspace> workspaces = new HashMap<>();
+        for (Workspace w : workspaceRepository.getWorkspaceByTitle(title)){
+            workspaces.put(w.getTitle(), w);
+        }
+            return workspaces;
     }
 
     @Override

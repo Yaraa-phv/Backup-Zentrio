@@ -58,5 +58,13 @@ public interface RoleRepository {
     @Select("""
         SELECT role_name FROM roles WHERE role_id = #{roleId}
     """)
-    String getRoleNameByRoleId(UUID existedMemberId);
+    String getRoleNameByRoleId(UUID roledId);
+
+
+    @Select("""
+            INSERT INTO members(user_id,board_id,role_id)
+            VALUES(#{userId},#{boardId},#{roleId})
+            """)
+    void insertToMember(UUID userId, UUID boardId, UUID roleId);
+
 }

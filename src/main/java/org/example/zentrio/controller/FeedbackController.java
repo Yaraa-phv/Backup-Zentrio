@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.FeedbackRequest;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequestMapping("api/v1/feedback")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
+@Tag(name = "Feedback Controller")
 public class FeedbackController {
 
     private final FeedbackService feedbackService;

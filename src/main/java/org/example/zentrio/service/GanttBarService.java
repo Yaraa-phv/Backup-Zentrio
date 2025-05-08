@@ -21,4 +21,5 @@ public interface GanttBarService {
     void deleteGanttBarByGanttBarId(UUID geanttbarId);
 
     GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
+
 }
