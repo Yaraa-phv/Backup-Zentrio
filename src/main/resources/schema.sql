@@ -96,9 +96,9 @@ CREATE TABLE tasks (
 -- Create the task_assignment table
 CREATE TABLE task_assignment (
                                  task_assign_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                                 assigned_to UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                                 assigned_to UUID UNIQUE REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                                  assigned_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                                 task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
+                                 task_id UUID UNIQUE REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create the checklists table
@@ -108,7 +108,7 @@ CREATE TABLE checklists (
                             is_done BOOLEAN DEFAULT false,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
-                            checklist_order SERIAL,
+                            checklist_order SERAIL,
                             started_at TIMESTAMP,
                             finished_at TIMESTAMP,
                             task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -142,8 +142,8 @@ CREATE TABLE labels (
 CREATE TABLE calendars (
                            calendar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                            noted TEXT,
-                           noted_at TIMESTAMP NOT NULL ,
-                           till_date TIMESTAMP ,
+                           noted_at TIMESTAMPS NOT NULL,
+                           till_date TIMESTAMPS ,
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                            checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -175,7 +175,7 @@ CREATE TABLE attachment (
                             details JSONB,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+                            checklist_id UUID UNIQUE REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create the achievement table
