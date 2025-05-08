@@ -84,4 +84,20 @@ public interface BoardRepository {
     """)
     @ResultMap("boardMapper")
     Board updateBoardTitleByBoardId(UUID boardId, String boardTitle);
+
+    @Select("""
+        SELECT * FROM boards b INNER JOIN tasks t ON b.board_id = t.board_id WHERE task_id = #{taskId}
+    """)
+    @ResultMap("boardMapper")
+    @Result(property = "taskId", column = "task-id")
+    Board getBoardByTaskId(UUID taskId);
+
+    //From Fanau
+    @Select("""
+        SELECT COUNT(*) FROM members
+        WHERE board_id = #{boardId}
+        AND  user_id = #{userId}
+    """)
+    boolean isMemberAlreadyAssignedRoleToBoard(UUID boardId, UUID userId);
+
 }

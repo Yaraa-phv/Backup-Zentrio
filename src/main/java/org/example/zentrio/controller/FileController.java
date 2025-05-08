@@ -1,6 +1,7 @@
 package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.FileMetadata;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("api/v1/files")
 @RequiredArgsConstructor
+@Tag(name = "File Controller")
 public class FileController {
     private final FileService fileService;
 

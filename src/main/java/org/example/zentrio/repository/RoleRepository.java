@@ -40,7 +40,7 @@ public interface RoleRepository {
     @Select("""
         SELECT role_id FROM roles WHERE role_name = #{roleName}
     """)
-    UUID getRoleNameByRoleId(String roleName);
+    UUID getRoleIdByRoleName(String roleName);
 
     @Select("""
         SELECT r.role_name FROM roles r INNER JOIN members m
@@ -49,4 +49,22 @@ public interface RoleRepository {
         AND user_id = #{userId}
     """)
     String getRoleNameByUserIdAndBoardId(UUID boardId, UUID userId);
+
+    @Select("""
+        SELECT member_id FROM members where board_id = #{boardId} AND user_id = #{assignedByUserId}
+    """)
+    UUID getMemberIdByUserIdAndBoardId(UUID boardId, UUID assignedByUserId);
+
+    @Select("""
+        SELECT role_name FROM roles WHERE role_id = #{roleId}
+    """)
+    String getRoleNameByRoleId(UUID roledId);
+
+
+    @Select("""
+            INSERT INTO members(user_id,board_id,role_id)
+            VALUES(#{userId},#{boardId},#{roleId})
+            """)
+    void insertToMember(UUID userId, UUID boardId, UUID roleId);
+
 }

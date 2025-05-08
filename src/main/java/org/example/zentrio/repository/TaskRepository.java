@@ -27,6 +27,7 @@ public interface TaskRepository {
             @Result(property = "stage", column = "stage"),
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
+            @Result(property = "ganttBarTitle", column = "gantt_bar_id", one = @One(select = "org.example.zentrio.repository.GanttBarRepository.getGanttBarName")),
     })
     Task createTask(UUID boardId, UUID ganttBarId, @Param("request") TaskRequest taskRequest);
 
@@ -43,10 +44,10 @@ public interface TaskRepository {
     Task getTaskById(UUID boardId, UUID ganttBarId, UUID taskId);
 
     @Select("""
-        SELECT * FROM tasks WHERE board_id = #{boardId} AND gantt_bar_id = #{ganttBarId} AND title ILIKE '%' || #{title} || '%'
+        SELECT * FROM tasks WHERE  title ILIKE '%' || #{title} || '%'
     """)
     @ResultMap("taskMapper")
-    List<Task> getTaskByTitle(UUID boardId, UUID ganttBarId, String title);
+    List<Task> getTaskByTitle(String title);
 
     @Select("""
         UPDATE tasks SET 
@@ -79,4 +80,33 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     Task deleteTaskByTaskId(UUID taskId);
+
+    @Select("""
+        INSERT INTO task_assignment(assigned_by, assigned_to, task_id)
+        VALUES (#{assignById}, #{assignedToId}, #{taskId})
+    """)
+    void assignMemberToTaskWithRole(UUID assignById,UUID assignedToId,UUID taskId);
+
+    @Select("""
+        SELECT * FROM tasks WHERE task_id = #{taskId}
+    """)
+    @ResultMap("taskMapper")
+    Task getTaskByTaskId(UUID taskId);
+
+    @Select("""
+        SELECT * FROM tasks WHERE board_id = #{boardId} AND  title ILIKE '%' || #{title} || '%'
+    """)
+    @ResultMap("taskMapper")
+    List<Task> getAllTaskByBoardIdAndTitle(UUID boardId, String title);
+
+
+    @Select("""
+                SELECT COUNT(*) FROM task_assignment
+                WHERE task_id = #{taskId}
+                AND assigned_to = #{memberId}
+            """)
+    boolean isMemberAlreadyAssignedToTask(UUID taskId, UUID memberId);
+
+    //From Fanau
+
 }

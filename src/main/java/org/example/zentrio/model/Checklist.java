@@ -10,20 +10,14 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
-    private UUID taskId;
+public class Checklist {
+    private UUID checklistId;
     private String title;
-    private String description;
+    private Boolean isDone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer checklistOrder;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
-    private Boolean isDone;
-    private Integer taskOrder;
-    private String stage;
-    private UUID boardId;
-    private UUID ganttBarId;
-    private String ganttBarTitle;
-//    private Board boardId;
-//    private GanttBar ganttBarId;
+    private UUID taskId;
 }

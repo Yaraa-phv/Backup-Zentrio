@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ProfileRequest;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @RequestMapping("api/v1/profiles")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Profile Controller")
 public class ProfileController {
     private final ProfileService profileService;
 

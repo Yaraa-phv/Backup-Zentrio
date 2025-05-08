@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,8 +45,8 @@ public class TaskController {
 
     @Operation(summary = "Get all tasks by board id, and gantt bar id")
     @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId){
-        ApiResponse<List<Task>> response = ApiResponse.<List<Task>> builder()
+    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getAllTasks(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId){
+        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>> builder()
                 .success(true)
                 .message("Created tasks successfully!")
                 .status(HttpStatus.OK)
@@ -56,96 +57,88 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get task by board id, gantt bar id, and task id")
-    @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/task-id/{task-id}")
-    public ResponseEntity<ApiResponse<Task>> getTaskById(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId, @PathVariable("task-id") UUID taskId){
+    @Operation(summary = "Get task by task id")
+    @GetMapping("/task-id/{task-id}")
+    public ResponseEntity<ApiResponse<Task>> getTaskById(@PathVariable("task-id") UUID taskId){
         ApiResponse<Task> response = ApiResponse.<Task> builder()
                 .success(true)
                 .message("Get task by id successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.getTaskById( boardId, ganttBarId, taskId))
+                .payload(taskService.getTaskById( taskId))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get task by board id, gantt bar id, and task title")
-    @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/task-title/{title}")
-    public ResponseEntity<ApiResponse<List<Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId, @PathVariable("title") String title){
-        ApiResponse<List<Task>> response = ApiResponse.<List<Task>> builder()
+    @Operation(summary = "Get task by task title")
+    @GetMapping("/board-id/{board-id}/task-title/{title}")
+    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("title") String title){
+        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>> builder()
                 .success(true)
                 .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.getTaskByTitle(boardId, ganttBarId, title))
+                .payload(taskService.getTaskByTitle(boardId, title))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task by board id, gantt bar id, and task id")
-    @PutMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/update/{task-id}")
+    @Operation(summary = "Edit task by task id")
+    @PutMapping("/update/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskById(
-            @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
             @PathVariable("task-id") UUID taskId,
             @RequestBody @Valid TaskRequest taskRequest){
         ApiResponse<Task> response = ApiResponse.<Task> builder()
                 .success(true)
                 .message("Update task by id successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.updateTaskById(boardId, ganttBarId, taskId, taskRequest))
+                .payload(taskService.updateTaskById(taskId, taskRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task title by board id, gantt bar id, and task id")
-    @PatchMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/updateTitle/{task-id}")
+    @Operation(summary = "Edit task title by task id")
+    @PatchMapping("/updateTitle/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskTitleByTaskId(
-            @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
             @PathVariable("task-id") UUID taskId,
             @RequestBody String title){
         ApiResponse<Task> response = ApiResponse.<Task> builder()
                 .success(true)
                 .message("Update task title by task id successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.updateTaskTitleByTaskId(boardId, ganttBarId, taskId, title))
+                .payload(taskService.updateTaskTitleByTaskId(taskId, title))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task description by board id, gantt bar id, and task id")
-    @PatchMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/updateDescription/{task-id}")
+    @Operation(summary = "Edit task description by task id")
+    @PatchMapping("/updateDescription/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskDescriptionByTaskId(
-            @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
             @PathVariable("task-id") UUID taskId,
             @RequestBody String description){
         ApiResponse<Task> response = ApiResponse.<Task> builder()
                 .success(true)
                 .message("Update task description by task id successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.updateTaskDescriptionByTaskId(boardId, ganttBarId, taskId, description))
+                .payload(taskService.updateTaskDescriptionByTaskId( taskId, description))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Delete task by board id, gantt bar id, and task id")
-    @DeleteMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}/delete/{task-id}")
+    @Operation(summary = "Delete task by task id")
+    @DeleteMapping("/delete/{task-id}")
     public ResponseEntity<DeleteApiResponse<Task>> deleteTaskByTaskId(
-            @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
             @PathVariable("task-id") UUID taskId){
 
-        taskService.deleteTaskByTaskId(boardId, ganttBarId, taskId);
+        taskService.deleteTaskByTaskId( taskId);
 
         DeleteApiResponse<Task> response = DeleteApiResponse.<Task>builder()
                 .success(true)
@@ -156,5 +149,9 @@ public class TaskController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    //From Fanau
+
 
 }

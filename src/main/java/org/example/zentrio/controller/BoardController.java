@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.BoardRequest;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RequestMapping("api/v1/boards")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
+@Tag(name = "Board Controller")
 public class BoardController {
 
     private final BoardService boardService;
@@ -117,9 +119,6 @@ public class BoardController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-
-
-
 
 
 }
