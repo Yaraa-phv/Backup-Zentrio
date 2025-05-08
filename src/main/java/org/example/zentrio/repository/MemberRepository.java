@@ -78,4 +78,18 @@ public interface MemberRepository {
     """)
     @ResultMap("memberMapper")
     Member editRoleForMembersByBoardIdAndMemberId(UUID memberId, UUID roleId);
+
+
+    @Select("""
+        SELECT m.member_id
+        FROM members m
+        WHERE m.user_id = #{userId}
+    """)
+    UUID getMemberIdByUserId(UUID userId);
+
+    @Select("""
+        INSERT INTO checklist_assignments (checklist_id,assigned_by,member_id)
+        VALUES (#{checklistId},#{assignedBy},#{memberId})
+    """)
+    void insertIntoChecklistWithRoleMember(UUID checklistId, UUID assignedBy, UUID memberId);
 }

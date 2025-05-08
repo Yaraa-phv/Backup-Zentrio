@@ -24,4 +24,6 @@ public interface ChecklistService {
     Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest);
 
     Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+
+    Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId);
 }

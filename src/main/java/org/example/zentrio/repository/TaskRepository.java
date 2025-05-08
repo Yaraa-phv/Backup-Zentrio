@@ -109,4 +109,21 @@ public interface TaskRepository {
 
     //From Fanau
 
+    @Select("""
+        SELECT m.member_id FROM members m
+        INNER JOIN task_assignment tk ON m.member_id = tk.assigned_to
+        WHERE tk.task_id = #{taskId}
+        AND m.user_id = #{userId}
+    """)
+    UUID findMemberIdByUserIdAndTaskId(UUID taskId, UUID userId);
+
+    @Select("""
+                SELECT r.role_name FROM task_assignment tk
+                INNER JOIN members m ON tk.assigned_to = m.member_id
+                INNER JOIN roles r ON m.role_id = r.role_id
+                WHERE task_id = #{taskId}
+                AND m.member_id = #{assignedById}
+            """)
+    String getRoleNameByUserIdAndTaskId(UUID taskId, UUID assignedById);
+
 }

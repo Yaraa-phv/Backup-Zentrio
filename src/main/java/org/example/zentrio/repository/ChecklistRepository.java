@@ -66,4 +66,15 @@ public interface ChecklistRepository {
     @ResultMap("checklistMapper")
     Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
 
+
+
+
+
+    @Select("""
+                SELECT COUNT(*) FROM checklist_assignments
+                WHERE checklist_id = #{checklistId}
+                AND   member_id = #{memberId}
+            """)
+    boolean isExistByUserIdAndTaskId(UUID checklistId,UUID memberId);
+
 }

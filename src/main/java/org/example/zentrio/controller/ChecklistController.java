@@ -130,4 +130,17 @@ public class ChecklistController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Assign members to checklists",description = "Assign members to any checklist")
+    @PostMapping("assign-member-checklist")
+    public ResponseEntity<ApiResponse<Checklist>> assignMemberToChecklist(UUID assignedByUserId,UUID assignToUserId,UUID checklistId,UUID taskId) {
+        ApiResponse<Checklist> apiResponse = ApiResponse.<Checklist>builder()
+                .success(true)
+                .message("Assign member to task successfully")
+                .payload(checklistService.assignMemberToChecklist(assignedByUserId,assignToUserId,checklistId,taskId))
+                .status(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
 }
