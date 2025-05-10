@@ -39,12 +39,12 @@ public interface GanttBarRepository {
           select * from gantt_bars where gantt_bar_id=#{geanntbarId}
             """)
     @ResultMap("ganttBarMapping")
-    GanttBar getGanttBarByGanttBartID(UUID geanntbarId);
+    GanttBar getGanttBarByGanttBarID(UUID geanntbarId);
 
     @Select("""
                 UPDATE gantt_bars set title= #{request.title},
                                       started_at= #{request.startAt},
-                                      finished_at= #{request.finshedAt}
+                                      finished_at= #{request.finishedAt}
                                   WHERE gantt_bar_id= #{ganntbarId}
                 RETURNING *
                 
