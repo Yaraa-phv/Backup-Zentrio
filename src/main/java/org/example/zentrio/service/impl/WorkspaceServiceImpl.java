@@ -2,13 +2,16 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.WorkspaceRequest;
+import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
+import org.example.zentrio.model.Pagination;
 import org.example.zentrio.model.Workspace;
 import org.example.zentrio.repository.WorkspaceRepository;
 import org.example.zentrio.service.AppUserService;
 import org.example.zentrio.service.AuthService;
 import org.example.zentrio.service.WorkspaceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +24,6 @@ import java.util.UUID;
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
-    private final AppUserService appUserService;
     private final AuthService authService;
 
     public UUID currentUserId(){
@@ -45,9 +47,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (!existedWorkspaceId.equals(workspaceId)){
             throw new NotFoundException("Workspace Id not found");
         }
-        if (existedWorkspaceId.equals(workspaceId)){
-            return existedWorkspaceId;
-        }
         return existedWorkspaceId;
 
     }
@@ -55,27 +54,42 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Workspace createWorkspace(WorkspaceRequest workspaceRequest) {
-
-        System.out.println("User Id in Workspace : " + currentUserId());
-
-        Workspace create = workspaceRepository.createWorkspace(workspaceRequest, currentUserId());
-        System.out.println("Create Workspace : " +create);
-
-        return create;
+        return workspaceRepository.createWorkspace(workspaceRequest, currentUserId());
     }
 
 
 
     @Override
-    public HashMap<String, Workspace> getAllWorkspaces() {
+    public ApiResponse<HashMap<String, Workspace>> getAllWorkspaces(Integer page, Integer size) {
+
+        Integer offset = page * size;
+        UUID userId = currentUserId(); // Store once
 
         HashMap<String, Workspace> workspaces = new HashMap<>();
-        for (Workspace w : workspaceRepository.getAllWorkspaces(currentUserId())){
-            workspaces.put(w.getTitle(), w);
+
+        // Paginated list for current user
+        List<Workspace> workspaceList = workspaceRepository.getAllWorkspaces(userId,size,offset);
+
+        // Count workspaces for this specific user
+        Integer totalElements = workspaceRepository.countWorkspacesByUserId(userId);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        System.out.println("offset" + offset);
+
+        for (Workspace workspace : workspaceList) {
+            workspaces.put(workspace.getWorkspaceId().toString(), workspace);
         }
 
-        return workspaces;
+        return ApiResponse.<HashMap<String, Workspace>>builder()
+                .success(true)
+                .message("Get all workspaces successfully")
+                .payload(workspaces)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .pagination(new Pagination(page, totalElements, totalPages))
+                .build();
     }
+
 
     @Override
     public Workspace getWorkspaceById(UUID workspaceId) {

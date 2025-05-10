@@ -2,6 +2,7 @@ package org.example.zentrio.service;
 
 import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.TaskRequest;
+import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Task;
 
 import java.util.HashMap;
@@ -11,13 +12,13 @@ import java.util.UUID;
 public interface TaskService {
     Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest);
 
-    HashMap<String, Task> getAllTasks(UUID boardId, UUID ganttBarId);
+    ApiResponse<HashMap<String, Task>> getAllTasks(UUID boardId, UUID ganttBarId,Integer page,Integer size);
 
-    Task getTaskById( UUID taskId);
+    Task getTaskById(UUID taskId);
 
     HashMap<String, Task> getTaskByTitle(UUID boardId,String title);
 
-    Task updateTaskById(UUID taskId, @Valid TaskRequest taskRequest);
+    Task updateTaskById(UUID taskId, TaskRequest taskRequest);
 
     Task updateTaskTitleByTaskId(UUID taskId, String title);
 

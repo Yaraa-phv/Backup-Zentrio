@@ -35,9 +35,10 @@ public interface BoardRepository {
 
     @Select("""
         SELECT * FROM boards WHERE workspace_id = #{workspaceId}
+        LIMIT #{limit} OFFSET #{offset}
     """)
     @ResultMap("boardMapper")
-    List<Board> getAllBoardsByWorkspaceId(UUID workspaceId);
+    List<Board> getAllBoardsByWorkspaceId(UUID workspaceId,Integer limit,Integer offset);
 
     @Select("""
         SELECT * FROM boards WHERE workspace_id = #{workspaceId} AND board_id = #{boardId}
@@ -99,5 +100,12 @@ public interface BoardRepository {
         AND  user_id = #{userId}
     """)
     boolean isMemberAlreadyAssignedRoleToBoard(UUID boardId, UUID userId);
+
+    @Select("""
+        SELECT COUNT(*) FROM boards WHERE workspace_id = #{workspaceId}
+    """)
+    Integer getBoardCountByWorkspaceId(UUID workspaceId);
+
+
 
 }

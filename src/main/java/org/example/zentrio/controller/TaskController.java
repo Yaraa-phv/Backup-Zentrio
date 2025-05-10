@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
@@ -45,16 +46,13 @@ public class TaskController {
 
     @Operation(summary = "Get all tasks by board id, and gantt bar id")
     @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getAllTasks(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId) {
-        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>>builder()
-                .success(true)
-                .message("Created tasks successfully!")
-                .status(HttpStatus.OK)
-                .payload(taskService.getAllTasks(boardId, ganttBarId))
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getAllTasks(
+            @PathVariable("board-id") UUID boardId,
+            @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        ApiResponse<HashMap<String, Task>> response = taskService.getAllTasks(boardId,ganttBarId,page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "Get task by task id")

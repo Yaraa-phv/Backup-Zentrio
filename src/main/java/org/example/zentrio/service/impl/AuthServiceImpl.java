@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -166,7 +163,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse loginThirdParty(AuthThirdPartyRequest request) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
-                .setAudience(Collections.singletonList("67453975102-v5k4olq9qom0dop0400ika07ntf9lils.apps.googleusercontent.com"))
+//                .setAudience(Collections.singletonList("67453975102-v5k4olq9qom0dop0400ika07ntf9lils.apps.googleusercontent.com")) own google id ("Fanau")
+                .setAudience(Collections.singleton("555065390048-dcgfpec66hk6e3oqs46nhuqlpg4a8c3f.apps.googleusercontent.com"))
                 .build();
 
         GoogleIdToken idToken = verifier.verify(request.getIdToken());

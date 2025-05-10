@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.ApiResponse;
@@ -45,16 +46,12 @@ public class WorkspaceController {
 
     @Operation(summary = "Get all workspaces")
     @GetMapping()
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(){
-        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>> builder()
-                .success(true)
-                .message("Created workspace successfully!")
-                .status(HttpStatus.OK)
-                .payload(workspaceService.getAllWorkspaces())
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(
+             @RequestParam(defaultValue = "0") Integer page,
+             @RequestParam(defaultValue = "10") Integer size
+    ){
+        ApiResponse<HashMap<String, Workspace>> response = workspaceService.getAllWorkspaces(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "Get workspace by id")
