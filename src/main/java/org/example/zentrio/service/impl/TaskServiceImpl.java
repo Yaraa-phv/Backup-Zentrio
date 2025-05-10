@@ -215,10 +215,6 @@ public class TaskServiceImpl implements TaskService {
     public Task assignRole(UUID boardId, UUID assignToUserId) {
         Board boardByBoardId = boardRepository.getBoardByBoardId(boardId);
 
-        UUID resultUserId = taskRepository.findUserIdByMemberId(assignToUserId);
-        if (resultUserId == null) {
-            throw new NotFoundException("User not found in members with userId: " + assignToUserId);
-        }
 
         if (boardByBoardId == null){
             throw new NotFoundException("Board cannot found by board id!");
@@ -236,7 +232,6 @@ public class TaskServiceImpl implements TaskService {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         System.out.println("userid : " + userId);
         String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
-        System.out.println("roleName : " + roleName);
         if (roleName == null) {
             throw new BadRequestException("You are doesn't have a role to assign this task");
         }

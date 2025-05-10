@@ -137,7 +137,7 @@ public class ChecklistController {
                 .success(true)
                 .message("Assign member to task successfully")
                 .payload(checklistService.assignMemberToChecklist(assignedByUserId,assignToUserId,checklistId,taskId))
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);

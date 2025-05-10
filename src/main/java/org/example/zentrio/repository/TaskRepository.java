@@ -101,12 +101,6 @@ public interface TaskRepository {
     List<Task> getAllTaskByBoardIdAndTitle(UUID boardId, String title);
 
 
-    @Select("""
-                SELECT user_id FROM members
-                WHERE user_id = #{userId}
-            """)
-    UUID findUserIdByMemberId(UUID userId);
-
 
     @Select("""
                 SELECT COUNT(*) FROM task_assignment
