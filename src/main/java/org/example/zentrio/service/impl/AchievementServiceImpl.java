@@ -61,7 +61,6 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     public Achievement getAllAchievementByCurrentUser() {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        System.out.println("userId = " + userId);
         return achievementRepository.getAllAchievementByCurrentUser(userId);
     }
 }
