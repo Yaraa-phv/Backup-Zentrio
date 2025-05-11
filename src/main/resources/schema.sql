@@ -108,7 +108,7 @@ CREATE TABLE checklists (
                             is_done BOOLEAN DEFAULT false,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
-                            checklist_order SERAIL,
+                            checklist_order SERIAL,
                             started_at TIMESTAMP,
                             finished_at TIMESTAMP,
                             task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -142,10 +142,10 @@ CREATE TABLE labels (
 CREATE TABLE calendars (
                            calendar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                            noted TEXT,
-                           noted_at TIMESTAMPS NOT NULL,
-                           till_date TIMESTAMPS ,
+                           noted_at TIMESTAMP NOT NULL,
+                           till_date TIMESTAMP ,
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                           checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+                           task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
