@@ -66,7 +66,7 @@ public class GanttChartController {
                 .success(true)
                 .message("Update GanttChart BY GanttChartID successfully!")
                 .status(HttpStatus.CREATED)
-                .payload(ganttChartService.updateGannntCjhartById(ganttChartId, ganttChartRequest))
+                .payload(ganttChartService.updateGannntChartById(ganttChartId, ganttChartRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);}

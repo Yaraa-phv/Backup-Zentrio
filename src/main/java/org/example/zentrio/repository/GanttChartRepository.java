@@ -49,7 +49,7 @@ public interface GanttChartRepository {
         RETURNING *
         """)
     @ResultMap("ganttChartMapper")
-    GanttChart updateGannntCjhartById(UUID ganttChartId,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
+    GanttChart updateGannntChartById(UUID ganttChartId,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
 
 
     @Select("""
