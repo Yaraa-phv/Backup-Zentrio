@@ -12,7 +12,7 @@ public interface GanttChartService {
 
     GanttChart getGanttChartByBoardId(UUID boardId);
 
-    GanttChart updateGannntCjhartById(UUID ganttChartId, GanttChartRequest ganttChartRequest);
+    GanttChart updateGannntChartById(UUID ganttChartId, GanttChartRequest ganttChartRequest);
 
     Void deleteGanttChartByID(UUID ganttChartId);
 

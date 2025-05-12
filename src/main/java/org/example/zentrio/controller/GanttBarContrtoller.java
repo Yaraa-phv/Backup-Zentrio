@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,9 +48,9 @@ public class GanttBarContrtoller {
 
     @GetMapping("gantt-chart-id/{ganntChartId}")
     @Operation(summary = "Get Gannt-bars by Gantt-Chart Id")
-    public ResponseEntity<ApiResponse<List<GanttBar>>> getAllGanttBarByGanttChartID(@PathVariable("ganntChartId") UUID ganntChartId){
+    public ResponseEntity<ApiResponse<HashMap<String,GanttBar>>> getAllGanttBarByGanttChartID(@PathVariable("ganntChartId") UUID ganntChartId){
 
-        ApiResponse<List<GanttBar>> response = ApiResponse.<List<GanttBar>>builder()
+        ApiResponse<HashMap<String,GanttBar>> response = ApiResponse.<HashMap<String,GanttBar>>builder()
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
                 .payload(ganttBarService.getAllGanttBarByGanttChartID(ganntChartId))
@@ -67,7 +68,7 @@ public class GanttBarContrtoller {
         ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
-                .payload( ganttBarService.getGanttBarByGanttBartID(geanntbarId))
+                .payload( ganttBarService.getGanttBarByGanttBarID(geanntbarId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
