@@ -18,7 +18,7 @@ public interface TaskRepository {
             @Result(property = "taskId", column = "task_id"),
             @Result(property = "title", column = "title"),
             @Result(property = "description", column = "description"),
-            @Result(property = "isDone", column = "is_done"),
+            @Result(property = "status", column = "status"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "startedAt", column = "started_at"),

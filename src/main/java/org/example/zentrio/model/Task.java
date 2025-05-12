@@ -18,12 +18,10 @@ public class Task {
     private LocalDateTime updatedAt;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
-    private Boolean isDone;
+    private String status;
     private Integer taskOrder;
     private String stage;
     private UUID boardId;
     private UUID ganttBarId;
     private String ganttBarTitle;
-//    private Board boardId;
-//    private GanttBar ganttBarId;
 }
