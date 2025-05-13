@@ -69,7 +69,8 @@ public class BoardServiceImpl implements BoardService {
         if (existedWorkspaceIdById == null) {
             throw new NotFoundException("Workspace cannot found!");
         }
-        Integer offset = page * size;
+        Integer offset = (page -1) * size;
+
         List<Board> boardList = boardRepository.getAllBoardsByWorkspaceId(workspaceId, size, offset);
 
         HashMap<String, Board> boards = new HashMap<>();

@@ -50,8 +50,8 @@ public class TaskController {
     public ResponseEntity<ApiResponse<HashSet<Task>>> getAllTasks(
             @PathVariable("board-id") UUID boardId,
             @PathVariable("gantt-bar-id") UUID ganttBarId,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "0") @Positive Integer page,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
         ApiResponse<HashSet<Task>> response = taskService.getAllTasks(boardId,ganttBarId,page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

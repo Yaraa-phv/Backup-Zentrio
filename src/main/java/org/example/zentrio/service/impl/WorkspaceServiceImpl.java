@@ -62,7 +62,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public ApiResponse<HashMap<String, Workspace>> getAllWorkspaces(Integer page, Integer size) {
 
-        Integer offset = page * size;
+        Integer offset = (page -1) * size;
         UUID userId = currentUserId(); // Store once
 
         HashMap<String, Workspace> workspaces = new HashMap<>();

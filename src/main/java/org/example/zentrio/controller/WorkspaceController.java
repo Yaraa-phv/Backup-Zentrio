@@ -47,8 +47,8 @@ public class WorkspaceController {
     @Operation(summary = "Get all workspaces")
     @GetMapping
     public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(
-             @RequestParam(defaultValue = "0") Integer page,
-             @RequestParam(defaultValue = "10") Integer size
+             @RequestParam(defaultValue = "1") @Positive Integer page,
+             @RequestParam(defaultValue = "10") @Positive Integer size
     ){
         ApiResponse<HashMap<String, Workspace>> response = workspaceService.getAllWorkspaces(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);

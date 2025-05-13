@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.ApiResponse;
@@ -41,11 +42,11 @@ public class BoardController {
     }
 
     @Operation(summary = "Get all boards",description = "Get all boards by workspace ID")
-    @GetMapping("/{workspace-id}")
+    @GetMapping("workspaces/{workspace-id}")
     public ResponseEntity<ApiResponse<HashMap<String,Board>>> getAllBoardsByWorkspaceId(
             @PathVariable("workspace-id") UUID workspaceId,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "1") @Positive Integer page,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
         ApiResponse<HashMap<String,Board>> response = boardService.getAllBoardsByWorkspaceId(workspaceId,page,size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

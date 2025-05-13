@@ -119,7 +119,7 @@ public class TaskServiceImpl implements TaskService {
     public ApiResponse<HashSet<Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
 
 
-        Integer offset = page * size;
+        Integer offset = (page -1) * size;
 
         List<UUID> existedIds = checkExistedBoardIdAndGanttBarId(boardId, ganttBarId);
         UUID existedBoardId = existedIds.get(0);
