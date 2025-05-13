@@ -94,7 +94,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public Workspace getWorkspaceById(UUID workspaceId) {
 
-        checkExistedWorkspaceId(workspaceId);
+//        checkExistedWorkspaceId(workspaceId);
         if (checkExistedWorkspaceId(workspaceId) == null){
             throw new BadRequestException("Cannot access to get this workspace!");
         }
@@ -139,7 +139,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public Workspace updateWorkspaceDescriptionByWorkspaceId(UUID workspaceId, String description) {
 
-        checkExistedWorkspaceId(workspaceId);
+        getWorkspaceById(workspaceId);
         Workspace request = workspaceRepository.getWorkspaceById(workspaceId, currentUserId());
         request.setTitle(description);
         request.setUpdatedAt(LocalDateTime.now());

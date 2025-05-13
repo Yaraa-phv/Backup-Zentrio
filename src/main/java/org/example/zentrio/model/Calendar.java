@@ -6,20 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Achievement {
-    private UUID achievementId;
-    private String achievementName;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Map<String, List<Board>> details;
+public class Calendar {
+    private UUID calendarId;
+    private String noted;
+    private LocalDateTime notedAt;
+    private LocalDateTime tillDate;
+    private UUID taskId;
     private UUID userId;
-
 }

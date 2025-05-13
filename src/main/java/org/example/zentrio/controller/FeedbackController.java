@@ -56,7 +56,7 @@ public class FeedbackController {
         return   ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get-feedback-by-id/{feedback-id}")
+    @GetMapping("/{feedback-id}")
     @Operation(summary = "Get all  feedback by taskId ")
     public ResponseEntity<ApiResponse<Feedback>>  getFeedbackById(
             @PathVariable("feedback-id") UUID feedbackId) {

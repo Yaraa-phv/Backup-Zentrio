@@ -6,13 +6,14 @@ import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Task;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
 public interface TaskService {
     Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest);
 
-    ApiResponse<HashMap<String, Task>> getAllTasks(UUID boardId, UUID ganttBarId,Integer page,Integer size);
+    ApiResponse<HashSet<Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size);
 
     Task getTaskById(UUID taskId);
 

@@ -24,7 +24,7 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @Operation(summary = "Get attachment", description = "Get attachment by checklist id")
-    @GetMapping("get-attachment/{checklist-id}")
+    @GetMapping("/{checklist-id}")
     public ResponseEntity<ApiResponse<Attachment>> getAttachmentByChecklistId(@PathVariable("checklist-id") UUID checklistId) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
@@ -36,8 +36,8 @@ public class AttachmentController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Created attachment", description = "Created attachment by checklist id")
-    @PostMapping("create-attachment")
+    @Operation(summary = "Create attachment", description = "Created attachment by checklist id")
+    @PostMapping
     public ResponseEntity<ApiResponse<Attachment>> createAttachment(@Valid @RequestBody AttachmentRequest attachmentRequest, UUID checklistId) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
@@ -50,8 +50,8 @@ public class AttachmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "Updated attachment", description = "Updated attachment by attachment id")
-    @PutMapping("updated-attachment/{attachment-id}")
+    @Operation(summary = "Update attachment", description = "Updated attachment by attachment id")
+    @PutMapping("/{attachment-id}")
     public ResponseEntity<ApiResponse<Attachment>> updateAttachment(@Valid @RequestBody AttachmentRequest attachmentRequest, @PathVariable("attachment-id") UUID attachmentId) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
@@ -64,8 +64,8 @@ public class AttachmentController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Deleted attachment", description = "Deleted attachment by attachment id")
-    @DeleteMapping("deleted-attachment/{attachment-id}")
+    @Operation(summary = "Delete attachment", description = "Deleted attachment by attachment id")
+    @DeleteMapping("/{attachment-id}")
     public ResponseEntity<ApiResponse<Attachment>> deleteAttachmentById(@PathVariable("attachment-id") UUID attachmentId) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)

@@ -28,7 +28,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "Get all members by board id")
-    @GetMapping("/getAll/board-id/{board-id}")
+    @GetMapping("/{board-id}")
     public ResponseEntity<ApiResponse<HashMap<String, Member>>> getAllMembersByBoardId(@PathVariable("board-id")UUID boardId){
 
         ApiResponse<HashMap<String, Member>> response = ApiResponse.<HashMap<String, Member>>builder()
@@ -43,7 +43,7 @@ public class MemberController {
     }
 
     @Operation(summary = "Invite members by board id")
-    @GetMapping("/invite/board-id/{board-id}/email/{email}")
+    @GetMapping("/{board-id}/email/{email}")
     public ResponseEntity<ApiResponse<HashMap<String, Member>>> inviteMembersByBoardIdAndEmails(@PathVariable("board-id")UUID boardId, @PathVariable("email") List<String> emails){
 
         ApiResponse<HashMap<String, Member>> response = ApiResponse.<HashMap<String, Member>>builder()
@@ -58,7 +58,7 @@ public class MemberController {
     }
 
     @Operation(summary = "Edit role for member by board id and member id")
-    @PutMapping("/edit-role/board-id/{board-id}/member-id/{member-id}")
+    @PutMapping("/{board-id}/members/{member-id}")
     public ResponseEntity<ApiResponse<Member>> editRoleForMembersByBoardIdAndMemberId(
             @PathVariable("board-id")UUID boardId,
             @PathVariable("member-id") UUID memberId,

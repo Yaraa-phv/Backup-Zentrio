@@ -24,7 +24,7 @@ public class AchievementController {
 
 
     @Operation(summary = "Get achievement", description = "Get achievement for a user")
-    @GetMapping("/get-achievement")
+    @GetMapping
     ResponseEntity<ApiResponse<Achievement>> getAllAchievementsByCurrentUser() {
         ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
                 .success(true)
@@ -36,12 +36,12 @@ public class AchievementController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "set up achievement", description = "set up achievement for a user")
-    @PostMapping("/setup-achievement")
+    @Operation(summary = "Set up achievement", description = "set up achievement for a user")
+    @PostMapping
     public ResponseEntity<ApiResponse<Achievement>> createAchievement(@Valid @RequestBody AchievementRequest achievementRequest) {
         ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
                 .success(true)
-                .message("Created achievement successfully")
+                .message("Create achievement successfully")
                 .payload(achievementService.createAchievement(achievementRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
@@ -49,13 +49,13 @@ public class AchievementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "updated achievement", description = "update achievement for a user")
-    @PutMapping("/update-achievement")
+    @Operation(summary = "Updated achievement", description = "update achievement for a user")
+    @PutMapping
     public ResponseEntity<ApiResponse<Achievement>> updateAchievement(@Valid @RequestBody AchievementRequest achievementRequest) {
         System.out.println("Details: " + achievementRequest.getDetails());
         ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
                 .success(true)
-                .message("Created achievement successfully")
+                .message("Update achievement successfully")
                 .payload(achievementService.updateAchievement(achievementRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())

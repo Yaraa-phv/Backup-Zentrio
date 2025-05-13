@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,7 +116,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ApiResponse<HashMap<String, Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
+    public ApiResponse<HashSet<Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
 
 
         Integer offset = page * size;
@@ -129,15 +130,13 @@ public class TaskServiceImpl implements TaskService {
         List<Task> taskList = taskRepository.getAllTasks(boardId, ganttBarId, size, offset);
 
 
-        HashMap<String, Task> tasks = new HashMap<>();
-        for (Task task : taskList) {
-            tasks.put(task.getTitle(), task);
-        }
+        HashSet<Task> tasks = new HashSet<>();
+        tasks.addAll(taskList);
 
         Integer totalElements = taskRepository.countTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
         Integer totalPages = (int) Math.ceil(totalElements / (double) size);
 
-        return ApiResponse.<HashMap<String, Task>>builder()
+        return ApiResponse.<HashSet<Task>>builder()
                 .success(true)
                 .message("Get all tasks successfully")
                 .payload(tasks)

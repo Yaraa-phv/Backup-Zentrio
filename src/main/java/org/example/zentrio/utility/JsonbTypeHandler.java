@@ -5,10 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.Map;
 
+@Component
 public class JsonbTypeHandler extends BaseTypeHandler<Map<String, Object>> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

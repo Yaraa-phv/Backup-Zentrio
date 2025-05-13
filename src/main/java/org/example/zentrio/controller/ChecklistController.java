@@ -28,7 +28,7 @@ public class ChecklistController {
     private final ChecklistService checklistService;
 
     @Operation(summary = "Create checklist by task id")
-    @PostMapping("/task-id/{task-id}")
+    @PostMapping("/{task-id}")
     public ResponseEntity<ApiResponse<Checklist>> createChecklist(
             @PathVariable("task-id") UUID taskId,
             @RequestBody ChecklistRequest checklistRequest){
@@ -46,7 +46,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Get all checklists by task id")
-    @GetMapping("/task-id/{task-id}")
+    @GetMapping("/{task-id}")
     public ResponseEntity<ApiResponse<HashMap<String, Checklist>>> getAllChecklistByTaskId(
             @PathVariable("task-id") UUID taskId){
 
@@ -62,7 +62,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Get checklist by task id and checklist id")
-    @GetMapping("/task-id/{task-id}/checklist-id/{checklist-id}")
+    @GetMapping("/task/{task-id}/checklist/{checklist-id}")
     public ResponseEntity<ApiResponse<Checklist>> getChecklistByTaskIdAndChecklistId(
             @PathVariable("task-id") UUID taskId,
             @PathVariable("checklist-id") UUID checklistId){
@@ -79,7 +79,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Get checklist by task id and title")
-    @GetMapping("/task-id/{task-id}/title/{title}")
+    @GetMapping("/task/{task-id}/checklist/{title}")
     public ResponseEntity<ApiResponse<HashMap<String, Checklist>>> getChecklistByTaskIdAndTitle(
             @PathVariable("task-id") UUID taskId,
             @PathVariable("title") String title
@@ -96,7 +96,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Edit checklist by task id and checklist id")
-    @PutMapping("/task-id/{task-id}/checklist-id/{checklist-id}")
+    @PutMapping("/task/{task-id}/checklist/{checklist-id}")
     public ResponseEntity<ApiResponse<Checklist>> updateChecklistById(
             @PathVariable("task-id") UUID taskId,
             @PathVariable("checklist-id") UUID checklistId,
@@ -113,7 +113,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Delete checklist by task id and checklist id")
-    @DeleteMapping("/task-id/{task-id}/checklist-id/{checklist-id}")
+    @DeleteMapping("/{task-id}/checklist/{checklist-id}")
     public ResponseEntity<DeleteApiResponse<Checklist>> deleteChecklistByTaskIdAndChecklist(
             @PathVariable("task-id") UUID taskId,
             @PathVariable("checklist-id") UUID checklistId){
@@ -131,8 +131,8 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Assign members to checklists",description = "Assign members to any checklist")
-    @PostMapping("assign-member-checklist")
-    public ResponseEntity<ApiResponse<Checklist>> assignMemberToChecklist(UUID assignedByUserId,UUID assignToUserId,UUID checklistId,UUID taskId) {
+    @PostMapping("{checklist-id}/members/{assigned-by}/members/{assigned-to}/tasks/{task-id}")
+    public ResponseEntity<ApiResponse<Checklist>> assignMemberToChecklist(@PathVariable("assigned-by") UUID assignedByUserId,@PathVariable("assigned-to") UUID assignToUserId,@PathVariable("checklist-id") UUID checklistId,@PathVariable("task-id") UUID taskId) {
         ApiResponse<Checklist> apiResponse = ApiResponse.<Checklist>builder()
                 .success(true)
                 .message("Assign member to task successfully")

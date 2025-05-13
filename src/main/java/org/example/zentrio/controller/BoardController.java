@@ -27,8 +27,8 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @Operation(summary = "created new board",description = "create a new board by workspace ID")
-    @PostMapping("/create-board")
+    @Operation(summary = "Created new board",description = "create a new board by workspace ID")
+    @PostMapping
     public ResponseEntity<ApiResponse<Board>> createBoard(@Valid @RequestBody BoardRequest boardRequest, UUID workspaceId) {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
@@ -51,7 +51,7 @@ public class BoardController {
     }
 
     @Operation(summary = "Update board",description = "Update board by board ID")
-    @PutMapping("update/{board-id}")
+    @PutMapping("/{board-id}")
     public ResponseEntity<ApiResponse<Board>> updateBoardByBoardId(@Valid @RequestBody BoardRequest boardRequest,@PathVariable("board-id") UUID boardId) {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
@@ -65,11 +65,11 @@ public class BoardController {
     }
 
     @Operation(summary = "Deleted board",description = "Deleted a board by board ID")
-    @DeleteMapping("delete/{board-id}")
+    @DeleteMapping("/{board-id}")
     public ResponseEntity<ApiResponse<Board>> deleteBoardByBoardId(@PathVariable("board-id") UUID boardId) {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
-                .message("Deleted board successfully.")
+                .message("Delete board successfully.")
                 .payload(boardService.deleteBoardByBoardId(boardId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -80,7 +80,7 @@ public class BoardController {
 
 
     @Operation(summary = "Get board by ID ",description = "Get a board by board ID")
-    @GetMapping("by-id/{board-id}")
+    @GetMapping("/{board-id}")
     public ResponseEntity<ApiResponse<Board>> getBoardByBoardId(@PathVariable("board-id") UUID boardId) {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
@@ -93,7 +93,7 @@ public class BoardController {
     }
 
     @Operation(summary = "Get board by title ",description = "Get a board by board title")
-    @GetMapping("by-title/{board-title}")
+    @GetMapping("/{board-title}")
     public ResponseEntity<ApiResponse<List<Board>>> getBoardByBoardTitle(@PathVariable("board-title") String boardTitle) {
         ApiResponse<List<Board>> apiResponse = ApiResponse.<List<Board>>builder()
                 .success(true)
@@ -106,11 +106,11 @@ public class BoardController {
     }
 
     @Operation(summary = "Update board title ",description = "Get a board title")
-    @PatchMapping("update/title/{board-title}")
-    public ResponseEntity<ApiResponse<Board>> updateBoardTitleByBoardId(UUID boardId, @PathVariable("board-title") String boardTitle) {
+    @PatchMapping("/{board-id}")
+    public ResponseEntity<ApiResponse<Board>> updateBoardTitleByBoardId(@PathVariable("board-id") UUID boardId, @RequestParam String boardTitle) {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
-                .message("Get board by title successfully.")
+                .message("Update board by title successfully.")
                 .payload(boardService.updateBoardTitleByBoardId(boardId,boardTitle))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())

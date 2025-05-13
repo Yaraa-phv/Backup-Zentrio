@@ -31,7 +31,7 @@ public class WorkspaceController {
     WorkspaceService workspaceService;
 
     @Operation(summary = "Create workspace")
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApiResponse<Workspace>> createWorkspace(@RequestBody @Valid WorkspaceRequest workspaceRequest){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
@@ -45,7 +45,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Get all workspaces")
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(
              @RequestParam(defaultValue = "0") Integer page,
              @RequestParam(defaultValue = "10") Integer size
@@ -55,7 +55,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Get workspace by id")
-    @GetMapping("workspace-id/{workspace-id}")
+    @GetMapping("/{workspace-id}")
     public ResponseEntity<ApiResponse<Workspace>> getWorkspaceById(@PathVariable("workspace-id") UUID workspaceId){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
@@ -69,7 +69,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Get workspace by title")
-    @GetMapping("title/{title}")
+    @GetMapping("/{title}")
     public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title){
         ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>> builder()
                 .success(true)
@@ -83,7 +83,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Edit workspace by id")
-    @PutMapping("/update/{workspace-id}")
+    @PutMapping("/{workspace-id}")
     public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceById(@PathVariable("workspace-id") UUID workspaceId, @RequestBody @Valid WorkspaceRequest workspaceRequest){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
@@ -97,7 +97,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Edit workspace title by workspace id")
-    @PatchMapping("/updateTitle/{workspace-id}")
+    @PatchMapping("/{workspace-id}")
     public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceTitleByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String title){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
@@ -111,7 +111,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Edit workspace description by workspace id")
-    @PatchMapping("/updateDescription/{workspace-id}")
+    @PatchMapping("/descriptions/{workspace-id}")
     public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceDescriptionByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String description){
         ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
                 .success(true)
@@ -125,7 +125,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Delete workspace by workspace id")
-    @DeleteMapping("delete/workspace-id/{workspace-id}")
+    @DeleteMapping("/{workspace-id}")
     public ResponseEntity<DeleteApiResponse<Workspace>> deleteWorkspaceByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId){
 
         workspaceService.deleteWorkspaceByWorkspaceId(workspaceId);
@@ -141,7 +141,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Get all workspaces for all users")
-    @GetMapping("/for-all-users")
+    @GetMapping("/users")
     public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspacesForAllUsers(){
 
         ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
@@ -156,7 +156,7 @@ public class WorkspaceController {
     }
 
     @Operation(summary = "Get workspace by workspace id for all users")
-    @GetMapping("/for-all-users/workspace-id/{workspace-id}")
+    @GetMapping("/users/{workspace-id}")
     public ResponseEntity<ApiResponse<Workspace>> getWorkspaceByIdForAllUsers(@PathVariable("workspace-id") UUID workspaceId){
 
         ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()

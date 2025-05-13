@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/gantt-chart")
+@RequestMapping("/api/v1/gantt-charts")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Gantt Chart Controller")
@@ -44,13 +44,13 @@ public class GanttChartController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get All GanttChart By BoardID")
-    @GetMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByBoardId(@PathVariable("boardId") UUID boardId){
+    @Operation(summary = "Get all gantt charts by board ID")
+    @GetMapping("/{board-id}")
+    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByBoardId(@PathVariable("board-id") UUID boardId){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
-                .message("Get All GanttChart successfully!")
+                .message("Get all gantt charts successfully!")
                 .status(HttpStatus.FOUND)
                 .payload(ganttChartService.getGanttChartByBoardId(boardId))
                 .timestamp(LocalDateTime.now())
