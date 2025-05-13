@@ -23,7 +23,7 @@ public class TaskRequest {
     @JsonSerialize
     @JsonFormat
     private LocalDateTime startedAt;
-    @FutureOrPresent(message = "Start Date better in present or future!")
+    @FutureOrPresent(message = "Finish Date better in present or future!")
     @JsonFormat
     private LocalDateTime finishedAt;
 }

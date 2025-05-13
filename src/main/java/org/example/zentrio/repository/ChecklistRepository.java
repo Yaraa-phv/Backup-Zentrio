@@ -38,10 +38,10 @@ public interface ChecklistRepository {
     List<Checklist> getAllChecklistByTaskId(UUID taskId);
 
     @Select("""
-        SELECT * FROM checklists WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
+        SELECT * FROM checklists WHERE checklist_id = #{checklistId}
     """)
     @ResultMap("checklistMapper")
-    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
+    Checklist getChecklistByChecklistId(UUID checklistId);
 
     @Select("""
         SELECT * FROM checklists WHERE task_id = #{taskId} AND title ILIKE '%' || #{title} || '%'
@@ -61,10 +61,10 @@ public interface ChecklistRepository {
     Checklist updateChecklistById(UUID taskId, UUID checklistId, @Param("request") ChecklistRequest checklistRequest);
 
     @Select("""
-        DELETE FROM checklists WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
+        DELETE FROM checklists WHERE checklist_id = #{checklistId}
     """)
     @ResultMap("checklistMapper")
-    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+    Checklist deleteChecklistByChecklist( UUID checklistId);
 
 
 

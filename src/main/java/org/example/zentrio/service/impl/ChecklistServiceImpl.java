@@ -7,7 +7,6 @@ import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.Checklist;
-import org.example.zentrio.model.Role;
 import org.example.zentrio.model.Task;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.AuthService;
@@ -15,6 +14,7 @@ import org.example.zentrio.service.ChecklistService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -102,32 +102,28 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
-    public HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId) {
+    public List<Checklist> getAllChecklistByTaskId(UUID taskId) {
 
-        HashMap<String , Checklist> checklists = new HashMap<>();
         taskId = checkTaskIdToGetChecklist(taskId);
 
-        for (Checklist c : checklistRepository.getAllChecklistByTaskId(taskId)){
-            checklists.put(c.getChecklistId().toString(), c);
-            System.out.println(c);
-        }
-
-        return checklists;
+        return checklistRepository.getAllChecklistByTaskId(taskId);
 
     }
 
     @Override
-    public Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId) {
+    public Checklist getChecklistChecklistId( UUID checklistId) {
 
-        taskId = checkTaskIdToGetChecklist(taskId);
-        if (taskId == null){
-            throw new NotFoundException("Checklist not found by task id!");
-        }
-
-        Checklist checklist = checklistRepository.getChecklistByTaskIdAndChecklistId(taskId, checklistId);
+        Checklist checklist = checklistRepository.getChecklistByChecklistId(checklistId);
         if (checklist == null){
             throw new NotFoundException("Checklist not found by task id and checklist id!!");
         }
+
+        UUID taskId = checklist.getTaskId();
+        if (taskId == null){
+            throw new NotFoundException("Checklist not found by task id!");
+        }
+        checkTaskIdToGetChecklist(taskId);
+
 
         return checklist;
 
@@ -151,34 +147,38 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
-    public Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest) {
+    public Checklist updateChecklistById(UUID checklistId, ChecklistRequest checklistRequest) {
 
         UUID currentUserId = authService.getCurrentAppUserId();
-        taskId = checkExistedTaskId(taskId, currentUserId);
-        taskId = checkTaskIdToGetChecklist(taskId);
+        Checklist checklist = getChecklistChecklistId(checklistId);
+        if (checklist == null){
+            throw new NotFoundException("Checklist not found!");
+        }
+        UUID taskId = checklist.getTaskId();
         if (taskId == null){
             throw new NotFoundException("Checklist not found by task id!");
         }
-        Checklist checklist = getChecklistByTaskIdAndChecklistId(taskId, checklistId);
+        checkExistedTaskId(taskId, currentUserId);
 
-        return checklistRepository.updateChecklistById(checklist.getTaskId(), checklist.getChecklistId(), checklistRequest);
+
+        return checklistRepository.updateChecklistById(taskId, checklist.getChecklistId(), checklistRequest);
     }
 
     @Override
-    public Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId) {
+    public Checklist deleteChecklistByChecklist(UUID checklistId) {
 
-        UUID currentUserId = authService.getCurrentAppUserId();
-        taskId = checkExistedTaskId(taskId, currentUserId);
-        taskId = checkTaskIdToGetChecklist(taskId);
-        if (taskId == null){
-            throw new NotFoundException("Checklist not found by task id!");
-        }
-        Checklist checklist = getChecklistByTaskIdAndChecklistId(taskId, checklistId);
+        Checklist checklist = getChecklistChecklistId(checklistId);
         if (checklist == null){
             throw new NotFoundException("Checklist not found by task id and checklist id!");
         }
+        UUID currentUserId = authService.getCurrentAppUserId();
+        UUID taskId = checklist.getTaskId();
+        if (taskId == null){
+            throw new NotFoundException("Checklist not found by task id!");
+        }
+        checkExistedTaskId(taskId, currentUserId);
 
-        return checklistRepository.deleteChecklistByTaskIdAndChecklist(checklist.getTaskId(), checklist.getChecklistId());
+        return checklistRepository.deleteChecklistByChecklist(checklist.getChecklistId());
     }
 
     @Override

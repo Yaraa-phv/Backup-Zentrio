@@ -60,7 +60,7 @@ public class GanttChartController {
 
     @Operation(summary = "Update GanttChart By GanttChartID")
     @PutMapping("/{ganttChartID}")
-    public ResponseEntity<ApiResponse<GanttChart>> updateGannntCjhartById(@PathVariable("ganttChartID") UUID ganttChartId,@Valid @RequestBody GanttChartRequest ganttChartRequest){
+    public ResponseEntity<ApiResponse<GanttChart>> updateGanttChartById(@PathVariable("ganttChartID") UUID ganttChartId,@Valid @RequestBody GanttChartRequest ganttChartRequest){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)

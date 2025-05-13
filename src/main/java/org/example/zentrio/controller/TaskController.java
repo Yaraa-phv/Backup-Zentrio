@@ -10,7 +10,6 @@ import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.DeleteApiResponse;
 import org.example.zentrio.model.Task;
-import org.example.zentrio.model.Workspace;
 import org.example.zentrio.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,28 +29,39 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @Operation(summary = "Create task by board id, and gantt bar id")
-    @PostMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<Task>> createTask(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId, @RequestBody @Valid TaskRequest taskRequest) {
+    @Operation(summary = "Create task by gantt bar id")
+    @PostMapping("/gantt-bar-id/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<Task>> createTask(
+            @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @RequestBody @Valid TaskRequest taskRequest) {
         ApiResponse<Task> response = ApiResponse.<Task>builder()
                 .success(true)
-                .message("Created board successfully!")
+                .message("Created task by gantt bar id successfully!")
                 .status(HttpStatus.CREATED)
-                .payload(taskService.createTask(boardId, ganttBarId, taskRequest))
+                .payload(taskService.createTask( ganttBarId, taskRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get all tasks by board id, and gantt bar id")
-    @GetMapping("/board-id/{board-id}/gantt-bar-id/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getAllTasks(
-            @PathVariable("board-id") UUID boardId,
+    @Operation(summary = "Get all tasks by gantt bar id")
+    @GetMapping("/gantt-bar-id/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<List<Task>>> getAllTasksByGanttBarId(
             @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @RequestParam(defaultValue = "0")  Integer page,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        ApiResponse<List<Task>> response = taskService.getAllTasksByGanttBarId(ganttBarId,page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "Get all tasks by board id")
+    @GetMapping("boards/board-id/{board-id}")
+    public ResponseEntity<ApiResponse<List<Task>>> getAllTasksByBoardId(
+            @PathVariable("board-id") UUID boardId,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
-        ApiResponse<HashMap<String, Task>> response = taskService.getAllTasks(boardId,ganttBarId,page, size);
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        ApiResponse<List<Task>> response = taskService.getAllTasksByBoardId(boardId,page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -69,12 +79,14 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get task by task title")
-    @GetMapping("/board-id/{board-id}/task-title/{title}")
-    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("title") String title) {
-        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>>builder()
+    @Operation(summary = "Get task by board id task title")
+    @GetMapping("boards/board-id/{board-id}/")
+    public ResponseEntity<ApiResponse<List<Task>>> getTaskByTitle(
+            @PathVariable("board-id") UUID boardId,
+            @RequestParam String title) {
+        ApiResponse<List<Task>> response = ApiResponse.<List<Task>>builder()
                 .success(true)
-                .message("Get workspace by title successfully!")
+                .message("Get tasks by board id and title successfully!")
                 .status(HttpStatus.OK)
                 .payload(taskService.getTaskByTitle(boardId, title))
                 .timestamp(LocalDateTime.now())
@@ -83,7 +95,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task by task id")
+    @Operation(summary = "Update task by task id")
     @PutMapping("/update/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskById(
             @PathVariable("task-id") UUID taskId,
@@ -99,7 +111,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task title by task id")
+    @Operation(summary = "Update task title by task id")
     @PatchMapping("/updateTitle/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskTitleByTaskId(
             @PathVariable("task-id") UUID taskId,
@@ -115,7 +127,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit task description by task id")
+    @Operation(summary = "Update task description by task id")
     @PatchMapping("/updateDescription/{task-id}")
     public ResponseEntity<ApiResponse<Task>> updateTaskDescriptionByTaskId(
             @PathVariable("task-id") UUID taskId,
@@ -148,6 +160,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    
 
     //From Fanau
 

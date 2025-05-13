@@ -32,11 +32,18 @@ public interface TaskRepository {
     Task createTask(UUID boardId, UUID ganttBarId, @Param("request") TaskRequest taskRequest);
 
     @Select("""
-                SELECT * FROM tasks WHERE board_id = #{boardId} AND gantt_bar_id = #{ganttBarId}
+                SELECT * FROM tasks WHERE gantt_bar_id = #{ganttBarId}
                 LIMIT #{limit} OFFSET #{offset}
             """)
     @ResultMap("taskMapper")
-    List<Task> getAllTasks(UUID boardId, UUID ganttBarId, Integer limit, Integer offset);
+    List<Task> getAllTasksByGanttBarId(UUID ganttBarId, Integer limit, Integer offset);
+
+    @Select("""
+                SELECT * FROM tasks WHERE board_id = #{boardId}
+                LIMIT #{limit} OFFSET #{offset}
+            """)
+    @ResultMap("taskMapper")
+    List<Task> getAllTasksByBoardId(UUID boardId, Integer limit, Integer offset);
 
     @Select("""
                 SELECT * FROM tasks WHERE board_id = #{boardId} AND gantt_bar_id = #{ganttBarId} AND task_id = #{taskId}
@@ -131,9 +138,15 @@ public interface TaskRepository {
 
     @Select("""
                 SELECT COUNT(*) FROM tasks
-                WHERE board_id = #{boardId} AND gantt_bar_id = #{ganttBarId}
+                WHERE gantt_bar_id = #{ganttBarId}
             """)
-    Integer countTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId);
+    Integer countTasksByGanttBarId( UUID ganttBarId);
+
+    @Select("""
+                SELECT COUNT(*) FROM tasks
+                WHERE board_id = #{boardId}
+            """)
+    Integer countTasksByBoardId( UUID boardId);
 
 
 }
