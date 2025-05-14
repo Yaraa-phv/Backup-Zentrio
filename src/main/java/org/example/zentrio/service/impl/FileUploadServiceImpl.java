@@ -9,8 +9,10 @@ import com.google.api.services.drive.model.FileList;
 import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.response.Res;
+import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
+import org.example.zentrio.model.Document;
 import org.example.zentrio.service.FileUploadService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,17 +21,23 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
 
-    private final FolderServiceImpl folderService;
+    private final DocumentServiceImpl documentService;
 
     @Override
-    public List<File> getAllFilesByFolderId(String accessToken, String folderId) throws IOException, GeneralSecurityException {
+    public List<File> getAllFilesByDocumentId(String accessToken, UUID documentId) throws IOException, GeneralSecurityException {
 
-        Drive drive = folderService.createDriveService(accessToken);
+        Document document= documentService.getDocumentById(documentId);
+        if (document== null){
+            throw new NotFoundException("Document not found");
+        }
+        String folderId= document.getFolderId();
+        Drive drive = documentService.createDriveService(accessToken);
 
         String query= String.format("'%s' in parents and trashed = false", folderId);
 
@@ -48,7 +56,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public void deleteFileById(String accessToken, String fileId) throws GeneralSecurityException, IOException {
-        Drive drive = folderService.createDriveService(accessToken);
+        Drive drive = documentService.createDriveService(accessToken);
 
 
         File fileMetadata;
@@ -71,8 +79,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
     @Override
-    public File getFileById(String accessToken, String fileId) throws GeneralSecurityException, IOException {
-        Drive drive = folderService.createDriveService(accessToken);
+    public File getFileById(String accessToken, String fileId, UUID documentId) throws GeneralSecurityException, IOException {
+
+        Document document= documentService.getDocumentById(documentId);
+        if (document== null){
+            throw new NotFoundException("Document not found");
+        }
+
+        Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
         try {
             fileMetadata = drive.files().get(fileId)
@@ -94,12 +108,12 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
     @Override
-    public File createDriveFile(String accessToken, String name, String userInputType, String folderId) throws GeneralSecurityException, IOException {
+    public File createDriveFile(String accessToken, String name, FileTypes userInputType, String folderId) throws GeneralSecurityException, IOException {
 
         // Convert user input to official Google MIME type
-        String mimeType = getGoogleMimeType(userInputType);
+        String mimeType = getGoogleMimeType(userInputType.toString());
 
-        Drive drive = folderService.createDriveService(accessToken);
+        Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
         try {
             fileMetadata = drive.files().get(folderId)
@@ -136,7 +150,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Override
     public File renameDriveFile(String accessToken, String fileId, String newName) throws GeneralSecurityException, IOException {
 
-        Drive drive = folderService.createDriveService(accessToken);
+        Drive drive = documentService.createDriveService(accessToken);
 
         File fileMetadata;
         try {
@@ -166,11 +180,16 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
     @Override
-    public List<File> getFilesByMimeTypeInFolder(String accessToken, String mimeType, String folderId)
+    public List<File> getFilesByMimeTypeInDocument(String accessToken, String mimeType, UUID documentId)
             throws GeneralSecurityException, IOException {
         String type = getGoogleMimeType(mimeType);
+        Document document= documentService.getDocumentById(documentId);
+        if (document == null) {
+            throw new NotFoundException("Document not found");
+        }
 
-        Drive drive = folderService.createDriveService(accessToken);
+        String folderId= document.getFolderId();
+        Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
         try {
             fileMetadata = drive.files().get(folderId)
@@ -237,7 +256,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     public Res uploadImageToRootDrive(String accessToken, MultipartFile multipartFile) throws GeneralSecurityException, IOException {
         Res res = new Res();
 
-        Drive drive = folderService.createDriveService(accessToken);
+        Drive drive = documentService.createDriveService(accessToken);
 
         // Step 2: Save MultipartFile to a temporary file
         java.io.File tempFile = java.io.File.createTempFile("upload-", multipartFile.getOriginalFilename());
@@ -271,9 +290,9 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     @Override
-    public Res uploadImageToFolderDrive(String accessToken, String folderId, MultipartFile imageFile) throws GeneralSecurityException, IOException {
+    public Res uploadImageToDocument(String accessToken, String folderId, MultipartFile imageFile) throws GeneralSecurityException, IOException {
         Res res = new Res();
-        Drive drive = folderService.createDriveService(accessToken);
+        Drive drive = documentService.createDriveService(accessToken);
 
 
         // Prepare file metadata: set the file name and the parent folder ID

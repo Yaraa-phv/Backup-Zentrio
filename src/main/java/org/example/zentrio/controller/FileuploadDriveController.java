@@ -2,11 +2,13 @@ package org.example.zentrio.controller;
 
 
 import com.google.api.services.drive.model.File;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.Res;
+import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.service.FileUploadService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/files")
@@ -25,48 +28,53 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class FileuploadDriveController {
 
-    private final FileUploadService fileSevice;
+    private final FileUploadService fileUploadService;
 
 
-    @GetMapping("/getFileBy-FolderID")
-    public ResponseEntity<ApiResponse<List<File>>> getAllFilesByFolderId(@RequestParam String accessToken,
-                                            @RequestParam String folderId) throws IOException, GeneralSecurityException {
+    @GetMapping("/get-file-by-documentId")
+    @Operation(summary = "Get All File By Document-Id")
+    public ResponseEntity<ApiResponse<List<File>>> getAllFilesByDocumentId(@RequestParam String accessToken,
+                                            @RequestParam UUID documentId) throws IOException, GeneralSecurityException {
 
         ApiResponse<List<File>> response =  ApiResponse.<List<File>>builder()
                 .success(true)
-                .message("file get succesfully ")
-                .payload(fileSevice.getAllFilesByFolderId(accessToken,folderId))
+                .message("All File Get Successfully ")
+                .payload(fileUploadService.getAllFilesByDocumentId(accessToken,documentId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getFileBy-typ")
-    public ResponseEntity<ApiResponse<List<File>>> getFilesByMimeTypeInFolder(@RequestParam String accessToken,
-                                                 @RequestParam  String mimeType ,
-                                                 @RequestParam  String folderId ) throws IOException, GeneralSecurityException {
+    @GetMapping("/get-files-by-type")
+    @Operation(summary = "Get Files By Files Type")
+    public ResponseEntity<ApiResponse<List<File>>> getFilesByMimeTypeInDocument(
+            @RequestParam String accessToken,
+            @RequestParam  String mimeType ,
+            @RequestParam  UUID documentId ) throws IOException, GeneralSecurityException {
 
         ApiResponse<List<File>> response =  ApiResponse.<List<File>>builder()
                 .success(true)
                 .message("file get successfully ")
-                .payload(fileSevice.getFilesByMimeTypeInFolder(accessToken,mimeType, folderId))
+                .payload(fileUploadService.getFilesByMimeTypeInDocument(accessToken,mimeType, documentId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
-        // Call the DriveService to get the folders
-     //   return fileSevice.getFilesByMimeTypeInFolder(accessToken,mimeType, folderId);
+
     }
 
-    @GetMapping("/file")
-    public ResponseEntity<ApiResponse<File>> getFileById(@RequestParam String accessToken,
-                                         @RequestParam String fileId) throws GeneralSecurityException, IOException {
+    @GetMapping("/get-file-by-fileId")
+    @Operation(summary = "Get File By File-Id")
+    public ResponseEntity<ApiResponse<File>> getFileById(
+            @RequestParam String accessToken,
+            @RequestParam String fileId,
+            @RequestParam UUID documentId) throws GeneralSecurityException, IOException {
 
         ApiResponse<File> response = ApiResponse.<File>builder()
                 .success(true)
                 .message("file get successfully ")
-                .payload(fileSevice.getFileById(accessToken, fileId))
+                .payload(fileUploadService.getFileById(accessToken, fileId,documentId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -74,13 +82,15 @@ public class FileuploadDriveController {
 
     }
 
-    @DeleteMapping("/file")
-    public ResponseEntity<ApiResponse<String>> deleteFileById(@RequestParam String accessToken,
-                                                 @RequestParam String fileId) throws GeneralSecurityException, IOException {
-        fileSevice.deleteFileById(accessToken, fileId);
+    @DeleteMapping("/delete-file-by-Id")
+    @Operation(summary = "Delete File By File-Id")
+    public ResponseEntity<ApiResponse<String>> deleteFileById(
+            @RequestParam String accessToken,
+            @RequestParam String fileId) throws GeneralSecurityException, IOException {
+        fileUploadService.deleteFileById(accessToken, fileId);
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("Delete File Successfully ")
                 .status(HttpStatus.ACCEPTED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -95,28 +105,18 @@ public class FileuploadDriveController {
     public ResponseEntity<ApiResponse<File>> createDriveFile(
             @RequestParam("accessToken") String accessToken,
             @RequestParam("name") String name,
-            @RequestParam("type") String type, // e.g., doc, sheet, slide
+            @RequestParam("type") FileTypes type, // e.g., doc, sheet, slide
             @RequestParam(value = "folderId", required = false) String folderId) throws GeneralSecurityException, IOException {
         ApiResponse<File> response =  ApiResponse.<File>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("file create Successfully ")
                 .status(HttpStatus.ACCEPTED)
-                .payload(fileSevice.createDriveFile(accessToken, name, type, folderId))
+                .payload(fileUploadService.createDriveFile(accessToken, name, type, folderId))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
 
 
-//        try {
-//            String fileId = fileSevice.createDriveFile(accessToken, name, type, folderId);
-//            return ResponseEntity.ok("File created successfully. File ID: " + fileId);
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.badRequest().body("Invalid file type: " + e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error creating file: " + e.getMessage());
-//        }
     }
 
 
@@ -128,20 +128,11 @@ public class FileuploadDriveController {
         ApiResponse<File> response =  ApiResponse.<File>builder()
                 .success(true)
                 .message("rename file  successfully ")
-                .payload(fileSevice.renameDriveFile(accessToken, fileId, newName))
+                .payload(fileUploadService.renameDriveFile(accessToken, fileId, newName))
                 .status(HttpStatus.ACCEPTED)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
-//
-//        try {
-//            String renamed = fileSevice.renameDriveFile(accessToken, fileId, newName);
-//            return ResponseEntity.ok("File renamed successfully to: " + renamed);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Failed to rename file: " + e.getMessage());
-//        }
     }
 
 
@@ -153,8 +144,8 @@ public class FileuploadDriveController {
 
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
-                .message("file create succesfully ")
-                .payload(fileSevice.uploadImageToRootDrive(accessToken, multipartFile))
+                .message("File Upload To Drive Successfully ")
+                .payload(fileUploadService.uploadImageToRootDrive(accessToken, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -163,7 +154,8 @@ public class FileuploadDriveController {
     }
 
 
-    @PostMapping(value = "/upload-image-to-drive", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload-all-kinds-file-to-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload All Kinds Of Files ")
     public ResponseEntity<ApiResponse<Res>>  uploadImageToFolderDrive (
             @RequestParam("token") String accessToken,
             @RequestParam("folderId") String folderId,
@@ -172,8 +164,8 @@ public class FileuploadDriveController {
 
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
-                .message("file create succesfully ")
-                .payload(fileSevice.uploadImageToFolderDrive(accessToken, folderId, multipartFile))
+                .message("File Upload  Succesfsully ")
+                .payload(fileUploadService.uploadImageToDocument(accessToken, folderId, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
