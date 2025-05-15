@@ -3,7 +3,6 @@ package org.example.zentrio.repository;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.model.Checklist;
-import org.example.zentrio.model.Task;
 
 import java.util.List;
 import java.util.UUID;
@@ -83,5 +82,24 @@ public interface ChecklistRepository {
     """)
     Checklist getChecklistById(UUID checklistId);
 
+    @Select("""
+    select r.role_name  from members m
+     inner join  roles r on r.role_id = m.role_id
+     inner join  users u on m.user_id = u.user_id
+     inner join checklist_assignments ca on ca.member_id = m.member_id
+     WHERE u.user_id = #{uuid}
+     AND  board_id = #{boardId}
+""")
+    String getRoleMemberInChecklist(UUID boardId, UUID uuid);
 
+
+    @Select("""
+    select ca.checklist_assign_id from members m
+     inner join  roles r on r.role_id = m.role_id
+     inner join  users u on m.user_id = u.user_id
+     inner join checklist_assignments ca on ca.member_id = m.member_id
+     WHERE u.user_id = #{uuid}
+     AND  board_id = #{boardId}
+""")
+    UUID getIdMemberInChecklist(UUID boardId, UUID uuid);
 }

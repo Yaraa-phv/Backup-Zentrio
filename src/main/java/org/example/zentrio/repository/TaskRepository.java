@@ -148,5 +148,15 @@ public interface TaskRepository {
             """)
     Integer countTasksByBoardId( UUID boardId);
 
+    @Select("""
+                SELECT tk.checklist_assign_id FROM task_assignment tk
+                INNER JOIN members m ON tk.assigned_to = m.member_id
+                INNER JOIN roles r ON m.role_id = r.role_id
+                WHERE task_id = #{taskId}
+                AND m.member_id = #{assignedById}
+            """)
+    UUID getUuidByUserIdAndTaskId(UUID taskId, UUID assignedById);
+
+
 
 }

@@ -281,6 +281,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId) {
 
+        UUID userIdDD = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        System.out.println("useriddddddddddd : " + userIdDD);
+//        System.out.println();
+
         System.out.println("assignedToUserId = " + assignedToUserId);
 
         Task task = taskRepository.getTaskByTaskId(taskId);

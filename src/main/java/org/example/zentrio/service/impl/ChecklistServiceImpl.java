@@ -188,7 +188,10 @@ public class ChecklistServiceImpl implements ChecklistService {
 
         // Verify that the assigner has the ROLE_LEADER for this task
         String assignerRole = taskRepository.getRoleNameByUserIdAndTaskId(taskId, assignerMemberId);
-        if (!assignerRole.contains(RoleName.ROLE_LEADER.toString())) {
+        if (assignerRole == null){
+            throw new NotFoundException("Assigner member not found!");
+        }
+        if (!assignerRole.equals(RoleName.ROLE_LEADER.name())) {
             throw new BadRequestException("Only a leader can assign members to a checklist.");
         }
 
