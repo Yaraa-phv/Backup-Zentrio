@@ -40,12 +40,12 @@ public class CommentServiceImpl implements CommentService {
         Task task= taskRepository.getTaskByTaskId(checklist.getTaskId());
 
         UUID userInCheckList= taskRepository.findMemberIdByUserIdAndTaskId(checklist.getTaskId(), userId());
-
+        System.out.println("User In Checklist: " + userInCheckList);
         String role= taskRepository.getRoleNameByUserIdAndTaskId(checklist.getTaskId(), userInCheckList);
         System.out.println("Role: "+role);
         if (role== null){
             String checkListRole= checklistRepository.getRoleMemberInChecklist(task.getBoardId(), userId());
-            UUID memberId = checklistRepository.getIdMemberInChecklist(task.getBoardId(), userId());
+            UUID memberId = checklistRepository.getIdMemberInChecklist(task.getBoardId(), userId(), checklist.getTaskId());
             System.out.println("CheckListRole: "+checkListRole);
             if (checkListRole.equals(RoleName.ROLE_MEMBER.name())) {
               Comment  comment = commentRepository.createComment(checklistId,commentRequest, LocalDateTime.now(),memberId);

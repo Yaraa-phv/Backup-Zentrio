@@ -94,12 +94,13 @@ public interface ChecklistRepository {
 
 
     @Select("""
-    select ca.checklist_assign_id from members m
-     inner join  roles r on r.role_id = m.role_id
-     inner join  users u on m.user_id = u.user_id
-     inner join checklist_assignments ca on ca.member_id = m.member_id
+  SELECT ca.checklist_assign_id
+   FROM members m       
+       INNER JOIN users u ON m.user_id = u.user_id
+       INNER JOIN checklist_assignments ca ON ca.member_id = m.member_id
      WHERE u.user_id = #{uuid}
-     AND  board_id = #{boardId}
+         AND m.board_id = #{boardId}
+         AND ca.checklist_id = #{checklistId}
 """)
-    UUID getIdMemberInChecklist(UUID boardId, UUID uuid);
+    UUID getIdMemberInChecklist(UUID boardId, UUID uuid, UUID checklistId);
 }
