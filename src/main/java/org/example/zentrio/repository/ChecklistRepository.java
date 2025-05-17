@@ -50,9 +50,9 @@ public interface ChecklistRepository {
     List<Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
 
     @Select("""
-        UPDATE checklists SET 
-                              title = #{request.title}, 
-                              started_at = #{request.startedAt}, 
+        UPDATE checklists SET
+                              title = #{request.title},
+                              started_at = #{request.startedAt},
                               finished_at = #{request.finishedAt}
         WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
         RETURNING *
@@ -65,5 +65,23 @@ public interface ChecklistRepository {
     """)
     @ResultMap("checklistMapper")
     Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+
+
+
+    @Select("""
+                SELECT COUNT(*) FROM checklist_assignments
+                WHERE checklist_id = #{checklistId}
+                AND   member_id = #{memberId}
+            """)
+    boolean isExistByUserIdAndTaskId(UUID checklistId,UUID memberId);
+
+
+
+    // get checklist by checklist id
+    @Select("""
+        SELECT * FROM checklists WHERE checklist_id = #{checklistId}
+    """)
+    Checklist getChecklistById(UUID checklistId);
+
 
 }

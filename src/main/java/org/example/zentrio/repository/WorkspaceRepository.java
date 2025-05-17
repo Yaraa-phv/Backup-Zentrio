@@ -26,10 +26,17 @@ public interface WorkspaceRepository {
     Workspace createWorkspace(@Param("request") WorkspaceRequest workspaceRequest, UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces WHERE created_by = #{userId}
+        SELECT * FROM workspaces
+        WHERE created_by = #{userId}
+        LIMIT #{limit} OFFSET #{offset}
     """)
     @ResultMap("workspaceMapper")
-    List<Workspace> getAllWorkspaces(UUID userId);
+    List<Workspace> getAllWorkspaces(UUID userId,Integer limit,Integer offset);
+
+    @Select("""
+         SELECT COUNT(*) FROM workspaces WHERE created_by = #{userId}
+    """)
+    Integer countWorkspacesByUserId(UUID userId);
 
     @Select("""
         SELECT * FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}

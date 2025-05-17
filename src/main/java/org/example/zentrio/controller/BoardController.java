@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,15 +42,12 @@ public class BoardController {
 
     @Operation(summary = "Get all boards",description = "Get all boards by workspace ID")
     @GetMapping("/{workspace-id}")
-    public ResponseEntity<ApiResponse<List<Board>>> getAllBoardsByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId) {
-        ApiResponse<List<Board>> apiResponse = ApiResponse.<List<Board>>builder()
-                .success(true)
-                .message("Create board successfully.")
-                .payload(boardService.getAllBoardsByWorkspaceId(workspaceId))
-                .status(HttpStatus.CREATED)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    public ResponseEntity<ApiResponse<HashMap<String,Board>>> getAllBoardsByWorkspaceId(
+            @PathVariable("workspace-id") UUID workspaceId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        ApiResponse<HashMap<String,Board>> response = boardService.getAllBoardsByWorkspaceId(workspaceId,page,size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "Update board",description = "Update board by board ID")

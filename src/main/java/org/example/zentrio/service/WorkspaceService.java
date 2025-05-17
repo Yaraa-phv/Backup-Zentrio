@@ -1,6 +1,7 @@
 package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.WorkspaceRequest;
+import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Workspace;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ public interface WorkspaceService {
 
     Workspace createWorkspace(WorkspaceRequest workspaceRequest);
 
-    HashMap<String, Workspace> getAllWorkspaces();
+    ApiResponse<HashMap<String, Workspace>> getAllWorkspaces(Integer page, Integer size);
 
     HashMap<String, Workspace> getWorkspaceByTitle(String title);
 

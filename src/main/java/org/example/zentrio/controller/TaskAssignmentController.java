@@ -38,8 +38,6 @@ public class TaskAssignmentController {
     }
 
 
-
-
     @PostMapping("/assign-task-with-role")
     public ResponseEntity<ApiResponse<Task>> assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId) {
         ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
