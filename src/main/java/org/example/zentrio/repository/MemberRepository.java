@@ -78,4 +78,15 @@ public interface MemberRepository {
     """)
     @ResultMap("memberMapper")
     Member editRoleForMembersByBoardIdAndMemberId(UUID memberId, UUID roleId);
+
+
+    @Select("""
+        
+        SELECT r.role_name FROM roles r
+        INNER JOIN  members m ON r.role_id = m.role_id
+        WHERE  m.user_id= #{userId}
+        AND  m.board_id= #{boardId}
+        
+        """)
+    String getRoleByBoardIdAndUserId(UUID boardId, UUID userId);
 }

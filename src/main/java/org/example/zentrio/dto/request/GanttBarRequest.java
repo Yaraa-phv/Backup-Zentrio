@@ -2,6 +2,7 @@ package org.example.zentrio.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,11 +19,11 @@ public class GanttBarRequest {
     @NotNull(message = "title cannot null")
     @NotBlank
     private String title;
-    @JsonFormat
-    @JsonSerialize
-    private LocalDateTime startAt;
-    @JsonFormat
-    @JsonSerialize
+
+    @FutureOrPresent
+    private LocalDateTime startedAt;
+
+    @FutureOrPresent
     private LocalDateTime finishedAt;
 
 

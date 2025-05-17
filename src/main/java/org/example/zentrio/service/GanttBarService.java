@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GanttBarService {
-    GanttBar creatGanntBar(UUID ganntBartId, GanttBarRequest ganttBarRequest);
+    GanttBar createGanttBar(UUID ganttBarId, GanttBarRequest ganttBarRequest);
 
-    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganntChartId);
-
-
-    GanttBar getGanttBarByGanttBartID(UUID geanntbarId);
+    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganttChartId);
 
 
-    GanttBar updateGanttBarByGanttBarId(UUID geanntbarId,  GanttBarRequest ganttBarRequest);
+    GanttBar getGanttBarByGanttBartID(UUID ganttBarId);
 
-    void deleteGanttBarByGanttBarId(UUID geanttbarId);
+
+    GanttBar updateGanttBarByGanttBarId(UUID ganttBarId,  GanttBarRequest ganttBarRequest);
+
+    void deleteGanttBarByGanttBarId(UUID ganttBarId);
 
     GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
 

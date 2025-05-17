@@ -8,19 +8,13 @@ import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.Feedback;
 import org.example.zentrio.model.Task;
-import org.example.zentrio.repository.AppUserRepository;
-import org.example.zentrio.repository.FeedbackRepository;
-import org.example.zentrio.repository.RoleRepository;
-import org.example.zentrio.repository.TaskRepository;
+import org.example.zentrio.repository.*;
 import org.example.zentrio.service.FeedbackService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,15 +23,16 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final TaskRepository taskRepository;
     private final RoleRepository roleRepository;
+    private final MemberRepository memberRepository;
 
-    @Override
-    public Feedback createFeedback( UUID taskId, FeedbackRequest feedbackRequest) {
+    private UUID userId(){
         AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Task task= taskRepository.getTaskByTaskId(taskId);
-        if (task==null) {
-            throw new NotFoundException("Task not found");
-        }
-        String role= roleRepository.getRoleNameByUserIdAndBoardId(task.getBoardId(),appUser.getUserId());
+        return appUser.getUserId();
+
+    }
+
+    private void userRole(UUID boardId){
+        String role= roleRepository.getRoleNameByUserIdAndBoardId(boardId,userId());
         if (role == null){
             throw new BadRequestException("You don't have any role here...");
         }
@@ -45,33 +40,48 @@ public class FeedbackServiceImpl implements FeedbackService {
         if (!role.equals(RoleName.ROLE_MANAGER.name())) {
             throw new BadRequestException("only ROLE_MANAGER allowed...");
         }
-        Feedback feedback = feedbackRepository.createFeedback(LocalDateTime.now(),appUser.getUserId(),taskId,feedbackRequest);
-        return feedback;
     }
 
+
     @Override
-    public HashMap<String,Feedback> getAllFeedback(UUID taskId) {
-        HashMap<String,Feedback> feedback = new HashMap<>();
+    public Feedback createFeedback( UUID taskId, FeedbackRequest feedbackRequest) {
+
         Task task= taskRepository.getTaskByTaskId(taskId);
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
-        for (Feedback f : feedbackRepository.getAllFeedback(taskId)){
-            feedback.put(f.getFeedbakId().toString(), f);
-        }
+        userRole(task.getBoardId());
+        UUID memberId = memberRepository.getMemberIdByUserIdAndBoardId(userId(),task.getBoardId());
 
-
+        Feedback feedback = feedbackRepository.createFeedback(LocalDateTime.now(),memberId,taskId,feedbackRequest);
         return feedback;
     }
 
+
     @Override
-    public Feedback UpdateFeedbackByid(UUID feedbackId, FeedbackRequest feedbackRequest) {
+    public Set<Feedback> getAllFeedback(UUID taskId) {
+
+        Task task= taskRepository.getTaskByTaskId(taskId);
+        if (task==null) {
+            throw new NotFoundException("Task not found");
+        }
+
+
+        return new HashSet<>(feedbackRepository.getAllFeedback(taskId));
+    }
+
+
+    @Override
+    public Feedback UpdateFeedbackById(UUID feedbackId, FeedbackRequest feedbackRequest) {
         Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
-            return feedbackRepository.UpdateFeedbackByid(feedbackId, feedbackRequest);
+        Task task = taskRepository.getTaskByTaskId(feedback.getTaskId());
+        userRole(task.getBoardId());
+            return feedbackRepository.UpdateFeedbackById(feedbackId, feedbackRequest);
     }
+
 
     @Override
     public Feedback getFeedbackById(UUID feedbackId) {
@@ -80,16 +90,17 @@ public class FeedbackServiceImpl implements FeedbackService {
             throw new NotFoundException("Feedback not found");
         }
         return feedback;
-
     }
 
+
     @Override
-    public void deleteFeedbackByid(UUID feedbackId) {
+    public void deleteFeedbackById(UUID feedbackId) {
         Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
-        feedbackRepository.deleteFeedbackByid(feedbackId);
-
+        Task task = taskRepository.getTaskByTaskId(feedback.getTaskId());
+        userRole(task.getBoardId());
+        feedbackRepository.deleteFeedbackById(feedbackId);
     }
 }

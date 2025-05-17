@@ -72,7 +72,6 @@ public class BoardServiceImpl implements BoardService {
     }
 
 
-
     @Override
     public Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId) {
         Workspace existedWorkspaceIdById = workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
