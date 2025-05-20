@@ -1,12 +1,15 @@
 package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
+import org.example.zentrio.dto.response.ChecklistResponse;
 import org.example.zentrio.model.AllMember;
 import org.example.zentrio.model.AllTasks;
 import org.example.zentrio.model.Report;
+import org.example.zentrio.utility.JsonbTypeHandler;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Mapper
@@ -42,12 +45,11 @@ public interface ReportRepository {
 
 
     @Select("""
-        SELECT * FROM  report WHERE board_id=#{boardId}
+        SELECT * FROM  reports WHERE board_id=#{boardId}
         """)
     @Results(id = "reportMapping", value = {
             @Result(property = "reportId" , column = "report_id"),
             @Result(property = "creationDate" , column = "created_at"),
-            @Result(property = "UpdateAt" , column = "updated_at"),
             @Result(property = "boardId" , column = "board_id"),
             @Result(property = "allMembers" , column = "board_id",
             many =@Many (select = "getMember") ),
@@ -63,11 +65,45 @@ public interface ReportRepository {
         """)
     String boardName(UUID boardId);
 
-//    SELECT r.role_name, COUNT(*) AS total
-//    FROM roles r
-//    INNER JOIN members m ON r.role_id = m.role_id
-//    INNER JOIN users u ON u.user_id = m.user_id
-//    WHERE m.board_id = '7c9d997b-1d97-4620-86a4-902cca25e286'
-//    GROUP BY r.role_name
+    @Select("""
+        select details from attachments where checklist_id= #{checklistId}
+        """)
+    Map<String, String> getAttachment(UUID checklistId);
+
+
+    @Select("""
+        
+            select  u.username from
+                               users u
+        inner join  members m on  m.user_id= u.user_id
+        inner join checklist_assignments ch on ch.member_id = m.member_id
+        where ch.checklist_id= #{checklistId};
+        """)
+    List<String> allMemberUsernames( UUID checklistId);
+
+    @Select("""
+            select count(*) from comments where checklist_id= #{checklistId};
+    """)
+    Integer countComments(UUID checklistId);
+
+
+    @Select("""
+        SELECT  * FROM  checklists where task_id= #{checklistId}
+        """)
+    @Results(id = "checkListResponse", value = {
+            @Result(property = "checklistId", column = "checklist_id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "members", column = "checklist_id",
+            one = @One(select = "allMemberUsernames")),
+            @Result(property = "comments", column = "checklist_id",
+            one = @One(select = "countComments")),
+            @Result(property = "attachments", column = "checklist_id",
+            one = @One(select = "getAttachment")),
+            @Result(property = "startedAt", column = "started_at"),
+            @Result(property = "finishedAt", column = "finished_at"),
+            @Result(property = "taskId", column = "task_id"),
+
+    })
+    List<ChecklistResponse> getChecklistById(UUID checklistId);
 
 }
