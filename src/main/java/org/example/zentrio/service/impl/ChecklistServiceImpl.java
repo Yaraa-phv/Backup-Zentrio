@@ -183,33 +183,33 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     @Override
     public Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId) {
-        // Get the member ID of the user assigning (must be a leader of the task)
-        UUID assignerMemberId = taskRepository.findMemberIdByUserIdAndTaskId(taskId, assignedByUserId);
-
-        // Verify that the assigner has the ROLE_LEADER for this task
-        String assignerRole = taskRepository.getRoleNameByUserIdAndTaskId(taskId, assignerMemberId);
-        if (assignerRole == null){
-            throw new NotFoundException("Assigner member not found!");
-        }
-        if (!assignerRole.equals(RoleName.ROLE_LEADER.name())) {
-            throw new BadRequestException("Only a leader can assign members to a checklist.");
-        }
-
-        // Get the member ID of the user to be assigned
-        UUID assigneeMemberId = memberRepository.getMemberIdByUserId(assignToUserId);
-        if(assigneeMemberId == null){
-            throw new NotFoundException("Assign user with id " + assignToUserId + " not found!");
-        }
-
-        boolean isAlreadyAssigned = checklistRepository.isExistByUserIdAndTaskId(checklistId,assigneeMemberId);
-        if (isAlreadyAssigned){
-            throw new BadRequestException("Checklist with member id " + assigneeMemberId + " already assigned!");
-        }
-
-        // Perform the assignment
-        memberRepository.insertIntoChecklistWithRoleMember(checklistId, assignerMemberId, assigneeMemberId);
-
-        // Optionally return something meaningful, currently returns null
+//        // Get the member ID of the user assigning (must be a leader of the task)
+//        UUID assignerMemberId = taskRepository.findMemberIdByUserIdAndTaskId(taskId, assignedByUserId);
+//
+//        // Verify that the assigner has the ROLE_LEADER for this task
+//        String assignerRole = taskRepository.getRoleNameByUserIdAndTaskId(taskId, assignerMemberId);
+//        if (assignerRole == null){
+//            throw new NotFoundException("Assigner member not found!");
+//        }
+//        if (!assignerRole.equals(RoleName.ROLE_LEADER.name())) {
+//            throw new BadRequestException("Only a leader can assign members to a checklist.");
+//        }
+//
+//        // Get the member ID of the user to be assigned
+//        UUID assigneeMemberId = memberRepository.getMemberIdByUserId(assignToUserId);
+//        if(assigneeMemberId == null){
+//            throw new NotFoundException("Assign user with id " + assignToUserId + " not found!");
+//        }
+//
+//        boolean isAlreadyAssigned = checklistRepository.isExistByUserIdAndTaskId(checklistId,assigneeMemberId);
+//        if (isAlreadyAssigned){
+//            throw new BadRequestException("Checklist with member id " + assigneeMemberId + " already assigned!");
+//        }
+//
+//        // Perform the assignment
+//        memberRepository.insertIntoChecklistWithRoleMember(checklistId, assignerMemberId, assigneeMemberId);
+//
+//        // Optionally return something meaningful, currently returns null
         return null;
     }
 

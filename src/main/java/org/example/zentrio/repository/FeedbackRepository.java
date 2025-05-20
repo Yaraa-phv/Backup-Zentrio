@@ -12,12 +12,12 @@ import java.util.UUID;
 public interface FeedbackRepository {
 
     @Select("""
-        INSERT INTO  feedback (created_at ,comment , task_id, feedback_by)
+        INSERT INTO  feedbacks (created_at ,comment , task_id, feedback_by)
         VALUES (#{time}, #{request.comment}, #{taskId} , #{userId} )
         RETURNING*
         """)
     @Results(id = "feedbackMapper", value = {
-            @Result( property = "feedbakId",column = "feedback_id"),
+            @Result( property = "feedbackId",column = "feedback_id"),
             @Result( property = "createAt",column = "created_at"),
             @Result( property = "comment",column = "comment"),
             @Result(property = "taskId", column = "task_id"),
@@ -28,7 +28,7 @@ public interface FeedbackRepository {
 
 
     @Select("""
-    SELECT * FROM feedback WHERE task_id=#{taskId}
+    SELECT * FROM feedbacks WHERE task_id=#{taskId}
     """)
     @ResultMap("feedbackMapper")
     List<Feedback> getAllFeedback(UUID taskId);
@@ -36,7 +36,7 @@ public interface FeedbackRepository {
 
 
     @Select("""
-        SELECT * FROM feedback WHERE feedback_id=#{feedbackId}
+        SELECT * FROM feedbacks WHERE feedback_id=#{feedbackId}
         """)
     @ResultMap("feedbackMapper")
     Feedback getFeedbackById(UUID feedbackId);
@@ -44,16 +44,16 @@ public interface FeedbackRepository {
 
 
     @Select("""
-        UPDATE feedback SET comment=#{request.comment}
+        UPDATE feedbacks SET comment=#{request.comment}
                             WHERE feedback_id=#{feedbackId}
         RETURNING *
         """)
     @ResultMap("feedbackMapper")
-    Feedback UpdateFeedbackByid(UUID feedbackId, @Param("request") FeedbackRequest feedbackRequest);
+    Feedback UpdateFeedbackById(UUID feedbackId, @Param("request") FeedbackRequest feedbackRequest);
 
 
     @Select("""
-    DELETE FROM feedback WHERE feedback_id=#{feedbackId}
+    DELETE FROM feedbacks WHERE feedback_id=#{feedbackId}
     """)
-    void deleteFeedbackByid(UUID feedbackId);
+    void deleteFeedbackById(UUID feedbackId);
 }

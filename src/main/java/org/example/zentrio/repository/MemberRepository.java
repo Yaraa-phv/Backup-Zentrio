@@ -4,7 +4,6 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ManagerRequest;
 import org.example.zentrio.model.Member;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,15 +80,55 @@ public interface MemberRepository {
 
 
     @Select("""
-        SELECT m.member_id
-        FROM members m
-        WHERE m.user_id = #{userId}
-    """)
-    UUID getMemberIdByUserId(UUID userId);
+       
+                   SELECT r.role_name FROM roles r
+                                              INNER JOIN  members m ON m.role_id = r.role_id
+                  WHERE  m.user_id= #{userId}
+                    AND  m.role_id= '34e22ec4-0898-44db-acf5-1c3ae5f8ef25'
+                    AND  m.board_id= #{boardId} limit 1;
+        
+        """)
+    String getRolePMByBoardIdAndUserId(UUID boardId, UUID userId);
+
 
     @Select("""
-        INSERT INTO checklist_assignments (checklist_id,assigned_by,member_id)
-        VALUES (#{checklistId},#{assignedBy},#{memberId})
+        
+            SELECT  m.member_id   from members m
+              inner join task_assignment task on task.assigned_to =m.member_id
+        where m.user_id= #{uuid}
+          and  task.task_id= #{taskId}
+        """)
+    UUID getTeamleadUUID(UUID uuid, UUID taskId);
+
+
+    @Select("""
+        SELECT member_id FROM members 
+                         WHERE user_id = #{userId} AND board_id = #{boardId}
+                        AND role_id= '58ad541b-2dea-4a64-a2e2-d40835abba95'
     """)
-    void insertIntoChecklistWithRoleMember(UUID checklistId, UUID assignedBy, UUID memberId);
+//    @ResultMap("memberMapper")
+    UUID getMemberId(UUID userId, UUID boardId);
+
+
+
+    @Select("""
+            SELECT member_id FROM members 
+                         WHERE user_id = #{userId} AND board_id = #{boardId}
+                        AND role_id= '34e22ec4-0898-44db-acf5-1c3ae5f8ef25'
+        """)
+    UUID getPmId(UUID userId, UUID boardId);
+
+
+
+    @Select("""
+        
+            SELECT  roles.role_name from roles
+        inner join public.members m on roles.role_id = m.role_id
+        inner join  task_assignment tk on tk.assigned_to =m.member_id
+                                OR tk.assigned_by = member_id
+        where m.user_id= #{userId}
+          AND  tk.task_id= #{taskId}
+        AND  m.board_id= #{boardId} limit  1;
+        """)
+    String getRoleInTask(UUID boardId, UUID userId, UUID taskId);
 }

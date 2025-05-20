@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class Feedback {
-    private UUID feedbakId;
+    private UUID feedbackId;
     private LocalDateTime createAt;
     private String comment;
     private UUID taskId;

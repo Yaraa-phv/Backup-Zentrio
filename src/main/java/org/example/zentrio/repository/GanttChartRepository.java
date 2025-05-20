@@ -13,8 +13,8 @@ public interface GanttChartRepository {
 
 
     @Select("""
-    INSERT INTO gantt_charts(title,created_at,updated_at,board_id)
-    VALUES (#{request.title},#{localDateTime},#{localDateTime}, #{boardId} )
+    INSERT INTO gantt_charts(title,created_at,board_id,created_by)
+    VALUES (#{request.title},#{localDateTime}, #{boardId}, #{memberId} )
     RETURNING *
     """)
     @Results(id = "ganttChartMapper", value = {
@@ -22,9 +22,10 @@ public interface GanttChartRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "createdBy", column = "created_by"),
             @Result(property = "board_id", column = "board_id")
     })
-    GanttChart createGanttChart(UUID boardId, @Param("request") GanttChartRequest ganttChartRequest, LocalDateTime localDateTime);
+    GanttChart createGanttChart(UUID boardId, @Param("request") GanttChartRequest ganttChartRequest, LocalDateTime localDateTime, UUID memberId);
 
     @Select("""
     SELECT * FROM gantt_charts  WHERE board_id = #{boardId}
@@ -49,7 +50,7 @@ public interface GanttChartRepository {
         RETURNING *
         """)
     @ResultMap("ganttChartMapper")
-    GanttChart updateGannntChartById(UUID ganttChartId,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
+    GanttChart updateGanttChartById(UUID ganttChartId,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
 
 
     @Select("""

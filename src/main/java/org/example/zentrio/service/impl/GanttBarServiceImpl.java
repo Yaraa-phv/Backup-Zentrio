@@ -2,21 +2,15 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.GanttBarRequest;
-import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
-import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.GanttBar;
 import org.example.zentrio.model.GanttChart;
 import org.example.zentrio.repository.GanttBarRepository;
-import org.example.zentrio.repository.GanttChartRepository;
-import org.example.zentrio.repository.RoleRepository;
 import org.example.zentrio.service.GanttBarService;
 import org.example.zentrio.service.GanttChartService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,49 +20,40 @@ public class GanttBarServiceImpl implements GanttBarService {
 
     private final GanttBarRepository ganttBarRepository;
     private final GanttChartService ganttChartService;
-    private final RoleRepository roleRepository;
 
-    public UUID userID (){
-        AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return appUser.getUserId();
-    }
 
     @Override
-    public GanttBar creatGanntBar(UUID ganntChartId , GanttBarRequest ganttBarRequest) {
-
-       GanttChart ganttChart = ganttChartService.getGanttChartByID(ganntChartId);
+    public GanttBar  createGanttBar(UUID ganttChartId , GanttBarRequest ganttBarRequest) {
+       GanttChart ganttChart = ganttChartService.getGanttChartByID(ganttChartId);
        if (ganttChart == null) {
            throw new NotFoundException("GanttChart not found");
        }
-       String role = roleRepository.getRoleNameByUserIdAndBoardId(ganttChart.getBoard_id(), userID());
-        if (role == null) {
-            throw new BadRequestException("you don't have a role in this board can not delete");
+        if (ganttBarRequest.getStartedAt() == null || ganttBarRequest.getFinishedAt() == null) {
+            throw new BadRequestException("Start and finish times are required");
         }
-       if (!role.equals(RoleName.ROLE_MANAGER.name())) {
-           throw new BadRequestException("only ROLE_MANAGER allowed");
+       if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
+           throw new BadRequestException("GanttBar already finished");
        }
-        return ganttBarRepository.creatGanntBar(ganntChartId,ganttBarRequest);
+       ganttChartService.userRole(ganttChart.getBoard_id());
+
+        return ganttBarRepository.createGanttBar(ganttChartId,ganttBarRequest);
     }
 
 
 
     @Override
-    public HashMap<String,GanttBar> getAllGanttBarByGanttChartID(UUID ganntChartId) {
-        GanttChart ganttChart= ganttChartService.getGanttChartByID(ganntChartId);
+    public List<GanttBar> getAllGanttBarByGanttChartID(UUID ganttChartId) {
+        GanttChart ganttChart= ganttChartService.getGanttChartByID(ganttChartId);
         if (ganttChart == null) {
             throw new NotFoundException("GanttChart not found");
         }
-        HashMap<String,GanttBar> barHashMap = new HashMap<>();
-        for( GanttBar bar: ganttBarRepository.getAllGanttBarByGanttChartID(ganntChartId) ){
-            barHashMap.put(bar.getGanttBarId().toString(), bar);
-        }
 
-        return barHashMap;
+        return ganttBarRepository.getAllGanttBarByGanttChartID(ganttChartId);
     }
 
     @Override
-    public GanttBar getGanttBarByGanttBarID(UUID geanntbarId) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBarID(geanntbarId);
+    public GanttBar getGanttBarByGanttBartID(UUID ganttBarId) {
+        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
         if (ganttBar == null) {
             throw new NotFoundException("GanttBar not found");
         }
@@ -76,39 +61,31 @@ public class GanttBarServiceImpl implements GanttBarService {
     }
 
     @Override
-    public GanttBar updateGanttBarByGanttBarId(UUID ganntbarId, GanttBarRequest ganttBarRequest) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBarID(ganntbarId);
-
-
+    public GanttBar updateGanttBarByGanttBarId(UUID ganttBarId, GanttBarRequest ganttBarRequest) {
+        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
         if (ganttBar == null) {
             throw new NotFoundException("GanttBar not found");
         }
-        GanttChart ganttChart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        String role= roleRepository.getRoleNameByUserIdAndBoardId(ganttChart.getBoard_id(), userID());
-        if (role == null) {
-            throw new BadRequestException("you don't have a role in this board can not delete");
+        if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
+            throw new BadRequestException("GanttBar already finished");
         }
-        if (!role.equals(RoleName.ROLE_MANAGER.name())) {
-            throw new BadRequestException("only ROLE_MANAGER allowed");
-        }
-        return ganttBarRepository.updateGanttBarByGanttBarId(ganntbarId,ganttBarRequest);
+        GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
+        ganttChartService.userRole(chart.getBoard_id());
+
+        GanttBar updatedGanttBar=ganttBarRepository.updateGanttBarByGanttBarId(ganttBarId,ganttBarRequest);
+        return updatedGanttBar;
     }
 
     @Override
-    public void deleteGanttBarByGanttBarId(UUID geanttbarId) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBarID(geanttbarId);
+    public void deleteGanttBarByGanttBarId(UUID ganttBarId) {
+        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
         if (ganttBar == null) {
-            throw new NotFoundException("GanttBar already  deleted");
+            throw new NotFoundException("GanttBar not found");
         }
-        GanttChart ganttChart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        String role= roleRepository.getRoleNameByUserIdAndBoardId(ganttChart.getBoard_id(), userID());
-        if (role == null) {
-            throw new BadRequestException("you don't have a role in this board can not delete");
-        }
-        if (!role.equals(RoleName.ROLE_MANAGER.name())) {
-            throw new BadRequestException("only ROLE_MANAGER allowed");
-        }
-        ganttBarRepository.deleteGanttBarByGanttBarId(geanttbarId);
+        GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
+        ganttChartService.userRole(chart.getBoard_id());
+
+        ganttBarRepository.deleteGanttBarByGanttBarId(ganttBarId);
     }
 
     @Override

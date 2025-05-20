@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,15 +28,15 @@ public class GanttBarContrtoller {
 
     private final GanttBarService ganttBarService;
 
-    @PostMapping("/{ganntChartId}")
-    @Operation(summary = "Creat Gannt-bar by Gannt-Chart Id")
-    public ResponseEntity<ApiResponse<GanttBar>> creatGanntBar(
-            @PathVariable("ganntChartId") UUID ganntChartId, @Valid @RequestBody GanttBarRequest ganttBarRequest) {
+    @PostMapping("/{ganttChartId}")
+    @Operation(summary = "Creat Gantt-bar by Gantt-Chart Id")
+    public ResponseEntity<ApiResponse<GanttBar>> createGanttBar(
+            @PathVariable("ganttChartId") UUID ganttChartId, @Valid @RequestBody GanttBarRequest ganttBarRequest) {
 
         ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                 .success(true)
-                .message("Creat Gannt-Bar successfully.")
-                .payload(ganttBarService.creatGanntBar(ganntChartId,ganttBarRequest))
+                .message("Creat Gantt-Bar successfully.")
+                .payload(ganttBarService.createGanttBar(ganttChartId,ganttBarRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -46,14 +45,14 @@ public class GanttBarContrtoller {
 
 
 
-    @GetMapping("gantt-chart-id/{ganntChartId}")
-    @Operation(summary = "Get Gannt-bars by Gantt-Chart Id")
-    public ResponseEntity<ApiResponse<HashMap<String,GanttBar>>> getAllGanttBarByGanttChartID(@PathVariable("ganntChartId") UUID ganntChartId){
+    @GetMapping("gantt-chart-id/{ganttChartId}")
+    @Operation(summary = "Get Gantt-bars by Gantt-Chart Id")
+    public ResponseEntity<ApiResponse<List<GanttBar>>> getAllGanttBarByGanttChartID(@PathVariable("ganttChartId") UUID ganttChartId){
 
-        ApiResponse<HashMap<String,GanttBar>> response = ApiResponse.<HashMap<String,GanttBar>>builder()
+        ApiResponse<List<GanttBar>> response = ApiResponse.<List<GanttBar>>builder()
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
-                .payload(ganttBarService.getAllGanttBarByGanttChartID(ganntChartId))
+                .payload(ganttBarService.getAllGanttBarByGanttChartID(ganttChartId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -61,14 +60,14 @@ public class GanttBarContrtoller {
     }
 
 
-    @GetMapping("/gantt-barid/{geanntbarId}")
+    @GetMapping("/gantt-BarId/{ganttBarId}")
     @Operation(summary = "Get Gantt-bars by Gantt-bar Id")
-    public ResponseEntity<ApiResponse<GanttBar>> getGanttBarByGanttBartID(@PathVariable("geanntbarId") UUID geanntbarId){
+    public ResponseEntity<ApiResponse<GanttBar>> getGanttBarByGanttBartID(@PathVariable("ganttBarId") UUID ganttBarId){
 
         ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                 .success(true)
                 .message("Get all Gannt-bars by Gantt-chartId Successfully")
-                .payload( ganttBarService.getGanttBarByGanttBarID(geanntbarId))
+                .payload( ganttBarService.getGanttBarByGanttBartID(ganttBarId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -76,15 +75,15 @@ public class GanttBarContrtoller {
     }
 
 
-        @PutMapping("/gantt-barid/{geanntbarId}")
+        @PutMapping("/gantt-BarId/{ganttBarId}")
         @Operation(summary = "Update Gantt-bar by Gantt-barId")
         public ResponseEntity<ApiResponse<GanttBar>> updateGanttBarByGanttBarId(
-                @PathVariable("geanntbarId") UUID geanntbarId,  @Valid @RequestBody GanttBarRequest ganttBarRequest){
+                @PathVariable("ganttBarId") UUID ganttBarId,  @Valid @RequestBody GanttBarRequest ganttBarRequest){
 
             ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                     .success(true)
-                    .message("Update Gannt-bars by Gantt-barId Successfully")
-                    .payload( ganttBarService.updateGanttBarByGanttBarId(geanntbarId, ganttBarRequest))
+                    .message("Update Gantt-bars by Gantt-barId Successfully")
+                    .payload( ganttBarService.updateGanttBarByGanttBarId(ganttBarId, ganttBarRequest))
                     .status(HttpStatus.CREATED)
                     .timestamp(LocalDateTime.now())
                     .build();
@@ -92,11 +91,11 @@ public class GanttBarContrtoller {
         }
 
 
-    @DeleteMapping("/gantt-barid/{geanntbarId}")
+    @DeleteMapping("/gantt-BarId/{ganttBarId}")
     @Operation(summary = "Delete Gantt-bar by Gantt-barId")
     public ResponseEntity<ApiResponse<GanttBar>> deleteGanttBarByGanttBarId(
-            @PathVariable("geanntbarId") UUID geanttbarId){
-        ganttBarService.deleteGanttBarByGanttBarId(geanttbarId);
+            @PathVariable("ganttBarId") UUID ganttBarId){
+        ganttBarService.deleteGanttBarByGanttBarId(ganttBarId);
         ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
                 .success(true)
                 .message("Delete Gannt-bars by Gantt-barId Successfully")

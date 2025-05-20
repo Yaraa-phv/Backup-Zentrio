@@ -19,12 +19,10 @@ public class GanttBarRequest {
     @NotNull(message = "title cannot null")
     @NotBlank
     private String title;
-    @JsonFormat
-    @JsonSerialize
+
     @FutureOrPresent
-    private LocalDateTime startAt;
-    @JsonFormat
-    @JsonSerialize
+    private LocalDateTime startedAt;
+
     @FutureOrPresent
     private LocalDateTime finishedAt;
 

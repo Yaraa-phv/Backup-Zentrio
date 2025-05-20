@@ -82,7 +82,7 @@ CREATE TABLE tasks (
                        task_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                        title VARCHAR(255) NOT NULL,
                        description TEXT,
-                       status VARCHAR(50) DEFAULT 'PENDING',
+                       is_done BOOLEAN DEFAULT false,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        started_at TIMESTAMP NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE task_assignment (
 CREATE TABLE checklists (
                             checklist_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                             title VARCHAR(255) NOT NULL,
-                            status VARCHAR(50) DEFAULT 'PENDING',
+                            is_done BOOLEAN DEFAULT false,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
                             checklist_order SERIAL,

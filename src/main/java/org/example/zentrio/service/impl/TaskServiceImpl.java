@@ -33,7 +33,7 @@ public class TaskServiceImpl implements TaskService {
 
     public List<UUID> checkExistedGanttBarId( UUID ganttBarId){
 
-        GanttBar getGanttBarById = ganttBarService.getGanttBarByGanttBarID(ganttBarId);
+        GanttBar getGanttBarById = ganttBarService.getGanttBarByGanttBartID(ganttBarId);
         if (getGanttBarById == null){
             throw new NotFoundException("Gantt Bar not found!");
         }

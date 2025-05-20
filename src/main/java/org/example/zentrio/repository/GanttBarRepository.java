@@ -13,7 +13,7 @@ public interface GanttBarRepository {
     @Select(
             """
             INSERT INTO gantt_bars(title,started_at,finished_at,gantt_chart_id)
-            VALUES (#{request.title},#{request.startAt}, #{request.finishedAt}, #{ganntChartId})
+            VALUES (#{request.title},#{request.startedAt}, #{request.finishedAt}, #{ganttChartId})
             RETURNING *
             """)
     @Results(id = "ganttBarMapping", value = {
@@ -23,39 +23,39 @@ public interface GanttBarRepository {
             @Result(property = "finishedAt", column = "finished_at"),
             @Result(property = "ganttChartId", column = "gantt_chart_id"),
     })
-    GanttBar creatGanntBar(UUID ganntChartId,@Param("request") GanttBarRequest ganttBarRequest);
+    GanttBar createGanttBar(UUID ganttChartId,@Param("request") GanttBarRequest ganttBarRequest);
 
 
 
     @Select("""
-    SELECT * FROM gantt_bars WHERE gantt_chart_id=#{ganntChartId}
+    SELECT * FROM gantt_bars WHERE gantt_chart_id= #{ganttBarId}
     """)
     @ResultMap("ganttBarMapping")
-    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganntChartId);
+    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganttBarId);
 
 
 
     @Select(""" 
-          select * from gantt_bars where gantt_bar_id=#{geanntbarId}
+          select * from gantt_bars where gantt_bar_id= #{ganttBarId}
             """)
     @ResultMap("ganttBarMapping")
-    GanttBar getGanttBarByGanttBarID(UUID geanntbarId);
+    GanttBar getGanttBarByGanttBartID(UUID ganttBarId);
 
     @Select("""
                 UPDATE gantt_bars set title= #{request.title},
                                       started_at= #{request.startAt},
-                                      finished_at= #{request.finishedAt}
-                                  WHERE gantt_bar_id= #{ganntbarId}
+                                      finished_at= #{request.finshedAt}
+                                  WHERE gantt_bar_id= #{ganttBarId}
                 RETURNING *
                 
            """)
     @ResultMap("ganttBarMapping")
-    GanttBar updateGanttBarByGanttBarId(UUID ganntbarId,@Param("request") GanttBarRequest ganttBarRequest);
+    GanttBar updateGanttBarByGanttBarId(UUID ganttBarId,@Param("request") GanttBarRequest ganttBarRequest);
 
     @Select("""
-        DELETE FROM gantt_bars WHERE  gantt_bar_id= #{geanttbarId}
+        DELETE FROM gantt_bars WHERE  gantt_bar_id= #{ganttBarId}
         """)
-    void deleteGanttBarByGanttBarId(UUID geanttbarId);
+    void deleteGanttBarByGanttBarId(UUID ganttBarId);
 
     @Select("""
         SELECT * FROM gantt_bars WHERE gantt_chart_id = #{ganttChartId} AND gantt_bar_id = #{ganttBarId}
