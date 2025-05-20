@@ -86,12 +86,12 @@ public class CommentServiceImpl implements CommentService {
         if (role == null) {
             UUID memberId= memberRepository.getMemberId(userId(),task.getBoardId());
             if (memberId ==null){
-                throw new NotFoundException("Member not found");
+                throw new BadRequestException("Member not found");
             }
             if(memberId.equals(comment.getMemberId())){
                 comment = commentRepository.deleteCommentByCommentId(commentId);
             }else {
-                throw new NotFoundException("This Comment does not belong to yours");
+                throw new BadRequestException("This Comment does not belong to yours");
             }
         }
         if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
