@@ -3,6 +3,7 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.CommentRequest;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.CommentRepository;
@@ -50,6 +51,9 @@ public class CommentServiceImpl implements CommentService {
 
        if (teamLeadId != null) {
          return   commentRepository.createComment(checklistId, commentRequest , LocalDateTime.now(), teamLeadId);
+       }
+       if (memberId == null) {
+           throw new BadRequestException("You are not member in this board");
        }
         return commentRepository.createComment(checklistId, commentRequest , LocalDateTime.now(), memberId);
 
@@ -113,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
             if(memberId.equals(comment.getMemberId())){
                 comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
             }else {
-                throw new NotFoundException("This Comment does not belong to yours");
+                throw new BadRequestException("This Comment does not belong to yours");
             }
         }
         if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
@@ -126,17 +130,17 @@ public class CommentServiceImpl implements CommentService {
                    comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
                    System.out.println("Team lead");
                }else {
-                   throw new NotFoundException("This Comment does not belong to yours team lead");
+                   throw new BadRequestException("This Comment does not belong to yours team lead");
                }
            } else if (pmId != null) {
                if (pmId.equals(comment.getMemberId())) {
                    comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
                    System.out.println("Pm lead");
                }else {
-                   throw new NotFoundException("This Comment does not belong to yours pm");
+                   throw new BadRequestException("This Comment does not belong to yours pm");
                }
            }else {
-               throw new NotFoundException("This Comment does not belong to yours");
+               throw new BadRequestException("This Comment does not belong to yours");
            }
         }
         return comment1;
