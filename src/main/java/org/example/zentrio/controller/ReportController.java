@@ -57,6 +57,8 @@ public class ReportController {
 
     @GetMapping("get-attachment-by-checklist-Id")
     public ResponseEntity<ApiResponse <Map<String, String>>>  getAttachment (@RequestParam UUID checklistId) {
+        System.out.println(reportService.getAttachment(checklistId));
+
         ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
                 .success(true)
                 .message("Get profile successfully")
@@ -66,6 +68,23 @@ public class ReportController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
+    @GetMapping("/String")
+    public Map<String, String>  get (@RequestParam UUID checklistId) {
+        return reportService.getAttachment(checklistId);
+
+//        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
+//                .success(true)
+//                .message("Get profile successfully")
+//                .payload(reportService.getAttachment(checklistId))
+//                .status(HttpStatus.OK)
+//                .timestamp(LocalDateTime.now())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
 
 
 

@@ -65,6 +65,7 @@ public interface ReportRepository {
         """)
     String boardName(UUID boardId);
 
+
     @Select("""
         select details from attachments where checklist_id= #{checklistId}
         """)
@@ -97,7 +98,7 @@ public interface ReportRepository {
             one = @One(select = "allMemberUsernames")),
             @Result(property = "comments", column = "checklist_id",
             one = @One(select = "countComments")),
-            @Result(property = "attachments", column = "checklist_id",
+            @Result(property = "attachments", column = "checklist_id",typeHandler = JsonbTypeHandler.class,
             one = @One(select = "getAttachment")),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),

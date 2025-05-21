@@ -40,8 +40,6 @@ public class ReportServiceImpl implements ReportService {
     public Set<ChecklistResponse> getChecklistById(UUID takId) {
 
         Set<ChecklistResponse>  response=new  HashSet<>(reportRepository.getChecklistById(takId));
-
-
         return response;
     }
 }
