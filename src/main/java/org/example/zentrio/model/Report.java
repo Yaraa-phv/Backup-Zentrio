@@ -16,6 +16,7 @@ public class Report {
 
     private UUID reportId;
     private LocalDate creationDate;
+    private Integer version;
     private  UUID boardId;
     private List<AllMember> allMembers;
     private String boardName;

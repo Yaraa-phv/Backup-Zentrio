@@ -31,14 +31,15 @@ public interface ReportRepository {
 
 
     @Select("""
-    
-            SELECT stage AS tasks, COUNT(*) AS total
-    FROM tasks WHERE board_id=#{boardId}
-    GROUP BY tasks
-    """)
+    SELECT task_id, stage AS tasks
+    FROM tasks
+    WHERE board_id = #{boardId}
+""")
     @Results(id = "tasksCountMapper", value = {
             @Result(property = "task", column = "tasks"),
-            @Result(property = "total", column = "total")
+            @Result(property = "taskId", column = "task_id"),
+            @Result(property = "checklist", column = "task_id",
+                    many = @Many(select = "getChecklistById"))
     })
     List<AllTasks> getTasks(UUID boardId);
 
@@ -51,6 +52,7 @@ public interface ReportRepository {
             @Result(property = "reportId" , column = "report_id"),
             @Result(property = "creationDate" , column = "created_at"),
             @Result(property = "boardId" , column = "board_id"),
+            @Result(property = "version" , column = "version"),
             @Result(property = "allMembers" , column = "board_id",
             many =@Many (select = "getMember") ),
             @Result(property = "boardName" , column = "board_id",
@@ -69,8 +71,14 @@ public interface ReportRepository {
     @Select("""
         select details from attachments where checklist_id= #{checklistId}
         """)
+    @Result(column = "details", property = "details", typeHandler = JsonbTypeHandler.class)
     Map<String, String> getAttachment(UUID checklistId);
 
+    @Select("""
+        select details from attachments where checklist_id= #{checklistId}
+        """)
+    @Result(column = "details", property = "details", typeHandler = JsonbTypeHandler.class)
+    Map<String, Object> getAttachmentBYId(UUID checklistId);
 
     @Select("""
         
@@ -98,8 +106,8 @@ public interface ReportRepository {
             one = @One(select = "allMemberUsernames")),
             @Result(property = "comments", column = "checklist_id",
             one = @One(select = "countComments")),
-            @Result(property = "attachments", column = "checklist_id",typeHandler = JsonbTypeHandler.class,
-            one = @One(select = "getAttachment")),
+            @Result(property = "attachments", column = "checklist_id",
+            one = @One(select = "getAttachmentBYId")),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
             @Result(property = "taskId", column = "task_id"),
