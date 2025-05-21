@@ -69,7 +69,7 @@ public class ReportController {
 
 
 
-    @GetMapping("get-checklist-by-Id")
+    @GetMapping("get-checklist-by-Task-Id")
     public ResponseEntity<ApiResponse <Set<ChecklistResponse>>>  getChecklistById (@RequestParam UUID checklistId) {
         ApiResponse<Set<ChecklistResponse>> apiResponse = ApiResponse.<Set<ChecklistResponse>>builder()
                 .success(true)

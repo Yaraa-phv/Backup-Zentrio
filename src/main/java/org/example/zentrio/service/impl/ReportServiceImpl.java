@@ -37,9 +37,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Set<ChecklistResponse> getChecklistById(UUID checklistId) {
+    public Set<ChecklistResponse> getChecklistById(UUID takId) {
 
-        Set<ChecklistResponse>  response=new  HashSet<>(reportRepository.getChecklistById(checklistId));
+        Set<ChecklistResponse>  response=new  HashSet<>(reportRepository.getChecklistById(takId));
 
 
         return response;
