@@ -3,6 +3,7 @@ package org.example.zentrio.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentRequest {
     @NotBlank
-    @NotBlank
+    @NotNull
     private String content;
 
-    @JsonSerialize
-    @JsonFormat
-    private LocalDateTime creationDate;
 
 }

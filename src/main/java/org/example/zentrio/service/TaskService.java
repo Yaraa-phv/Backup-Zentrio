@@ -1,22 +1,20 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Task;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public interface TaskService {
-    Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest);
+    Task createTask(UUID ganttBarId, TaskRequest taskRequest);
 
-    ApiResponse<HashMap<String, Task>> getAllTasks(UUID boardId, UUID ganttBarId,Integer page,Integer size);
+    ApiResponse<List<Task>> getAllTasksByGanttBarId(UUID ganttBarId,Integer page,Integer size);
 
     Task getTaskById(UUID taskId);
 
-    HashMap<String, Task> getTaskByTitle(UUID boardId,String title);
+    List<Task> getTaskByTitle(UUID boardId,String title);
 
     Task updateTaskById(UUID taskId, TaskRequest taskRequest);
 
@@ -32,5 +30,5 @@ public interface TaskService {
 
     Task assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId);
 
-
+    ApiResponse<List<Task>> getAllTasksByBoardId(UUID boardId, Integer page, Integer size);
 }

@@ -18,5 +18,5 @@ public class Comment {
     private String content;
     private LocalDateTime creationDate;
     private UUID checklistId;
-    private UUID userId;
+    private UUID memberId;
 }

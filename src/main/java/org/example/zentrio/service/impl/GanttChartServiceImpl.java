@@ -34,9 +34,9 @@ public class GanttChartServiceImpl implements GanttChartService {
     @Override
     public void userRole(UUID boardID){
         boardService.getBoardByBoardId(boardID);
-        String role = memberRepository.getRoleByBoardIdAndUserId(boardID, userId());
+        String role = memberRepository.getRolePMByBoardIdAndUserId(boardID, userId());
         if (role == null) {
-            throw new NotFoundException(" You are not in member this board in");
+            throw new NotFoundException(" You are not in MANAGER this board in");
         }
         if(!role.equals(RoleName.ROLE_MANAGER.name())){
             throw new BadRequestException("Only MANAGER roles are allowed");

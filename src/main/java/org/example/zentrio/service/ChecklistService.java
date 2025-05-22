@@ -2,7 +2,6 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.model.Checklist;
-import org.example.zentrio.model.Task;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +14,15 @@ public interface ChecklistService {
 
     UUID checkTaskIdToGetChecklist(UUID taskId);
 
-    HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId);
+    List<Checklist> getAllChecklistByTaskId(UUID taskId);
 
-    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
+    Checklist getChecklistChecklistId( UUID checklistId);
 
     HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
 
-    Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest);
+    Checklist updateChecklistById(UUID checklistId, ChecklistRequest checklistRequest);
 
-    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+    Checklist deleteChecklistByChecklist(UUID checklistId);
 
     Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId);
 }

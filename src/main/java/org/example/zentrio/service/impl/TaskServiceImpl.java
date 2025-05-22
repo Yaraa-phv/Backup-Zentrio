@@ -31,29 +31,34 @@ public class TaskServiceImpl implements TaskService {
     private final BoardRepository boardRepository;
     private final AuthService authService;
 
-    public List<UUID> checkExistedBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId){
+    public List<UUID> checkExistedGanttBarId( UUID ganttBarId){
+
+        GanttBar getGanttBarById = ganttBarService.getGanttBarByGanttBartID(ganttBarId);
+        if (getGanttBarById == null){
+            throw new NotFoundException("Gantt Bar not found!");
+        }
+        if (!ganttBarId.equals(getGanttBarById.getGanttBarId())){
+            throw new NotFoundException("Gantt Bar not found!");
+        }
+        UUID ganttChartId = getGanttBarById.getGanttChartId();
+        if (ganttChartId == null){
+            throw new NotFoundException("Gantt Bar Id not found!");
+        }
+        GanttChart getGanttChartById = ganttChartService.getGanttChartByID(ganttChartId);
+        if (getGanttChartById == null){
+            throw new NotFoundException("Gantt Chart not found!");
+        }
+
+        UUID boardId = getGanttChartById.getBoard_id();
         if (boardId != null) {
             boardService.checkExistedBoardId(boardId);
         } else {
             throw new NotFoundException("Board Id not found! Cannot create task!");
         }
 
-        GanttChart ganttChartByBoardId = ganttChartService.getGanttChartByBoardId(boardId);
-        UUID existedGanttChartId = ganttChartByBoardId.getGanttChartId();
+        ganttBarId = getGanttBarById.getGanttBarId();
 
-        if (ganttBarId == null){
-            throw new NotFoundException("Gantt Bar Id not found!");
-        }
-
-        GanttBar ganttBarByGanttChartIdAndGanttBarId = ganttBarService.getGanttBarByGanttChartIdAndGanttBarId(existedGanttChartId, ganttBarId);
-        if (ganttBarByGanttChartIdAndGanttBarId == null){
-            throw new NotFoundException("Gantt Bar Id cannot find!");
-        }
-//        UUID existedGanttBarId = ganttBarByGanttChartIdAndGanttBarId.getGanttBarId();
-        if (!ganttBarId.equals(ganttBarByGanttChartIdAndGanttBarId.getGanttBarId())){
-            throw new NotFoundException("Gantt Bar Id not found!");
-        }
-        return List.of(boardId, ganttBarByGanttChartIdAndGanttBarId.getGanttBarId());
+        return List.of(boardId, ganttBarId);
     }
 
     public UUID checkExistedBoardByUserId(UUID currentUserId, UUID boardId){
@@ -65,24 +70,25 @@ public class TaskServiceImpl implements TaskService {
         }
 
         Member checkMember = memberRepository.getMemberByUserIdAndBoardId(currentUserId, boardId);
-        System.out.println("checkMember : " + checkMember);
-        System.out.println("checkMember id : " + checkMember.getMemberId());
         if (checkMember == null){
             throw new BadRequestException("You are not a member here!");
         }
+//        System.out.println("checkMember : " + checkMember);
+//        System.out.println("checkMember id : " + checkMember.getMemberId());
 
         UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(checkMember.getMemberId());
-        System.out.println("roleIdOfExistedMember : " + roleIdOfExistedMember);
+//        System.out.println("roleIdOfExistedMember : " + roleIdOfExistedMember);
         String roleOfExistedMember = roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
-        System.out.println("roleOfExistedMember : " + roleOfExistedMember);
+//        System.out.println("roleOfExistedMember : " + roleOfExistedMember);
+        String managerRole = RoleName.ROLE_MANAGER.toString();
+        String leaderRole = RoleName.ROLE_LEADER.toString();
         if (roleOfExistedMember.isEmpty()){
             throw new BadRequestException("You are not a member here!");
         }
-        if (!roleOfExistedMember.equals(RoleName.ROLE_MANAGER.toString())){
-            throw new NotFoundException("You are not a MANAGER here!");
-        }
-        if (roleOfExistedMember.equals(RoleName.ROLE_MANAGER.toString())){
-            return boardId;
+        if (!roleOfExistedMember.equals(managerRole)){
+            if (!roleOfExistedMember.equals(leaderRole)){
+                throw new BadRequestException("You are not a MANAGER or a LEADER here!");
+            }
         }
 
         return boardId;
@@ -95,7 +101,7 @@ public class TaskServiceImpl implements TaskService {
         }
         taskId = task.getTaskId();
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
+        checkExistedGanttBarId( task.getGanttBarId());
         UUID currentUserId = authService.getCurrentAppUserId();
         UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
         Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
@@ -107,40 +113,62 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
-    public Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest) {
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
+    public Task createTask( UUID ganttBarId, TaskRequest taskRequest) {
+        List<UUID> existedIds = checkExistedGanttBarId(ganttBarId);
         UUID currentUserId = authService.getCurrentAppUserId();
+        UUID boardId = existedIds.get(0);
         boardId = checkExistedBoardByUserId(currentUserId, boardId);
         return taskRepository.createTask(boardId, ganttBarId, taskRequest);
     }
 
     @Override
-    public ApiResponse<HashMap<String, Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
+    public ApiResponse<List<Task>> getAllTasksByGanttBarId(UUID ganttBarId, Integer page, Integer size) {
 
 
         Integer offset = page * size;
 
-        List<UUID> existedIds = checkExistedBoardIdAndGanttBarId(boardId, ganttBarId);
+        List<UUID> existedIds = checkExistedGanttBarId(ganttBarId);
         UUID existedBoardId = existedIds.get(0);
         System.out.println("board id : " + existedBoardId);
-        UUID existedGanttBarId = existedIds.get(1);
-        System.out.println("gantt bar id : " + existedGanttBarId);
+        ganttBarId = existedIds.get(1);
+        System.out.println("gantt bar id : " + ganttBarId);
 
-        List<Task> taskList = taskRepository.getAllTasks(boardId, ganttBarId, size, offset);
+        List<Task> taskList = taskRepository.getAllTasksByGanttBarId( ganttBarId, size, offset);
 
 
-        HashMap<String, Task> tasks = new HashMap<>();
-        for (Task task : taskList) {
-            tasks.put(task.getTitle(), task);
-        }
-
-        Integer totalElements = taskRepository.countTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
+        Integer totalElements = taskRepository.countTasksByGanttBarId( ganttBarId);
         Integer totalPages = (int) Math.ceil(totalElements / (double) size);
 
-        return ApiResponse.<HashMap<String, Task>>builder()
+        return ApiResponse.<List<Task>>builder()
                 .success(true)
-                .message("Get all tasks successfully")
-                .payload(tasks)
+                .message("Get all tasks by gantt bar id successfully")
+                .payload(taskList)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .pagination(new Pagination(page, totalElements, totalPages))
+                .build();
+    }
+
+    @Override
+    public ApiResponse<List<Task>> getAllTasksByBoardId(UUID boardId, Integer page, Integer size) {
+        Integer offset = page * size;
+
+        if (boardId != null) {
+            boardService.checkExistedBoardId(boardId);
+        } else {
+            throw new NotFoundException("Board Id not found! Cannot create task!");
+        }
+
+        List<Task> taskList = taskRepository.getAllTasksByBoardId( boardId, size, offset);
+
+
+        Integer totalElements = taskRepository.countTasksByBoardId( boardId);
+        Integer totalPages = (int) Math.ceil(totalElements / (double) size);
+
+        return ApiResponse.<List<Task>>builder()
+                .success(true)
+                .message("Get all tasks by board id successfully")
+                .payload(taskList)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .pagination(new Pagination(page, totalElements, totalPages))
@@ -150,17 +178,20 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task getTaskById( UUID taskId) {
         Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null){
+            throw new NotFoundException("Task with this id not found!");
+        }
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
+        checkExistedGanttBarId(task.getGanttBarId());
         if (taskId == null){
             throw new NotFoundException("Task Id not found!");
-        } else {
-            return taskRepository.getTaskById(task.getBoardId(), task.getGanttBarId(), taskId);
         }
+            return taskRepository.getTaskById(task.getBoardId(), task.getGanttBarId(), taskId);
+
     }
 
     @Override
-    public HashMap<String, Task> getTaskByTitle(UUID boardId, String title) {
+    public List<Task> getTaskByTitle(UUID boardId, String title) {
 
         if (boardId != null) {
             boardService.checkExistedBoardId(boardId);
@@ -168,15 +199,10 @@ public class TaskServiceImpl implements TaskService {
             throw new NotFoundException("Board Id not found! Cannot create task!");
         }
 
-        HashMap<String, Task> tasks = new HashMap<>();
-        for (Task t : taskRepository.getAllTaskByBoardIdAndTitle(boardId, title)){
-         tasks.put(t.getTitle(), t);
-        }
-
         if (title == null){
             throw new NotFoundException("Task title not found!");
         }
-        return tasks;
+        return taskRepository.getAllTaskByBoardIdAndTitle(boardId, title);
     }
 
     @Override
@@ -316,6 +342,8 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.assignMemberToTaskWithRole(assignUserIdInMemberTable, assignTo, taskId);
         return task;
     }
+
+
 
 
 }
