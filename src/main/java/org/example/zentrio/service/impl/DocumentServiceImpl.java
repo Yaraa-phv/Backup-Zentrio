@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.http.HttpTransport;
@@ -22,6 +23,7 @@ import org.example.zentrio.repository.DocumentRepository;
 import org.example.zentrio.service.DocumentService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -312,6 +314,73 @@ public class DocumentServiceImpl implements DocumentService {
 
         return "Folder deleted with ID: " + folderId;
     }
+
+
+    @Override
+    public Document uploadDocumentToDrive(
+            String accessToken,
+            MultipartFile multipartFile,
+            UUID boardId
+    ) throws GeneralSecurityException, IOException {
+
+        // Validate board
+        Board board = boardRepository.getBoardByBoardId(boardId);
+        if (board == null) {
+            throw new NotFoundException("Board not found with ID: " + boardId);
+        }
+
+        // Detect file type and validate
+        String originalFilename = multipartFile.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new BadRequestException("Invalid file name.");
+        }
+
+        String extension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
+
+        String googleMimeType = switch (extension) {
+            case "doc", "docx" -> "application/vnd.google-apps.document";
+            case "xls", "xlsx" -> "application/vnd.google-apps.spreadsheet";
+            case "ppt", "pptx" -> "application/vnd.google-apps.presentation";
+            default -> throw new BadRequestException("Unsupported file type: " + extension);
+        };
+
+        Drive drive = createDriveService(accessToken);
+
+        // Save to temp file
+        java.io.File tempFile = java.io.File.createTempFile("upload-", originalFilename);
+        multipartFile.transferTo(tempFile);
+
+        try {
+            File fileMetadata = new File();
+            fileMetadata.setName(originalFilename);
+            fileMetadata.setMimeType(googleMimeType);
+
+            FileContent mediaContent = new FileContent(multipartFile.getContentType(), tempFile);
+
+            File uploadedFile = drive.files()
+                    .create(fileMetadata, mediaContent)
+                    .setFields("id, name, mimeType, webViewLink")
+                    .execute();
+
+            if (uploadedFile == null) {
+                throw new RuntimeException("Upload failed — Google Drive did not return a file.");
+            }
+
+            return documentRepository.createFolder(
+                    LocalDateTime.now(),
+                    uploadedFile.getMimeType(),
+                    userId(),
+                    boardId,
+                    uploadedFile.getWebViewLink(),
+                    uploadedFile.getName(),
+                    uploadedFile.getId()
+            );
+
+        } finally {
+            tempFile.delete();
+        }
+    }
+
 
 
 

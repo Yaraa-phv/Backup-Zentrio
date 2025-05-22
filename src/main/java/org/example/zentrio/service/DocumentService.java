@@ -3,6 +3,7 @@ package org.example.zentrio.service;
 import com.google.api.services.drive.model.File;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -31,4 +32,8 @@ public interface DocumentService {
 
 
     List<Document> getDocumentByType(UUID boardId, FileTypes mimeType);
+
+    Document uploadDocumentToDrive(String accessToken,
+                                   MultipartFile multipartFile,
+                                   UUID boardId) throws GeneralSecurityException, IOException;
 }

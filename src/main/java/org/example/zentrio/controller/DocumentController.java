@@ -10,10 +10,13 @@ import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
 import org.example.zentrio.service.DocumentService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.google.api.services.drive.model.File;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
@@ -79,6 +82,27 @@ public class DocumentController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+
+
+
+    @PostMapping(value = "/upload-document"  ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create Document by upload")
+    public ResponseEntity<ApiResponse<Document>> uploadFolder(@RequestParam String accessToken,
+                                                              @RequestParam MultipartFile multipartFile,
+                                                              @RequestParam  UUID boardId)
+            throws IOException, GeneralSecurityException {
+        ApiResponse<Document> response =  ApiResponse.<Document>builder()
+                .success(true)
+                .message("Folder create Successfully ")
+                .payload(documentService.uploadDocumentToDrive(accessToken, multipartFile,boardId))
+                .status(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
     @DeleteMapping("/delete-document")

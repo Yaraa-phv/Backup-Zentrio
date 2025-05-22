@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface DocumentRepository {
 
     @Select("""
-        INSERT INTO documents(created_at,doc_type,user_id,board_id,drive_url,decriptction,folder_id)
+        INSERT INTO documents(created_at,doc_type,user_id,board_id,drive_url,description,folder_id)
         VALUES (#{now}, #{mimeType}, #{uuid}, #{boardId}, #{webViewLink}, #{name}, #{id})
         RETURNING *
         """)
@@ -23,7 +23,7 @@ public interface DocumentRepository {
             @Result(property = "ownerId", column = "user_id"),
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "drive_url", column = "drive_url"),
-            @Result(property = "description", column = "decriptction"),
+            @Result(property = "description", column = "description"),
             @Result(property = "folderId", column = "folder_id")
     })
     Document createFolder(LocalDateTime now, String mimeType, UUID uuid, UUID boardId, String webViewLink, String name, String id);
@@ -89,7 +89,7 @@ public interface DocumentRepository {
 
     @Select("""
         SELECT * FROM documents 
-                 where board_id=#{boardId} AND decriptction ILIKE '%' || #{documentName} || '%' AND user_id=#{userId}
+                 where board_id=#{boardId} AND description ILIKE '%' || #{documentName} || '%' AND user_id=#{userId}
         """)
     @ResultMap("folderMapper")
     List<Document> getDocumentByName(UUID boardId, String documentName, UUID userId);
