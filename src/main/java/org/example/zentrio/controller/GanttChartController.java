@@ -89,7 +89,7 @@ public class GanttChartController {
 
 
     @Operation(summary = "Get GanttChart By GanttChartID")
-    @GetMapping("/gantt-chartid/{ganttChartID}")
+    @GetMapping("/gantt-chartId/{ganttChartID}")
     public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByID(@PathVariable("ganttChartID") UUID ganttChartId){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()

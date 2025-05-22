@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.GanttBarRequest;
+import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.GanttBar;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface GanttBarRepository {
             @Result(property = "startAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
             @Result(property = "ganttChartId", column = "gantt_chart_id"),
+            @Result(property = "teamLead", column = "gantt_bar_id",
+            many = @Many(select = "teamLeadGanttBar")),
     })
     GanttBar createGanttBar(UUID ganttChartId,@Param("request") GanttBarRequest ganttBarRequest);
 
@@ -67,4 +70,21 @@ public interface GanttBarRepository {
         SELECT title FROM gantt_bars WHERE gantt_bar_id = #{ganttBarId}
     """)
     String getGanttBarName(UUID ganttBarId);
+
+    @Select("""
+        
+            SELECT us.username AS name,us.profile_image AS image
+        FROM gantt_bars g
+                 JOIN tasks ts ON ts.gantt_bar_id = g.gantt_bar_id
+                 JOIN task_assignment ta ON ta.task_id = ts.task_id
+                 JOIN members m ON m.member_id = ta.assigned_to
+                 JOIN roles r on r.role_id= m.role_id
+                 JOIN users us ON us.user_id = m.user_id
+        WHERE g.gantt_bar_id = #{ganttBarId};
+        """)
+    @Results(id = "teamLeadGanttBarMapper", value = {
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "userName", column = "name"),
+    })
+    List<MemberResponse> teamLeadGanttBar(UUID ganttBarId);
 }

@@ -88,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
             if (memberId ==null){
                 throw new BadRequestException("Member not found");
             }
-            if(memberId.equals(comment.getMemberId())){
+            if(memberId.equals(comment.getCommentBy())){
                 comment = commentRepository.deleteCommentByCommentId(commentId);
             }else {
                 throw new BadRequestException("This Comment does not belong to yours");
@@ -101,58 +101,60 @@ public class CommentServiceImpl implements CommentService {
     }
 
     //not work correct
-//    @Override
-//    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
-//        Comment  comment = getCommentByCommentId(commentId);
-//        Checklist checklist= checklistService.getChecklistChecklistId(comment.getChecklistId());
-//        Task task= taskService.getTaskById(checklist.getTaskId());
-//        String role= memberRepository.getRoleInTask(task.getBoardId(),userId(), task.getTaskId());
-//        System.out.println("role:" + role);
-//        Comment comment1 = new Comment();
-//        if (role == null) {
-//            UUID memberId= memberRepository.getMemberId(userId(),task.getBoardId());
-//            if (memberId ==null){
-//                throw new NotFoundException("You are not member in this board");
-//            }
-//            if(memberId.equals(comment.getMemberId())){
-//                comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-//            }else {
-//                throw new BadRequestException("This Comment does not belong to yours");
-//            }
-//        }
-//        if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
-//           UUID teamLeastId= memberRepository.getTeamleadUUID(userId(),checklist.getTaskId());
-//           UUID pmId= memberRepository.getPmId(userId(),task.getBoardId());
-//            System.out.println(userId()+ "board"+task.getBoardId());
-//            System.out.println("pmId:" + pmId);
-//           if (teamLeastId != null) {
-//               if (teamLeastId.equals(comment.getMemberId())) {
-//                   comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-//                   System.out.println("Team lead");
-//               }else {
-//                   throw new BadRequestException("This Comment does not belong to yours team lead");
-//               }
-//           } else if (pmId != null) {
-//               if (pmId.equals(comment.getMemberId())) {
-//                   comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-//                   System.out.println("Pm lead");
-//               }else {
-//                   throw new BadRequestException("This Comment does not belong to yours pm");
-//               }
-//           }else {
-//               throw new BadRequestException("This Comment does not belong to yours");
-//           }
-//        }
-//        return comment1;
-//    }
-//    private boolean canModifyComment(Comment comment, Task task) {
-//        String role = memberRepository.getRoleInTask(task.getBoardId(), userId(), task.getTaskId());
-//        if (role == null) {
-//            UUID memberId = memberRepository.getMemberId(userId(), task.getBoardId());
-//            return memberId != null && memberId.equals(comment.getMemberId());
-//        }
-//        return role.equals(RoleName.ROLE_MANAGER.name()) || role.equals(RoleName.ROLE_LEADER.name());
-//    }
+    @Override
+    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
+        Comment  comment = getCommentByCommentId(commentId);
+        System.out.println(comment.getChecklistId());
+        Checklist checklist= checklistService.getChecklistChecklistId(comment.getChecklistId());
+        System.out.println(checklist);
+        Task task= taskService.getTaskById(checklist.getTaskId());
+        String role= memberRepository.getRoleInTask(task.getBoardId(),userId(), task.getTaskId());
+        System.out.println("role:" + role);
+        Comment comment1 = new Comment();
+        if (role == null) {
+            UUID memberId= memberRepository.getMemberId(userId(),task.getBoardId());
+            if (memberId ==null){
+                throw new NotFoundException("You are not member in this board");
+            }
+            if(memberId.equals(comment.getCommentBy())){
+                comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
+            }else {
+                throw new BadRequestException("This Comment does not belong to yours");
+            }
+        }
+        if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
+           UUID teamLeastId= memberRepository.getTeamleadUUID(userId(),checklist.getTaskId());
+           UUID pmId= memberRepository.getPmId(userId(),task.getBoardId());
+            System.out.println(userId()+ "board"+task.getBoardId());
+            System.out.println("pmId:" + pmId);
+           if (teamLeastId != null) {
+               if (teamLeastId.equals(comment.getCommentBy())) {
+                   comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
+                   System.out.println("Team lead");
+               }else {
+                   throw new BadRequestException("This Comment does not belong to yours team lead");
+               }
+           } else if (pmId != null) {
+               if (pmId.equals(comment.getCommentBy())) {
+                   comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
+                   System.out.println("Pm lead");
+               }else {
+                   throw new BadRequestException("This Comment does not belong to yours pm");
+               }
+           }else {
+               throw new BadRequestException("This Comment does not belong to yours");
+           }
+        }
+        return comment1;
+    }
+    private boolean canModifyComment(Comment comment, Task task) {
+        String role = memberRepository.getRoleInTask(task.getBoardId(), userId(), task.getTaskId());
+        if (role == null) {
+            UUID memberId = memberRepository.getMemberId(userId(), task.getBoardId());
+            return memberId != null && memberId.equals(comment.getCommentBy());
+        }
+        return role.equals(RoleName.ROLE_MANAGER.name()) || role.equals(RoleName.ROLE_LEADER.name());
+    }
 //    @Override
 //    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
 //        Comment comment = getCommentByCommentId(commentId);
@@ -180,16 +182,16 @@ public class CommentServiceImpl implements CommentService {
 //        return commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
 //    }
 
-    @Override
-    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
-        Comment comment = getCommentByCommentId(commentId);  // fetch comment
-
-        if (!comment.getMemberId().equals(userId())) {
-            throw new BadRequestException("You do not have permission to update this comment because you do not own it.");
-        }
-
-        return commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-    }
+//    @Override
+//    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
+//        Comment comment = getCommentByCommentId(commentId);  // fetch comment
+//
+//        if (!comment.getMemberId().equals(userId())) {
+//            throw new BadRequestException("You do not have permission to update this comment because you do not own it.");
+//        }
+//
+//        return commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
+//    }
 
 
 

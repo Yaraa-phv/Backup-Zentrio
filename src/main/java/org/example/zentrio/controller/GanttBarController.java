@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Gantt-bars Controller")
-public class GanttBarContrtoller {
+public class GanttBarController {
 
     private final GanttBarService ganttBarService;
 

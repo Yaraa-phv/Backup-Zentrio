@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponse;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,4 +19,5 @@ public class Feedback {
     private String comment;
     private UUID taskId;
     private UUID userId;
+    private MemberResponse user;
 }

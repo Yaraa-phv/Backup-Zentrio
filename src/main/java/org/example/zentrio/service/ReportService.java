@@ -14,7 +14,7 @@ public interface ReportService {
 
     List<AllMember> getMember(UUID boardId);
 
-    Map<String, String> getAttachment(UUID checklistId);
+    Map<String, Object> getAttachment(UUID checklistId);
 
     Set<ChecklistResponse> getChecklistById(UUID checklistId);
 }

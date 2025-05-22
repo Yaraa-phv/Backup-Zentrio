@@ -21,7 +21,9 @@ public interface FeedbackRepository {
             @Result( property = "createAt",column = "created_at"),
             @Result( property = "comment",column = "comment"),
             @Result(property = "taskId", column = "task_id"),
-            @Result(property = "userId", column = "feedback_by")
+            @Result(property = "userId", column = "feedback_by"),
+            @Result(property = "user", column = "feedback_by",
+            one = @One(select = "org.example.zentrio.repository.CommentRepository.getMemberByUserId"))
     })
     Feedback createFeedback(LocalDateTime time, UUID userId, UUID taskId, @Param("request") FeedbackRequest feedbackRequest);
 

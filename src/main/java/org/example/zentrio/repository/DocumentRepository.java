@@ -72,17 +72,17 @@ public interface DocumentRepository {
 
 
     @Select(""" 
-            UPDATE  documents SET is_private=#{is_private}
+            UPDATE  documents SET is_public=#{is_private}
             WHERE user_id=#{userID} AND document_id=#{documentId}
             RETURNING *
         """)
     @ResultMap("folderMapper")
-    void publicfolder( UUID userID ,UUID documentId, boolean is_private);
+    void publicFolder(UUID userID , UUID documentId, boolean is_private);
 
 
     @Select("""
         SELECT  * FROM  documents  
-        WHERE is_private= true AND user_id= #{userID}
+        WHERE is_public= true AND user_id= #{userID}
         """)
     @ResultMap("folderMapper")
     List<Document> getAllPublicDocument(UUID userID);

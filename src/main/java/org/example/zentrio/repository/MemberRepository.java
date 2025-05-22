@@ -81,11 +81,11 @@ public interface MemberRepository {
 
     @Select("""
        
-                   SELECT r.role_name FROM roles r
-                                              INNER JOIN  members m ON m.role_id = r.role_id
-                  WHERE  m.user_id= #{userId}
-                    AND  m.role_id= '34e22ec4-0898-44db-acf5-1c3ae5f8ef25'
-                    AND  m.board_id= #{boardId} limit 1;
+         SELECT r.role_name FROM roles r
+            INNER JOIN  members m ON m.role_id = r.role_id
+           WHERE  m.user_id= #{userId}
+            AND  r.role_name='ROLE_MANAGER'
+           AND  m.board_id= #{boardId} limit 1;
         
         """)
     String getRolePMByBoardIdAndUserId(UUID boardId, UUID userId);
@@ -102,9 +102,10 @@ public interface MemberRepository {
 
 
     @Select("""
-        SELECT member_id FROM members 
-                         WHERE user_id = #{userId} AND board_id = #{boardId}
-                        AND role_id= '58ad541b-2dea-4a64-a2e2-d40835abba95'
+      SELECT member_id FROM members m
+         JOIN roles r ON r.role_id= m.role_id
+          WHERE m.user_id = #{userId}
+    AND m.board_id = #{boardId} AND r.role_name='ROLE_MEMBER'
     """)
 //    @ResultMap("memberMapper")
     UUID getMemberId(UUID userId, UUID boardId);
@@ -112,9 +113,10 @@ public interface MemberRepository {
 
 
     @Select("""
-            SELECT member_id FROM members 
-                         WHERE user_id = #{userId} AND board_id = #{boardId}
-                        AND role_id= '34e22ec4-0898-44db-acf5-1c3ae5f8ef25'
+          SELECT member_id FROM members m
+            inner join roles r on m.role_id= r.role_id
+          WHERE user_id = #{userId}  AND board_id = #{boardId}
+            AND r.role_name='ROLE_MANAGER'
         """)
     UUID getPmId(UUID userId, UUID boardId);
 

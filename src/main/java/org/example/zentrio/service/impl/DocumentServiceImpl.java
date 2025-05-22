@@ -8,7 +8,6 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 
 import com.google.api.services.drive.model.Permission;
 import lombok.RequiredArgsConstructor;
@@ -190,7 +189,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .setSendNotificationEmail(false)
                 .setSupportsAllDrives(true)
                 .execute();
-        documentRepository.publicfolder( userId(),documentId,true);
+        documentRepository.publicFolder( userId(),documentId,true);
         return  "Folder shared successfully with: " + folder.getWebViewLink();
     }
 

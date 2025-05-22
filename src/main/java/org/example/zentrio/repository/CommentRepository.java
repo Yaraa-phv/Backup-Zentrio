@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.CommentRequest;
+import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Comment;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,9 @@ public interface CommentRepository {
             @Result(property = "content", column = "content"),
             @Result(property = "creationDate" , column = "comment_date"),
             @Result(property = "checklistId" , column = "checklist_id"),
-            @Result(property = "memberId" , column = "commented_by")
+            @Result(property = "commentBy" , column = "commented_by"),
+            @Result(property = "member" , column = "commented_by",
+            one = @One(select = "getMemberByUserId" ))
     })
 
     Comment createComment(UUID checklistId, @Param("request") CommentRequest commentRequest, LocalDateTime time, UUID userId);
@@ -57,4 +60,18 @@ public interface CommentRepository {
         """)
     @ResultMap("commentMapper")
     Comment UpdateCommentByCommentId(UUID commentId,@Param("request") CommentRequest commentRequest);
+
+    @Select("""
+        
+         SELECT u.profile_image AS image , u.username AS name FROM users u
+        INNER JOIN  members m ON u.user_id = m.user_id
+        WHERE member_id= #{memberId}
+        """)
+    @Results(id = "memberResponseMapper", value = {
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "userName", column = "name"),
+    })
+    MemberResponse getMemberByUserId(UUID memberId);
+
+
 }

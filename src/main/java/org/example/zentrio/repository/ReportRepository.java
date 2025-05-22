@@ -8,6 +8,7 @@ import org.example.zentrio.model.Report;
 import org.example.zentrio.utility.JsonbTypeHandler;
 import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +47,10 @@ public interface ReportRepository {
 
 
     @Select("""
-        SELECT * FROM  reports WHERE board_id=#{boardId}
+        SELECT * FROM  reports WHERE board_id=#{boardId}  
+            ORDER BY version DESC
+            LIMIT 1
+        
         """)
     @Results(id = "reportMapping", value = {
             @Result(property = "reportId" , column = "report_id"),
@@ -72,7 +76,7 @@ public interface ReportRepository {
         select details from attachments where checklist_id= #{checklistId}
         """)
     @Result(column = "details", property = "details", typeHandler = JsonbTypeHandler.class)
-    Map<String, String> getAttachment(UUID checklistId);
+    Map<String, Object> getAttachment(UUID checklistId);
 
     @Select("""
         select details from attachments where checklist_id= #{checklistId}
@@ -115,4 +119,9 @@ public interface ReportRepository {
     })
     List<ChecklistResponse> getChecklistById(UUID checklistId);
 
+    @Select("""
+        INSERT  INTO reports(created_at,created_by,board_id)
+        VALUES (#{time}, #{pmID}, #{boardId})
+        """)
+    void createReport(LocalDateTime time, UUID boardId, UUID pmID);
 }

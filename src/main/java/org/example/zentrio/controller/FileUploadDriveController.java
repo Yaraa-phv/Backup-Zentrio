@@ -23,9 +23,9 @@ import java.util.List;
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-public class FileuploadDriveController {
+public class FileUploadDriveController {
 
-    private final FileUploadService fileSevice;
+    private final FileUploadService fileService;
 
 
     @GetMapping("/getFileBy-FolderID")
@@ -35,7 +35,7 @@ public class FileuploadDriveController {
         ApiResponse<List<File>> response =  ApiResponse.<List<File>>builder()
                 .success(true)
                 .message("file get succesfully ")
-                .payload(fileSevice.getAllFilesByFolderId(accessToken,folderId))
+                .payload(fileService.getAllFilesByFolderId(accessToken,folderId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -50,7 +50,7 @@ public class FileuploadDriveController {
         ApiResponse<List<File>> response =  ApiResponse.<List<File>>builder()
                 .success(true)
                 .message("file get successfully ")
-                .payload(fileSevice.getFilesByMimeTypeInFolder(accessToken,mimeType, folderId))
+                .payload(fileService.getFilesByMimeTypeInFolder(accessToken,mimeType, folderId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -66,7 +66,7 @@ public class FileuploadDriveController {
         ApiResponse<File> response = ApiResponse.<File>builder()
                 .success(true)
                 .message("file get successfully ")
-                .payload(fileSevice.getFileById(accessToken, fileId))
+                .payload(fileService.getFileById(accessToken, fileId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -77,7 +77,7 @@ public class FileuploadDriveController {
     @DeleteMapping("/file")
     public ResponseEntity<ApiResponse<String>> deleteFileById(@RequestParam String accessToken,
                                                  @RequestParam String fileId) throws GeneralSecurityException, IOException {
-        fileSevice.deleteFileById(accessToken, fileId);
+        fileService.deleteFileById(accessToken, fileId);
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
                 .message("file create succesfully ")
@@ -101,7 +101,7 @@ public class FileuploadDriveController {
                 .success(true)
                 .message("file create succesfully ")
                 .status(HttpStatus.ACCEPTED)
-                .payload(fileSevice.createDriveFile(accessToken, name, type, folderId))
+                .payload(fileService.createDriveFile(accessToken, name, type, folderId))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -128,7 +128,7 @@ public class FileuploadDriveController {
         ApiResponse<File> response =  ApiResponse.<File>builder()
                 .success(true)
                 .message("rename file  successfully ")
-                .payload(fileSevice.renameDriveFile(accessToken, fileId, newName))
+                .payload(fileService.renameDriveFile(accessToken, fileId, newName))
                 .status(HttpStatus.ACCEPTED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -154,7 +154,7 @@ public class FileuploadDriveController {
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
                 .message("file create succesfully ")
-                .payload(fileSevice.uploadImageToRootDrive(accessToken, multipartFile))
+                .payload(fileService.uploadImageToRootDrive(accessToken, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -173,7 +173,7 @@ public class FileuploadDriveController {
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
                 .message("file create succesfully ")
-                .payload(fileSevice.uploadImageToFolderDrive(accessToken, folderId, multipartFile))
+                .payload(fileService.uploadImageToFolderDrive(accessToken, folderId, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();

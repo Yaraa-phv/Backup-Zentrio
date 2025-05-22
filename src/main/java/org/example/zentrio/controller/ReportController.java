@@ -1,5 +1,6 @@
 package org.example.zentrio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/profiles")
+@RequestMapping("api/v1/reports")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Report Controller")
@@ -31,6 +32,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping
+    @Operation(summary = "Get Report By Board Id")
     public ResponseEntity<ApiResponse<Report>> getReportByBoardId(@RequestParam UUID boardId) {
         ApiResponse<Report> apiResponse = ApiResponse.<Report>builder()
                 .success(true)
@@ -56,10 +58,10 @@ public class ReportController {
 
 
     @GetMapping("get-attachment-by-checklist-Id")
-    public ResponseEntity<ApiResponse <Map<String, String>>>  getAttachment (@RequestParam UUID checklistId) {
+    public ResponseEntity<ApiResponse <Map<String, Object>>>  getAttachment (@RequestParam UUID checklistId) {
         System.out.println(reportService.getAttachment(checklistId));
 
-        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
+        ApiResponse<Map<String, Object>> apiResponse = ApiResponse.<Map<String, Object>>builder()
                 .success(true)
                 .message("Get profile successfully")
                 .payload(reportService.getAttachment(checklistId))
@@ -71,7 +73,7 @@ public class ReportController {
 
 
     @GetMapping("/String")
-    public Map<String, String>  get (@RequestParam UUID checklistId) {
+    public Map<String, Object>  get (@RequestParam UUID checklistId) {
         return reportService.getAttachment(checklistId);
 
 //        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
