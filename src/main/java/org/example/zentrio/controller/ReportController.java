@@ -44,39 +44,24 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @GetMapping("all-user-and-role")
-    public ResponseEntity<ApiResponse <List<AllMember>>> getMember(@RequestParam UUID boardId) {
-        ApiResponse<List<AllMember>> apiResponse = ApiResponse.< List<AllMember>>builder()
-                .success(true)
-                .message("Get profile successfully")
-                .payload(reportService.getMember(boardId))
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-
-    @GetMapping("get-attachment-by-checklist-Id")
-    public ResponseEntity<ApiResponse <Map<String, Object>>>  getAttachment (@RequestParam UUID checklistId) {
-        System.out.println(reportService.getAttachment(checklistId));
-
-        ApiResponse<Map<String, Object>> apiResponse = ApiResponse.<Map<String, Object>>builder()
-                .success(true)
-                .message("Get profile successfully")
-                .payload(reportService.getAttachment(checklistId))
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-
-    @GetMapping("/String")
-    public Map<String, Object>  get (@RequestParam UUID checklistId) {
-        return reportService.getAttachment(checklistId);
-
-//        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
+//    @GetMapping("all-user-and-role")
+//    public ResponseEntity<ApiResponse <List<AllMember>>> getMember(@RequestParam UUID boardId) {
+//        ApiResponse<List<AllMember>> apiResponse = ApiResponse.< List<AllMember>>builder()
+//                .success(true)
+//                .message("Get profile successfully")
+//                .payload(reportService.getMember(boardId))
+//                .status(HttpStatus.OK)
+//                .timestamp(LocalDateTime.now())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
+//
+//
+//    @GetMapping("get-attachment-by-checklist-Id")
+//    public ResponseEntity<ApiResponse <Map<String, Object>>>  getAttachment (@RequestParam UUID checklistId) {
+//        System.out.println(reportService.getAttachment(checklistId));
+//
+//        ApiResponse<Map<String, Object>> apiResponse = ApiResponse.<Map<String, Object>>builder()
 //                .success(true)
 //                .message("Get profile successfully")
 //                .payload(reportService.getAttachment(checklistId))
@@ -84,22 +69,37 @@ public class ReportController {
 //                .timestamp(LocalDateTime.now())
 //                .build();
 //        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-
-
-
-
-    @GetMapping("get-checklist-by-Task-Id")
-    public ResponseEntity<ApiResponse <Set<ChecklistResponse>>>  getChecklistById (@RequestParam UUID checklistId) {
-        ApiResponse<Set<ChecklistResponse>> apiResponse = ApiResponse.<Set<ChecklistResponse>>builder()
-                .success(true)
-                .message("Get profile successfully")
-                .payload(reportService.getChecklistById(checklistId))
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
+//    }
+//
+//
+//    @GetMapping("/String")
+//    public Map<String, Object>  get (@RequestParam UUID checklistId) {
+//        return reportService.getAttachment(checklistId);
+//
+////        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
+////                .success(true)
+////                .message("Get profile successfully")
+////                .payload(reportService.getAttachment(checklistId))
+////                .status(HttpStatus.OK)
+////                .timestamp(LocalDateTime.now())
+////                .build();
+////        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
+//
+//
+//
+//
+//
+//    @GetMapping("get-checklist-by-Task-Id")
+//    public ResponseEntity<ApiResponse <Set<ChecklistResponse>>>  getChecklistById (@RequestParam UUID checklistId) {
+//        ApiResponse<Set<ChecklistResponse>> apiResponse = ApiResponse.<Set<ChecklistResponse>>builder()
+//                .success(true)
+//                .message("Get profile successfully")
+//                .payload(reportService.getChecklistById(checklistId))
+//                .status(HttpStatus.OK)
+//                .timestamp(LocalDateTime.now())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
 
 }

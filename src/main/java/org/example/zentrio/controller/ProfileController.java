@@ -38,7 +38,7 @@ public class ProfileController {
 
     @Operation(summary = "Update user profile", description = "Updates the details of the currently authenticated user. Provide the necessary fields in the request body.")
     @PutMapping("/update-profile")
-    public ResponseEntity<ApiResponse<AppUserResponse>> updateProfile(@Valid ProfileRequest profileRequest) {
+    public ResponseEntity<ApiResponse<AppUserResponse>> updateProfile(@Valid @RequestBody ProfileRequest profileRequest) {
         ApiResponse<AppUserResponse> apiResponse = ApiResponse.<AppUserResponse>builder()
                 .success(true)
                 .message("Updated profile successfully")

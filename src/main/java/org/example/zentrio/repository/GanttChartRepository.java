@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Mapper
-public interface GanttChartRepository {
+public interface  GanttChartRepository {
 
 
     @Select("""
