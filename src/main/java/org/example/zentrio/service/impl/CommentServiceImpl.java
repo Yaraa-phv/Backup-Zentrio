@@ -8,7 +8,6 @@ import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.CommentRepository;
 import org.example.zentrio.repository.MemberRepository;
-import org.example.zentrio.service.ChecklistService;
 import org.example.zentrio.service.CommentService;
 import org.example.zentrio.service.TaskService;
 import org.springframework.security.core.context.SecurityContextHolder;

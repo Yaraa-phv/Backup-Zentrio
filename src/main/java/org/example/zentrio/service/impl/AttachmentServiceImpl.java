@@ -6,7 +6,6 @@ import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.model.Attachment;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.repository.AttachmentRepository;
-import org.example.zentrio.repository.ChecklistRepository;
 import org.example.zentrio.service.AttachmentService;
 import org.springframework.stereotype.Service;
 
