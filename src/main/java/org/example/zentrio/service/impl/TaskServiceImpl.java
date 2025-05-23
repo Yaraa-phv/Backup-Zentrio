@@ -52,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
         //  Task start time must not be before GanttBar's start time
-        if (taskRequest.getStartedAt().isBefore(ganttBar.getStartedAt())) {
+        if (taskRequest.getStartedAt().isBefore(ganttBar.getStartAt())) {
             throw new BadRequestException("Task start time cannot be before GanttBar's start time.");
         }
     }
@@ -60,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
 
     private void validateBoardAndGanttBar(UUID boardId, UUID ganttBarId) {
         boardService.getBoardByBoardId(boardId);
-        ganttBarService.getGanttBarById(ganttBarId);
+        ganttBarService.getGanttBarByGanttBartID(ganttBarId);
     }
 
 
@@ -69,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
         boardService.getBoardByBoardId(boardId);
 
         //  Load GanttBar entity from DB
-        GanttBar ganttBar = ganttBarRepository.getGanttBarById(ganttBarId);
+        GanttBar ganttBar = ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
         if (ganttBar == null) {
             throw new NotFoundException("Gantt bar with ID " + ganttBarId + " not found");
         }
@@ -147,7 +147,7 @@ public class TaskServiceImpl implements TaskService {
     //  taskRepository.insertTaskAssignment(task.getTaskId(),managerId,memberId);
     @Override
     public Task getTaskById(UUID taskId) {
-        Task task = taskRepository.getTaskById(taskId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
         if (task == null) {
             throw new NotFoundException("Task with ID " + taskId + " not found");
         }

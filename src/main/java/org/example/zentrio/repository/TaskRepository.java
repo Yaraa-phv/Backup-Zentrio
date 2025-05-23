@@ -40,7 +40,7 @@ public interface TaskRepository {
                 SELECT * FROM tasks WHERE task_id  = #{taskId}
             """)
     @ResultMap("taskMapper")
-    Task getTaskById(UUID taskId);
+    Task getTaskByTaskId(UUID taskId);
 
     @Select("""
                 SELECT * FROM tasks WHERE board_id  = #{boardId} AND gantt_bar_id  = #{ganttBarId}

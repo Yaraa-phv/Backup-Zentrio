@@ -30,53 +30,18 @@ public class ChecklistServiceImpl implements ChecklistService {
     private final BoardRepository boardRepository;
 
     @Override
-    public UUID checkExistedTaskId(UUID taskId, UUID currentUserId){
-
-        Task taskById = taskRepository.getTaskByTaskId(taskId);
-        if (taskById == null){
-            throw new BadRequestException("Cannot find task by id!");
-        }
-        taskId = taskById.getTaskId();
-
-        Board getBoardByTaskId = boardRepository.getBoardByTaskId(taskId);
-        if (getBoardByTaskId == null){
-            throw new NotFoundException("Cannot found board by task id!");
-        }
-
-        UUID existedMemberId = memberRepository.getMemberIdByUserIdAndBoardId(currentUserId, getBoardByTaskId.getBoardId());
-        if (existedMemberId == null){
-            throw new NotFoundException("User is not a member in this board!");
-        }
-        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(existedMemberId);
-        String roleOfExistedMember = roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
-        if (roleOfExistedMember.isEmpty()){
-            throw new NotFoundException("You are not a LEADER here!");
-        }
-        if (!roleOfExistedMember.equals(RoleName.ROLE_LEADER.toString())){
-            throw new NotFoundException("You are not a LEADER here!");
-        }
-        if (roleOfExistedMember.equals(RoleName.ROLE_LEADER.toString())){
-            return taskId;
-        }
-
-        return taskId;
+    public Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest) {
+        return null;
     }
 
     @Override
-    public UUID checkTaskIdToGetChecklist(UUID taskId){
+    public UUID checkExistedTaskId(UUID taskId, UUID currentUserId) {
+        return null;
+    }
 
-        Task taskById = taskRepository.getTaskByTaskId(taskId);
-        if (taskById == null){
-            throw new BadRequestException("Cannot find task by id!");
-        }
-        taskId = taskById.getTaskId();
-
-        Board getBoardByTaskId = boardRepository.getBoardByTaskId(taskId);
-        if (getBoardByTaskId == null){
-            throw new NotFoundException("Cannot found board by task id!");
-        }
-        return taskId;
-
+    @Override
+    public UUID checkTaskIdToGetChecklist(UUID taskId) {
+        return null;
     }
 
     @Override
@@ -84,81 +49,14 @@ public class ChecklistServiceImpl implements ChecklistService {
         return List.of();
     }
 
-    public String checkRoleUserById(UUID currentUserId){
-
-        UUID existedMemberId = memberRepository.getRoleIdByUserIdAsAMember(currentUserId);
-        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(existedMemberId);
-
-//        currentUserId = existedMember.getUserId();
-
-        return roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
-    }
-
-    @Override
-    public Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest) {
-
-        UUID currentUserId = authService.getCurrentAppUserId();
-        System.out.println("Current user : " + currentUserId);
-        taskId = checkExistedTaskId(taskId, currentUserId);
-
-        System.out.println("checklist title : " + checklistRequest.getTitle());
-
-
-        return checklistRepository.createChecklist(taskId, checklistRequest);
-    }
-
-//    @Override
-//    public HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId) {
-//
-//        HashMap<String , Checklist> checklists = new HashMap<>();
-//        taskId = checkTaskIdToGetChecklist(taskId);
-//
-//        for (Checklist c : checklistRepository.getAllChecklistByTaskId(taskId)){
-//            checklists.put(c.getChecklistId().toString(), c);
-//            System.out.println(c);
-//        }
-//
-//        return checklists;
-//
-//    }
-
     @Override
     public Checklist getChecklistChecklistId(UUID checklistId) {
-        return checklistRepository.getChecklistByChecklistId(checklistId);
+        return null;
     }
-
-//    @Override
-//    public Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId) {
-//
-//        taskId = checkTaskIdToGetChecklist(taskId);
-//        if (taskId == null){
-//            throw new NotFoundException("Checklist not found by task id!");
-//        }
-//
-//        Checklist checklist = checklistRepository.getChecklistByTaskIdAndChecklistId(taskId, checklistId);
-//        if (checklist == null){
-//            throw new NotFoundException("Checklist not found by task id and checklist id!!");
-//        }
-//
-//        return checklist;
-//
-//    }
 
     @Override
     public HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title) {
-
-        taskId = checkTaskIdToGetChecklist(taskId);
-        taskId = checkTaskIdToGetChecklist(taskId);
-        if (taskId == null){
-            throw new NotFoundException("Checklist not found by task id!");
-        }
-        HashMap<String, Checklist> checklists = new HashMap<>();
-        for (Checklist c : checklistRepository.getChecklistByTaskIdAndTitle(taskId, title)){
-            checklists.put(c.getChecklistId().toString(), c);
-        }
-
-        return checklists;
-
+        return null;
     }
 
     @Override
@@ -175,6 +73,153 @@ public class ChecklistServiceImpl implements ChecklistService {
     public Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId) {
         return null;
     }
+
+//    @Override
+//    public UUID checkExistedTaskId(UUID taskId, UUID currentUserId){
+
+//        Task taskById = taskRepository.getTaskByTaskId(taskId);
+//        if (taskById == null){
+//            throw new BadRequestException("Cannot find task by id!");
+//        }
+//        taskId = taskById.getTaskId();
+//
+//        Board getBoardByTaskId = boardRepository.getBoardByBoardId(taskId);
+//        if (getBoardByTaskId == null){
+//            throw new NotFoundException("Cannot found board by task id!");
+//        }
+//
+//        UUID existedMemberId = memberRepository.getMemberIdByUserIdAndBoardId(currentUserId, getBoardByTaskId.getBoardId());
+//        if (existedMemberId == null){
+//            throw new NotFoundException("User is not a member in this board!");
+//        }
+//        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(existedMemberId);
+//        String roleOfExistedMember = roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
+//        if (roleOfExistedMember.isEmpty()){
+//            throw new NotFoundException("You are not a LEADER here!");
+//        }
+//        if (!roleOfExistedMember.equals(RoleName.ROLE_LEADER.toString())){
+//            throw new NotFoundException("You are not a LEADER here!");
+//        }
+//        if (roleOfExistedMember.equals(RoleName.ROLE_LEADER.toString())){
+//            return taskId;
+//        }
+//
+//        return taskId;
+//    }
+//
+//    @Override
+//    public UUID checkTaskIdToGetChecklist(UUID taskId){
+//
+//        Task taskById = taskRepository.getTaskByTaskId(taskId);
+//        if (taskById == null){
+//            throw new BadRequestException("Cannot find task by id!");
+//        }
+//        taskId = taskById.getTaskId();
+//
+//        Board getBoardByTaskId = boardRepository.getBoardByTaskId(taskId);
+//        if (getBoardByTaskId == null){
+//            throw new NotFoundException("Cannot found board by task id!");
+//        }
+//        return taskId;
+//
+//    }
+//
+//    @Override
+//    public List<Checklist> getAllChecklistByTaskId(UUID taskId) {
+//        return List.of();
+//    }
+//
+//    public String checkRoleUserById(UUID currentUserId){
+//
+//        UUID existedMemberId = memberRepository.getRoleIdByUserIdAsAMember(currentUserId);
+//        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(existedMemberId);
+//
+////        currentUserId = existedMember.getUserId();
+//
+//        return roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
+//    }
+//
+//    @Override
+//    public Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest) {
+//
+//        UUID currentUserId = authService.getCurrentAppUserId();
+//        System.out.println("Current user : " + currentUserId);
+//        taskId = checkExistedTaskId(taskId, currentUserId);
+//
+//        System.out.println("checklist title : " + checklistRequest.getTitle());
+//
+//
+//        return checklistRepository.createChecklist(taskId, checklistRequest);
+//    }
+//
+////    @Override
+////    public HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId) {
+////
+////        HashMap<String , Checklist> checklists = new HashMap<>();
+////        taskId = checkTaskIdToGetChecklist(taskId);
+////
+////        for (Checklist c : checklistRepository.getAllChecklistByTaskId(taskId)){
+////            checklists.put(c.getChecklistId().toString(), c);
+////            System.out.println(c);
+////        }
+////
+////        return checklists;
+////
+////    }
+//
+//    @Override
+//    public Checklist getChecklistChecklistId(UUID checklistId) {
+//        return checklistRepository.getChecklistByChecklistId(checklistId);
+//    }
+//
+////    @Override
+////    public Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId) {
+////
+////        taskId = checkTaskIdToGetChecklist(taskId);
+////        if (taskId == null){
+////            throw new NotFoundException("Checklist not found by task id!");
+////        }
+////
+////        Checklist checklist = checklistRepository.getChecklistByTaskIdAndChecklistId(taskId, checklistId);
+////        if (checklist == null){
+////            throw new NotFoundException("Checklist not found by task id and checklist id!!");
+////        }
+////
+////        return checklist;
+////
+////    }
+//
+//    @Override
+//    public HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title) {
+//
+//        taskId = checkTaskIdToGetChecklist(taskId);
+//        taskId = checkTaskIdToGetChecklist(taskId);
+//        if (taskId == null){
+//            throw new NotFoundException("Checklist not found by task id!");
+//        }
+//        HashMap<String, Checklist> checklists = new HashMap<>();
+//        for (Checklist c : checklistRepository.getChecklistByTaskIdAndTitle(taskId, title)){
+//            checklists.put(c.getChecklistId().toString(), c);
+//        }
+//
+//        return checklists;
+//
+//    }
+//
+//    @Override
+//    public Checklist updateChecklistById(UUID checklistId, ChecklistRequest checklistRequest) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Checklist deleteChecklistByChecklist(UUID checklistId) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId) {
+//        return null;
+//    }
 
 //    @Override
 //    public Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest) {
@@ -265,5 +310,4 @@ public class ChecklistServiceImpl implements ChecklistService {
 //>>>>>>> 31096f2d2c7ac1ba0d1eb2ab1843ab4b9bfdd634
 //        return null;
 //    }
-
-}
+    }

@@ -66,9 +66,11 @@ public class GanttChartServiceImpl implements GanttChartService {
     @Override
     public GanttChart getGanttChartByBoardId(UUID boardId) {
 
-        UUID existedBoardId = boardService.checkExistedBoardId(boardId);
+//      //  UUID existedBoardId = boardService.checkExistedBoardId(boardId);
+//
+//        return ganttChartRepository.getGanttChartByBoardId(existedBoardId);
+        return null;
 
-        return ganttChartRepository.getGanttChartByBoardId(existedBoardId);
     }
 
     @Override
