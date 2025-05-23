@@ -46,8 +46,8 @@ public interface GanttBarRepository {
 
     @Select("""
                 UPDATE gantt_bars set title= #{request.title},
-                                      started_at= #{request.startAt},
-                                      finished_at= #{request.finshedAt}
+                                      started_at= #{request.startedAt},
+                                      finished_at= #{request.finishedAt}
                                   WHERE gantt_bar_id= #{ganttBarId}
                 RETURNING *
                 

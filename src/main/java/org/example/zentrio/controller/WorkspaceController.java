@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -68,8 +69,8 @@ public class WorkspaceController {
 
     @Operation(summary = "Get workspace by title", description = "Get workspace by titles")
     @GetMapping("/get-title/{title}")
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title) {
-        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
+    public ResponseEntity<ApiResponse<Set<Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title) {
+        ApiResponse<Set<Workspace>> response = ApiResponse.<Set<Workspace>>builder()
                 .success(true)
                 .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)
@@ -99,7 +100,7 @@ public class WorkspaceController {
     @DeleteMapping("/{workspace-id}")
     public ResponseEntity<DeleteApiResponse<Workspace>> deleteWorkspaceByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId) {
 
-        workspaceService.deleteWorkspaceByWorkspaceId(workspaceId);
+        workspaceService.deleteWorkSpaceByWorkSpaceId(workspaceId);
 
         DeleteApiResponse<Workspace> response = DeleteApiResponse.<Workspace>builder()
                 .success(true)
@@ -113,9 +114,9 @@ public class WorkspaceController {
 
     @Operation(summary = "Get all workspaces for users", description = "Get all workspace for display to users")
     @GetMapping("/users")
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspacesForAllUsers() {
+    public ResponseEntity<ApiResponse<Set<Workspace>>> getAllWorkspacesForAllUsers() {
 
-        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
+        ApiResponse<Set<Workspace>> response = ApiResponse.<Set<Workspace>>builder()
                 .success(true)
                 .message("Get all workspaces for all users successfully")
                 .payload(workspaceService.getAllWorkspacesForAllUsers())

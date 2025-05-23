@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.GanttChartRequest;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ConflictException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.GanttChart;
@@ -51,11 +53,11 @@ public class GanttChartServiceImpl implements GanttChartService {
 
         GanttChart ganttChart = ganttChartRepository.getGanttChartByBoardId(boardId);
         if (ganttChart != null) {
-            throw new BadRequestException("Gantt Chart already exists");
+            throw new ConflictException("Gantt Chart already exists");
         }
-        UUID memberId = memberRepository.getMemberIdByUserIdAndBoardId(userId(), boardId);
+        UUID memberId = memberRepository.getPmId(userId(), boardId);
         if (memberId == null) {
-            throw new NotFoundException(" You are not in member this board in");
+            throw new ForbiddenException(" You are not in member this board in");
         }
 
         userRole(boardId);
@@ -65,12 +67,12 @@ public class GanttChartServiceImpl implements GanttChartService {
 
     @Override
     public GanttChart getGanttChartByBoardId(UUID boardId) {
-
-//      //  UUID existedBoardId = boardService.checkExistedBoardId(boardId);
-//
-//        return ganttChartRepository.getGanttChartByBoardId(existedBoardId);
-        return null;
-
+        boardService.getBoardByBoardId(boardId);
+        GanttChart  chart= ganttChartRepository.getGanttChartByBoardId(boardId);
+        if (chart == null) {
+            throw new NotFoundException(" You are not in MANAGER this board in");
+        }
+        return chart;
     }
 
     @Override

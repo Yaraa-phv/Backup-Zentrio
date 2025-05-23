@@ -5,7 +5,7 @@ import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Workspace;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface WorkspaceService {
@@ -14,7 +14,7 @@ public interface WorkspaceService {
 
     ApiResponse<HashMap<String, Workspace>> getAllWorkspaces(Integer page, Integer size);
 
-    HashMap<String, Workspace> getWorkspaceByTitle(String title);
+    Set<Workspace> getWorkspaceByTitle(String title);
 
     Workspace getWorkspaceById(UUID workspaceId);
 
@@ -22,9 +22,9 @@ public interface WorkspaceService {
 
     UUID checkExistedWorkspaceId(UUID existedWorkspaceId);
 
-    Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId);
+    Workspace deleteWorkSpaceByWorkSpaceId(UUID workspaceId);
 
-    HashMap<String, Workspace> getAllWorkspacesForAllUsers();
+    Set<Workspace> getAllWorkspacesForAllUsers();
 
     Workspace getWorkspaceByIdForAllUsers(UUID workspaceId);
 

@@ -51,7 +51,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             throw new NotFoundException("Task not found");
         }
         userRole(task.getBoardId());
-        UUID memberId = memberRepository.getMemberIdByUserIdAndBoardId(userId(),task.getBoardId());
+        UUID memberId = memberRepository.getPmId(userId(),task.getBoardId());
         if (memberId == null) {
             throw new NotFoundException("You are not member of this board");
         }

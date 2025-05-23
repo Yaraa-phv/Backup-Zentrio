@@ -15,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -103,15 +101,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public HashMap<String, Workspace> getWorkspaceByTitle(String title) {
+    public Set<Workspace> getWorkspaceByTitle(String title) {
 
         if (title.isEmpty()){
             throw new NotFoundException("Workspace Title not found!");
         }
-        HashMap<String, Workspace> workspaces = new HashMap<>();
-        for (Workspace w : workspaceRepository.getWorkspaceByTitle(title)){
-            workspaces.put(w.getTitle(), w);
-        }
+        Set<Workspace> workspaces = new HashSet<>( workspaceRepository.getWorkspaceByTitle(title));
             return workspaces;
     }
 
@@ -126,19 +121,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
     @Override
-    public Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId) {
+    public Workspace deleteWorkSpaceByWorkSpaceId(UUID workspaceId) {
 
         getWorkspaceById(workspaceId);
         return workspaceRepository.deleteWorkspaceByWorkspaceId(workspaceId, currentUserId());
     }
 
     @Override
-    public HashMap<String, Workspace> getAllWorkspacesForAllUsers() {
+    public Set<Workspace> getAllWorkspacesForAllUsers() {
 
-        HashMap<String, Workspace> workspace = new HashMap<>();
-        for (Workspace w : workspaceRepository.getAllWorkspacesForAllUsers()){
-            workspace.put(w.getWorkspaceId().toString(), w);
-        }
+        Set<Workspace> workspace = new HashSet<>( workspaceRepository.getAllWorkspacesForAllUsers());
         return workspace;
     }
 

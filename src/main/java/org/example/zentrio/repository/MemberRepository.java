@@ -150,7 +150,7 @@ public interface MemberRepository {
             SELECT  roles.role_name from roles
         inner join public.members m on roles.role_id = m.role_id
         inner join  task_assignment tk on tk.assigned_to =m.member_id
-                                OR tk.assigned_by = member_id
+        OR tk.assigned_by = member_id
         where m.user_id= #{userId}
           AND  tk.task_id= #{taskId}
         AND  m.board_id= #{boardId} limit  1;
