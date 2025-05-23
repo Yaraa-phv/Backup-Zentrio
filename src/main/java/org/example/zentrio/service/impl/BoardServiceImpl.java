@@ -67,7 +67,6 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
-
     @Override
     public Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId) {
         getBoardByBoardId(boardId);

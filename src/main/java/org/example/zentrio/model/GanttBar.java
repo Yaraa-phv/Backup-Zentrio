@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.zentrio.dto.request.GanttBarRequest;
+import org.example.zentrio.dto.response.MemberResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,18 +18,9 @@ public class GanttBar {
 
     private UUID ganttBarId;
     private String title;
-    private LocalDateTime startedAt;
+    private LocalDateTime startAt;
     private LocalDateTime finishedAt;
     private UUID ganttChartId;
-
-
-    public GanttBarRequest mapToGanttBarRequest() {
-        return GanttBarRequest.builder()
-                .title(this.getTitle())
-                .startedAt(this.getStartedAt())
-                .finishedAt(this.getFinishedAt())
-                .build();
-    }
-
+    private List<MemberResponse> teamLead;
 
 }

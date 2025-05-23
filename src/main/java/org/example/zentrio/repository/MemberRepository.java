@@ -102,5 +102,62 @@ public interface MemberRepository {
     })
     List<Member> getMembersByBoardId(UUID boardId);
 
+    @Select("""
+       
+         SELECT r.role_name FROM roles r
+            INNER JOIN  members m ON m.role_id = r.role_id
+           WHERE  m.user_id= #{userId}
+            AND  r.role_name='ROLE_MANAGER'
+           AND  m.board_id= #{boardId} limit 1;
+        
+        """)
+    String getRolePMByBoardIdAndUserId(UUID boardId, UUID userId);
+
+
+    @Select("""
+        
+            SELECT  m.member_id   from members m
+              inner join task_assignment task on task.assigned_to =m.member_id
+        where m.user_id= #{uuid}
+          and  task.task_id= #{taskId}
+        """)
+    UUID getTeamleadUUID(UUID uuid, UUID taskId);
+
+
+    @Select("""
+      SELECT member_id FROM members m
+         JOIN roles r ON r.role_id= m.role_id
+          WHERE m.user_id = #{userId}
+    AND m.board_id = #{boardId} AND r.role_name='ROLE_MEMBER'
+    """)
+//    @ResultMap("memberMapper")
+    UUID getMemberId(UUID userId, UUID boardId);
+
+
+
+    @Select("""
+          SELECT member_id FROM members m
+            inner join roles r on m.role_id= r.role_id
+          WHERE user_id = #{userId}  AND board_id = #{boardId}
+            AND r.role_name='ROLE_MANAGER'
+        """)
+    UUID getPmId(UUID userId, UUID boardId);
+
+
+
+    @Select("""
+        
+            SELECT  roles.role_name from roles
+        inner join public.members m on roles.role_id = m.role_id
+        inner join  task_assignment tk on tk.assigned_to =m.member_id
+                                OR tk.assigned_by = member_id
+        where m.user_id= #{userId}
+          AND  tk.task_id= #{taskId}
+        AND  m.board_id= #{boardId} limit  1;
+        """)
+    String getRoleInTask(UUID boardId, UUID userId, UUID taskId);
+
+
+
 
 }

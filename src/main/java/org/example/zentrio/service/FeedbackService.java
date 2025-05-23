@@ -1,21 +1,19 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.FeedbackRequest;
 import org.example.zentrio.model.Feedback;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface FeedbackService {
     Feedback createFeedback( UUID taskId,  FeedbackRequest feedbackRequest);
 
-    HashMap<String,Feedback> getAllFeedback(UUID taskId);
+    Set<Feedback> getAllFeedback(UUID taskId);
 
-    Feedback UpdateFeedbackByid(UUID feedbackId,  FeedbackRequest feedbackRequest);
+    Feedback UpdateFeedbackById(UUID feedbackId, FeedbackRequest feedbackRequest);
 
     Feedback getFeedbackById(UUID feedbackId);
 
-    void deleteFeedbackByid(UUID feedbackId);
+    void deleteFeedbackById(UUID feedbackId);
 }

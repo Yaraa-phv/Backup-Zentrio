@@ -43,21 +43,12 @@ CREATE TABLE boards (
                         board_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                         title VARCHAR(255) NOT NULL,
                         description TEXT,
+                        cover VARCHAR,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         is_favourite BOOLEAN DEFAULT false,
-                        cover VARCHAR(255),
-                        image_url   VARCHAR(255),
+                        is_verified BOOLEAN DEFAULT false,
                         workspace_id UUID REFERENCES workspaces(workspace_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-
--- Create the members table
-CREATE TABLE members (
-                         member_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                         role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                         user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                         board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create the gantt_charts table
@@ -66,9 +57,7 @@ CREATE TABLE gantt_charts (
                               title VARCHAR(255) NOT NULL,
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                               updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                              created_by UUID REFERENCES members(member_id) ON DELETE CASCADE  ON UPDATE CASCADE ,
                               board_id UUID UNIQUE REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
-
 );
 
 -- Create the gantt_bars table
@@ -80,6 +69,13 @@ CREATE TABLE gantt_bars (
                             gantt_chart_id UUID REFERENCES gantt_charts(gantt_chart_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Create the members table
+CREATE TABLE members (
+                         member_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                         role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                         user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                         board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 -- Create the tasks table
 CREATE TABLE tasks (
@@ -92,8 +88,7 @@ CREATE TABLE tasks (
                        started_at TIMESTAMP NOT NULL,
                        finished_at TIMESTAMP NOT NULL,
                        task_order SERIAL,
-                       stage VARCHAR(50) NOT NULL DEFAULT 'TO DO' ,
-                       created_by UUID REFERENCES  members(member_id) ON UPDATE CASCADE ON DELETE CASCADE ,
+                       stage VARCHAR(50) NOT NULL,
                        board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                        gantt_bar_id UUID REFERENCES gantt_bars(gantt_bar_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -101,7 +96,7 @@ CREATE TABLE tasks (
 -- Create the task_assignment table
 CREATE TABLE task_assignment (
                                  task_assign_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                                 assigned_to UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                                 assigned_to UUID UNIQUE REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                                  assigned_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                                  task_id UUID UNIQUE REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -111,17 +106,21 @@ CREATE TABLE checklists (
                             checklist_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                             title VARCHAR(255) NOT NULL,
                             is_done BOOLEAN DEFAULT false,
-                            cover VARCHAR(255),
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
                             checklist_order SERIAL,
                             started_at TIMESTAMP,
                             finished_at TIMESTAMP,
-                            created_by  UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                             task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
+-- Create the checklist_items table
+CREATE TABLE checklist_items (
+                                 checklist_item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                                 title VARCHAR(255) NOT NULL,
+                                 status VARCHAR(50),
+                                 checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 -- Create the checklist_assignments table
 CREATE TABLE checklist_assignments (
@@ -131,15 +130,22 @@ CREATE TABLE checklist_assignments (
                                        checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Create the labels table
+CREATE TABLE labels (
+                        label_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                        label_title VARCHAR(50) NOT NULL,
+                        label_color VARCHAR(20),
+                        checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 -- Create the calendars table
 CREATE TABLE calendars (
                            calendar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                            noted TEXT,
-                           noted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+                           noted_at TIMESTAMP NOT NULL,
                            till_date TIMESTAMP ,
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                           checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+                           task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -149,68 +155,65 @@ CREATE TABLE comments (
                           comment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                           content TEXT NOT NULL,
                           comment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          commented_by UUID REFERENCES members(member_id)  ON DELETE CASCADE ON UPDATE CASCADE,
-                          checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
-
+                          checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                          commented_by UUID REFERENCES checklist_assignments(checklist_assign_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create the documents table
 CREATE TABLE documents (
                            document_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                            created_at TIMESTAMP ,
-                           is_public BOOLEAN DEFAULT false,
-                           doc_type VARCHAR(100),
+                           is_private BOOLEAN DEFAULT false,
+                           doc_type VARCHAR(50),
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                            board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the attachments table
-CREATE TABLE attachments (
-                             attachment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                             details JSONB NOT NULL,
-                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             created_by   UUID REFERENCES members(member_id) ON UPDATE CASCADE ON DELETE CASCADE ,
-                             checklist_id UUID UNIQUE REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
+-- Create the attachment table
+CREATE TABLE attachment (
+                            attachment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                            details JSONB,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            checklist_id UUID UNIQUE REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the achievements table
-CREATE TABLE achievements (
-                              achievement_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                              details JSONB NOT NULL,
-                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                              user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+-- Create the achievement table
+CREATE TABLE achievement (
+                             achievement_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                             details JSONB,
+                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 -- Create the notifications table
 CREATE TABLE notifications (
                                notification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                               content TEXT NOT NULL ,
+                               content VARCHAR ,
                                type VARCHAR(50),
-                               is_read BOOLEAN DEFAULT FALSE,
+                               is_read BOOLEAN DEFAULT false,
                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                task_assign_id UUID REFERENCES task_assignment(task_assign_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                                user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the reports table
-CREATE TABLE reports (
-                         report_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                         version  SERIAL ,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE  CASCADE ,
-                         board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
+-- Create the report table
+CREATE TABLE report (
+                        report_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the feedbacks table
-CREATE TABLE feedbacks (
-                           feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           comment TEXT NOT NULL ,
-                           task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                           feedback_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE
+-- Create the feedback table
+CREATE TABLE feedback (
+                          feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          comment VARCHAR(255),
+                          task_id UUID REFERENCES tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                          feedback_by UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 

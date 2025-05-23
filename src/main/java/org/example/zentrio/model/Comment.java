@@ -13,11 +13,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Feedback {
-    private UUID feedbackId;
-    private LocalDateTime createAt;
-    private String comment;
-    private UUID taskId;
-    private UUID userId;
-    private MemberResponse user;
+public class Comment {
+
+    private UUID id;
+    private String content;
+    private LocalDateTime creationDate;
+    private UUID checklistId;
+    private UUID commentBy;
+    private MemberResponse  member;
 }

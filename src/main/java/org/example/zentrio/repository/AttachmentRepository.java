@@ -19,7 +19,7 @@ public interface AttachmentRepository {
     })
 
     @Select("""
-        INSERT INTO attachment(created_at, updated_at, details,checklist_id)
+        INSERT INTO attachments(created_at, updated_at, details,checklist_id)
         VALUES (#{req.createdAt}, #{req.updatedAt}, #{req.details, jdbcType=OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler},
                 #{checklistId})
         RETURNING *
@@ -35,20 +35,20 @@ public interface AttachmentRepository {
 
 
     @Select("""
-        SELECT * FROM attachment WHERE attachment_id = #{attachmentId}
+        SELECT * FROM attachments WHERE attachment_id = #{attachmentId}
     """)
     @ResultMap("attachmentMapper")
     Attachment getAttachmentById(UUID attachmentId);
 
     @Select("""
-        SELECT * FROM attachment WHERE checklist_id = #{checklistId}
+        SELECT * FROM attachments WHERE checklist_id = #{checklistId}
     """)
     @ResultMap("attachmentMapper")
     Attachment getAttachmentByChecklistId(UUID checklistId);
 
 
     @Select("""
-        DELETE FROM attachment WHERE attachment_id = #{attachmentId}
+        DELETE FROM attachments WHERE attachment_id = #{attachmentId}
     """)
     void deleteAttachmentById(UUID attachmentId);
 }
