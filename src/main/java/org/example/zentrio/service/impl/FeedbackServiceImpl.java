@@ -32,7 +32,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     private void userRole(UUID boardId){
-        String role= roleRepository.getRoleNameByBoardIdAndUserId(boardId,userId());
+        String role= memberRepository.getRolePMByBoardIdAndUserId(boardId,userId());
         if (role == null){
             throw new BadRequestException("You don't have any role here...");
         }

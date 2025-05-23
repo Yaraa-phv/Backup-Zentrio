@@ -54,4 +54,9 @@ public interface RoleRepository {
         WHERE role_id=#{roleId}
         """)
     String getRoleByRoleId(UUID roleId);
+
+
+
+
+
 }

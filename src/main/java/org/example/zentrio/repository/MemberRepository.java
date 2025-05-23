@@ -157,7 +157,15 @@ public interface MemberRepository {
         """)
     String getRoleInTask(UUID boardId, UUID userId, UUID taskId);
 
-
-
-
+    @Select("""
+        
+         SELECT roles.role_name   FROM roles
+        INNER JOIN members m ON m.role_id = roles.role_id
+        WHERE m.board_id = #{boardId}
+          AND m.user_id = #{userId}
+          AND role_name IN (
+            'ROLE_MANAGER', 'ROLE_LEADER');
+        
+        """)
+    String getRolePmTeamLead(UUID boardId, UUID userId);
 }

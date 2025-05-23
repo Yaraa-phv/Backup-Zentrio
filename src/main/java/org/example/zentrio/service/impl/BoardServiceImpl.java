@@ -27,6 +27,7 @@ public class BoardServiceImpl implements BoardService {
     private final WorkspaceRepository workspaceRepository;
     private final RoleRepository roleRepository;
     private final AppUserRepository appUserRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public Board createBoard(BoardRequest boardRequest, UUID workspaceId) {
@@ -71,7 +72,7 @@ public class BoardServiceImpl implements BoardService {
     public Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId) {
         getBoardByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        String roleName = memberRepository.getRolePmTeamLead(boardId, userId);
 
         if (roleName == null) {
             throw new NotFoundException("You're doesn't have a ROLE MANGER to update this board");
@@ -88,7 +89,7 @@ public class BoardServiceImpl implements BoardService {
     public Board deleteBoardByBoardId(UUID boardId) {
         getBoardByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        String roleName = memberRepository.getRolePmTeamLead(boardId, userId);
 
         if (roleName == null) {
             throw new NotFoundException("You're doesn't have a ROLE MANGER to deleted this board");
@@ -154,7 +155,7 @@ public class BoardServiceImpl implements BoardService {
 
     public void validateCurrentUserRoles(UUID boardId){
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        String roleName = memberRepository.getRolePmTeamLead(boardId, userId);
         if(roleName == null || !roleName.equals(RoleName.ROLE_MANAGER.toString())){
             throw new ForbiddenException("You're not manager in this board can't assign role");
         }

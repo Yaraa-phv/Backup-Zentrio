@@ -31,6 +31,7 @@ public class TaskServiceImpl implements TaskService {
     private final RoleRepository roleRepository;
     private final BoardRepository boardRepository;
     private final GanttBarRepository ganttBarRepository;
+    private final MemberRepository memberRepository;
 
 
     private void validateTaskTimeWithGanttBar(TaskRequest taskRequest, GanttBar ganttBar) {
@@ -86,6 +87,7 @@ public class TaskServiceImpl implements TaskService {
             throw new ForbiddenException("You are not a member of this board");
         }
 
+
         boolean hasAccess = roles.stream()
                 .anyMatch(role -> role.equals(RoleName.ROLE_MANAGER.toString()) || role.equals(RoleName.ROLE_LEADER.toString()));
 
@@ -102,7 +104,9 @@ public class TaskServiceImpl implements TaskService {
 
     public void validateCurrentUserRoles(UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        String roleName = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
+        System.out.println("role: " + roleName);
+
         if (roleName == null || !roleName.equals(RoleName.ROLE_MANAGER.toString())) {
             throw new ForbiddenException("You're not manager in this board can't assign role");
         }
@@ -118,9 +122,11 @@ public class TaskServiceImpl implements TaskService {
         validateRoleManageTask(boardId, userId);
 
         // Determine the role of the user in the board
-        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
+        String role = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
         System.out.println("role: " + role);
-
+        if (role==null) {
+            throw new ForbiddenException("You're not manager or teamLead in this board");
+        }
         UUID creatorMemberId;
 
         if (RoleName.ROLE_MANAGER.toString().equals(role)) {
@@ -181,10 +187,11 @@ public class TaskServiceImpl implements TaskService {
 
         // Validate user role (Manager or Team Leader)
         validateRoleManageTask(boardId, userId);
-
-        // Get role name for user in board
-        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
-
+        String role = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
+        System.out.println("role: " + role);
+        if (role==null) {
+            throw new ForbiddenException("You're not manager or teamLead in this board");
+        }
         if (RoleName.ROLE_LEADER.toString().equals(role)) {
             // If Team Leader, allow only if creator
             UUID teamLeaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
@@ -209,7 +216,11 @@ public class TaskServiceImpl implements TaskService {
         validateTaskIdWithBoardIdAndGanttBarId(taskId, boardId, ganttBarId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         validateRoleManageTask(boardId,userId);
-        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        String role = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
+        System.out.println("role: " + role);
+        if (role==null) {
+            throw new ForbiddenException("You're not manager or teamLead in this board");
+        }
 
         if (RoleName.ROLE_LEADER.toString().equals(role)) {
             UUID teamLeaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
