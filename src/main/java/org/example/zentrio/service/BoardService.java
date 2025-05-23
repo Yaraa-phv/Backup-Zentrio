@@ -1,11 +1,12 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.BoardResponse;
+import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.model.Board;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,9 +14,7 @@ public interface BoardService {
 
     Board createBoard(BoardRequest boardRequest,UUID workspaceId);
 
-    ApiResponse<HashMap<String,Board>> getAllBoardsByWorkspaceId(UUID workspaceId,Integer page,Integer size);
-
-    Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId);
+    ApiResponse<HashSet<Board>> getAllBoardsByWorkspaceId(UUID workspaceId, Integer page, Integer size);
 
     Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId);
 
@@ -25,7 +24,8 @@ public interface BoardService {
 
     List<Board> getBoardByBoardTitle(String boardTitle);
 
-    Board updateBoardTitleByBoardId(UUID boardId, String boardTitle);
 
-    UUID checkExistedBoardId(UUID boardId);
+    BoardResponse getBoardByBoardIdWithMember(UUID boardId);
+
+    void assignRoleToBoard(UUID boardId, UUID assigneeId, RoleName roleName);
 }

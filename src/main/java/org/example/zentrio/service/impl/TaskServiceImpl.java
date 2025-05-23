@@ -5,16 +5,18 @@ import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ConflictException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -25,121 +27,145 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final BoardService boardService;
-    private final GanttChartService ganttChartService;
     private final GanttBarService ganttBarService;
     private final RoleRepository roleRepository;
-    private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
-    private final AuthService authService;
+    private final GanttBarRepository ganttBarRepository;
 
-    public List<UUID> checkExistedBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId){
-        if (boardId != null) {
-            boardService.checkExistedBoardId(boardId);
-        } else {
-            throw new NotFoundException("Board Id not found! Cannot create task!");
+
+    private void validateTaskTimeWithGanttBar(TaskRequest taskRequest, GanttBar ganttBar) {
+        LocalDateTime now = LocalDateTime.now();
+
+        //  Task start time cannot be in the past
+        if (taskRequest.getStartedAt().isBefore(now)) {
+            throw new BadRequestException("Task start time cannot be in the past.");
         }
 
-        GanttChart ganttChartByBoardId = ganttChartService.getGanttChartByBoardId(boardId);
-        UUID existedGanttChartId = ganttChartByBoardId.getGanttChartId();
-
-        if (ganttBarId == null){
-            throw new NotFoundException("Gantt Bar Id not found!");
+        //  Task finish time must be after start time
+        if (taskRequest.getFinishedAt().isBefore(taskRequest.getStartedAt())) {
+            throw new BadRequestException("Task finish time must be after start time.");
         }
 
-        GanttBar ganttBarByGanttChartIdAndGanttBarId = ganttBarService.getGanttBarByGanttChartIdAndGanttBarId(existedGanttChartId, ganttBarId);
-        if (ganttBarByGanttChartIdAndGanttBarId == null){
-            throw new NotFoundException("Gantt Bar Id cannot find!");
+        //  Task finish time must not exceed GanttBar's finish time
+        if (taskRequest.getFinishedAt().isAfter(ganttBar.getFinishedAt())) {
+            throw new BadRequestException("Task finish time cannot exceed GanttBar's finish time.");
         }
-//        UUID existedGanttBarId = ganttBarByGanttChartIdAndGanttBarId.getGanttBarId();
-        if (!ganttBarId.equals(ganttBarByGanttChartIdAndGanttBarId.getGanttBarId())){
-            throw new NotFoundException("Gantt Bar Id not found!");
+
+        //  Task start time must not be before GanttBar's start time
+        if (taskRequest.getStartedAt().isBefore(ganttBar.getStartedAt())) {
+            throw new BadRequestException("Task start time cannot be before GanttBar's start time.");
         }
-        return List.of(boardId, ganttBarByGanttChartIdAndGanttBarId.getGanttBarId());
     }
 
-    public UUID checkExistedBoardByUserId(UUID currentUserId, UUID boardId){
 
-        if (boardId != null) {
-            boardService.checkExistedBoardId(boardId);
-        } else {
-            throw new NotFoundException("Board Id not found! Cannot create task!");
-        }
-
-        Member checkMember = memberRepository.getMemberByUserIdAndBoardId(currentUserId, boardId);
-        System.out.println("checkMember : " + checkMember);
-        System.out.println("checkMember id : " + checkMember.getMemberId());
-        if (checkMember == null){
-            throw new BadRequestException("You are not a member here!");
-        }
-
-        UUID roleIdOfExistedMember = memberRepository.getRoleIdByMemberId(checkMember.getMemberId());
-        System.out.println("roleIdOfExistedMember : " + roleIdOfExistedMember);
-        String roleOfExistedMember = roleRepository.getRoleNameByRoleId(roleIdOfExistedMember);
-        System.out.println("roleOfExistedMember : " + roleOfExistedMember);
-        if (roleOfExistedMember.isEmpty()){
-            throw new BadRequestException("You are not a member here!");
-        }
-        if (!roleOfExistedMember.equals(RoleName.ROLE_MANAGER.toString())){
-            throw new NotFoundException("You are not a MANAGER here!");
-        }
-        if (roleOfExistedMember.equals(RoleName.ROLE_MANAGER.toString())){
-            return boardId;
-        }
-
-        return boardId;
+    private void validateBoardAndGanttBar(UUID boardId, UUID ganttBarId) {
+        boardService.getBoardByBoardId(boardId);
+        ganttBarService.getGanttBarById(ganttBarId);
     }
 
-    public UUID checkExistedTaskByTaskId(UUID taskId){
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        if (task == null){
-            throw new NotFoundException("Task Id not found!");
-        }
-        taskId = task.getTaskId();
 
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        UUID currentUserId = authService.getCurrentAppUserId();
-        UUID boardId = checkExistedBoardByUserId(currentUserId, task.getBoardId());
-        Task existedTask = taskRepository.getTaskById(boardId, task.getGanttBarId(), taskId);
-        if (!taskId.equals(existedTask.getTaskId())){
-            throw new NotFoundException("Task Id not found!");
+    private void validateBoardAndGanttBarAndTaskTime(UUID boardId, UUID ganttBarId, TaskRequest taskRequest) {
+        //  Validate if board exists
+        boardService.getBoardByBoardId(boardId);
+
+        //  Load GanttBar entity from DB
+        GanttBar ganttBar = ganttBarRepository.getGanttBarById(ganttBarId);
+        if (ganttBar == null) {
+            throw new NotFoundException("Gantt bar with ID " + ganttBarId + " not found");
         }
-        return taskId;
+
+        //  Validate task timing against GanttBar timing
+        validateTaskTimeWithGanttBar(taskRequest, ganttBar);
     }
+
+
+    private void validateRoleManageTask(UUID boardId, UUID userId) {
+        List<String> roles = roleRepository.getRolesNameByBoardIdAndUserId(boardId, userId);
+
+        if (roles == null || roles.isEmpty()) {
+            throw new ForbiddenException("You are not a member of this board");
+        }
+
+        boolean hasAccess = roles.stream()
+                .anyMatch(role -> role.equals(RoleName.ROLE_MANAGER.toString()) || role.equals(RoleName.ROLE_LEADER.toString()));
+
+        if (!hasAccess) {
+            throw new ForbiddenException("Only Project Managers or Team Leaders can manage tasks");
+        }
+    }
+
+
+    public void validateTaskIdWithBoardIdAndGanttBarId(UUID taskId, UUID boardId, UUID ganttBarId) {
+        getTaskById(taskId);
+        validateBoardAndGanttBar(boardId, ganttBarId);
+    }
+
+    public void validateCurrentUserRoles(UUID boardId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        if (roleName == null || !roleName.equals(RoleName.ROLE_MANAGER.toString())) {
+            throw new ForbiddenException("You're not manager in this board can't assign role");
+        }
+    }
+
 
 
     @Override
-    public Task createTask(UUID boardId, UUID ganttBarId, TaskRequest taskRequest) {
-        checkExistedBoardIdAndGanttBarId( boardId, ganttBarId);
-        UUID currentUserId = authService.getCurrentAppUserId();
-        boardId = checkExistedBoardByUserId(currentUserId, boardId);
-        return taskRepository.createTask(boardId, ganttBarId, taskRequest);
+    public Task createTaskByBoardIdAndGanttBarId(TaskRequest taskRequest, UUID boardId, UUID ganttBarId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+
+        // Validate user has permission (Manager or TL)
+        validateRoleManageTask(boardId, userId);
+
+        // Determine the role of the user in the board
+        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
+        System.out.println("role: " + role);
+
+        UUID creatorMemberId;
+
+        if (RoleName.ROLE_MANAGER.toString().equals(role)) {
+            creatorMemberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, boardId);
+        } else if (RoleName.ROLE_LEADER.toString().equals(role)) {
+            creatorMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+
+        } else {
+            throw new ForbiddenException("You're not a Manager or Team Leader in this board can't create task");
+        }
+
+        // Validate timing and references
+        validateBoardAndGanttBarAndTaskTime(boardId, ganttBarId, taskRequest);
+
+        // Create the task with the correct "created_by" (manager or TL)
+        Task task = taskRepository.createTaskByBoardIdAndGanttBarId(taskRequest, boardId, ganttBarId, creatorMemberId);
+        // the same id
+        taskRepository.insertTaskAssignment(task.getTaskId(),creatorMemberId,creatorMemberId);
+
+        return task;
+    }
+
+
+    //  taskRepository.insertTaskAssignment(task.getTaskId(),managerId,memberId);
+    @Override
+    public Task getTaskById(UUID taskId) {
+        Task task = taskRepository.getTaskById(taskId);
+        if (task == null) {
+            throw new NotFoundException("Task with ID " + taskId + " not found");
+        }
+        return task;
     }
 
     @Override
-    public ApiResponse<HashSet<Task>> getAllTasks(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
-
-
-        Integer offset = (page -1) * size;
-
-        List<UUID> existedIds = checkExistedBoardIdAndGanttBarId(boardId, ganttBarId);
-        UUID existedBoardId = existedIds.get(0);
-        System.out.println("board id : " + existedBoardId);
-        UUID existedGanttBarId = existedIds.get(1);
-        System.out.println("gantt bar id : " + existedGanttBarId);
-
-        List<Task> taskList = taskRepository.getAllTasks(boardId, ganttBarId, size, offset);
-
-
-        HashSet<Task> tasks = new HashSet<>();
-        tasks.addAll(taskList);
-
+    public ApiResponse<List<Task>> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
+        int offset = (page - 1) * size;
+        validateBoardAndGanttBar(boardId, ganttBarId);
+        List<Task> taskList = taskRepository.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId, size, offset);
         Integer totalElements = taskRepository.countTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
-        Integer totalPages = (int) Math.ceil(totalElements / (double) size);
 
-        return ApiResponse.<HashSet<Task>>builder()
+        int totalPages = (int) Math.ceil(totalElements / (double) size);
+        return ApiResponse.<List<Task>>builder()
                 .success(true)
                 .message("Get all tasks successfully")
-                .payload(tasks)
+                .payload(taskList)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .pagination(new Pagination(page, totalElements, totalPages))
@@ -147,170 +173,84 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getTaskById( UUID taskId) {
-        Task task = taskRepository.getTaskByTaskId(taskId);
-
-        checkExistedBoardIdAndGanttBarId( task.getBoardId(), task.getGanttBarId());
-        if (taskId == null){
-            throw new NotFoundException("Task Id not found!");
-        } else {
-            return taskRepository.getTaskById(task.getBoardId(), task.getGanttBarId(), taskId);
-        }
-    }
-
-    @Override
-    public HashMap<String, Task> getTaskByTitle(UUID boardId, String title) {
-
-        if (boardId != null) {
-            boardService.checkExistedBoardId(boardId);
-        } else {
-            throw new NotFoundException("Board Id not found! Cannot create task!");
-        }
-
-        HashMap<String, Task> tasks = new HashMap<>();
-        for (Task t : taskRepository.getAllTaskByBoardIdAndTitle(boardId, title)){
-         tasks.put(t.getTitle(), t);
-        }
-
-        if (title == null){
-            throw new NotFoundException("Task title not found!");
-        }
-        return tasks;
-    }
-
-    @Override
-    public Task updateTaskById(UUID taskId, TaskRequest taskRequest) {
-
-        checkExistedTaskByTaskId(taskId);
-        return taskRepository.updateTaskById(taskId, taskRequest);
-    }
-
-    @Override
-    public Task updateTaskTitleByTaskId( UUID taskId, String title) {
-
-        checkExistedTaskByTaskId(taskId);
-        return taskRepository.updateTaskTitleByTaskId(taskId, title);
-
-    }
-
-    @Override
-    public Task updateTaskDescriptionByTaskId(UUID taskId, String description) {
-
-        checkExistedTaskByTaskId(taskId);
-        return taskRepository.updateTaskDescriptionByTaskId(taskId, description);
-
-    }
-
-    @Override
-    public Task deleteTaskByTaskId( UUID taskId) {
-
-        checkExistedTaskByTaskId(taskId);
-        return taskRepository.deleteTaskByTaskId(taskId);
-
-    }
-
-    //From Fanau
-    @Override
-    public Task assignRole(UUID boardId, UUID assignToUserId) {
-        Board boardByBoardId = boardRepository.getBoardByBoardId(boardId);
-
-
-        if (boardByBoardId == null){
-            throw new NotFoundException("Board cannot found by board id!");
-        }
-        UUID getBoardId = boardByBoardId.getBoardId();
-        if (!boardId.equals(getBoardId)){
-            throw new BadRequestException("Board id is not existed!");
-        }
-
-        boolean isAlreadyAssignedRole = boardRepository.isMemberAlreadyAssignedRoleToBoard(boardId, assignToUserId);
-        if(isAlreadyAssignedRole) {
-            throw new BadRequestException("You are already member of this board");
-        }
-
-        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        System.out.println("userid : " + userId);
-        String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
-        if (roleName == null) {
-            throw new BadRequestException("You are doesn't have a role to assign this task");
-        }
-
-        if (!roleName.equals(RoleName.ROLE_MANAGER.toString())) {
-            throw new BadRequestException("You are not PM can't assign role for member in this task");
-        }
-
-//        load roleId by passing roleName;
-        UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_LEADER.toString());
-//        System.out.println("targetBoardId = " + getBoardId);
-//        input role for member that has invite
-//        roleRepository.insertUserRoles(userIdFromEmailInput, roleId);
-
-//        insert userId that have roleId = ROLE_LEADER into boardId
-        roleRepository.insertToMember(assignToUserId, getBoardId, roleId);
-        return null;
-    }
-
-
-    @Override
-    public Task assignUserToTaskWithRole(UUID assignedToUserId, UUID taskId) {
-
-        System.out.println("assignedToUserId = " + assignedToUserId);
-
-        Task task = taskRepository.getTaskByTaskId(taskId);
-        UUID boardId = task.getBoardId();
+    public Task updateTaskByIdWithBoardIdAndGanttBarId(TaskRequest taskRequest, UUID taskId, UUID boardId, UUID ganttBarId) {
+        // Fetch the task to check creator
+        Task task = getTaskById(taskId);
 
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 
-        // load user id input for sure id of the user are correct in current board
-        UUID assignUserIdInMemberTable = roleRepository.getMemberIdByUserIdAndBoardId(boardId, userId); // pm id assign
+        // Validate user role (Manager or Team Leader)
+        validateRoleManageTask(boardId, userId);
 
-        String managerRole = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
-//        System.out.println("managerRole = " + managerRole);
+        // Get role name for user in board
+        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
-        if (managerRole == null) {
-            throw new BadRequestException("You are doesn't have a role to assign this task");
-        }
-        if (!managerRole.equals(RoleName.ROLE_MANAGER.toString())) {
-            throw new BadRequestException("You are not PM can't assign member in this task");
-        }
-
-
-        System.out.println("assignUserIdInMemberTable = " + assignUserIdInMemberTable);
-        if (assignUserIdInMemberTable == null) {
-            throw new BadRequestException("Assigned user does not exist");
+        if (RoleName.ROLE_LEADER.toString().equals(role)) {
+            // If Team Leader, allow only if creator
+            UUID teamLeaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+            if (!task.getCreatedBy().equals(teamLeaderMemberId)) {
+                throw new ForbiddenException("Team Leader can only update tasks they created");
+            }
+        } else if (!RoleName.ROLE_MANAGER.toString().equals(role)) {
+            // If not Manager or Team Leader, forbid update
+            throw new ForbiddenException("You are not have permission to update this task");
         }
 
-        // load role of the user that are assign in this task doesn't have role leader -> exist
-        UUID assignTo = roleRepository.getMemberIdByUserIdAndBoardId(boardId, assignedToUserId); // assign to
-        System.out.println("assignTo = " + assignTo);
+        validateBoardAndGanttBarAndTaskTime(boardId, ganttBarId, taskRequest);
 
-        if(assignTo == null) {
-            throw new BadRequestException("User id that u was assign was " + assignedToUserId + " not exist");
-        }
-
-        // load role for user using id of user input
-        String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, assignedToUserId);
-        System.out.println("roleName = " + roleName);
-
-
-        if (roleName == null) {
-            throw new BadRequestException("You doesn't have role as a leader you should ");
-        }
-        // if user doesn't have any role in board with table member
-        if (!roleName.equals(RoleName.ROLE_LEADER.toString())) {
-            throw new BadRequestException("You should let's manager assign role first ");
-        }
-
-        boolean alreadyAssigned = taskRepository.isMemberAlreadyAssignedToTask(taskId, assignTo);
-        if(alreadyAssigned) {
-            throw new BadRequestException("This team leader is already assigned to this task.");
-        }
-
-
-        // insert assignerId , assignToId , and taskId , with role as a Leader
-        taskRepository.assignMemberToTaskWithRole(assignUserIdInMemberTable, assignTo, taskId);
-        return task;
+        // Update task in DB
+        return taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, boardId, ganttBarId);
     }
 
+
+    @Override
+    public Task deleteTaskByIdWithBoardIdAndGanttBarId(UUID taskId, UUID boardId, UUID ganttBarId) {
+        Task task = getTaskById(taskId);
+        validateTaskIdWithBoardIdAndGanttBarId(taskId, boardId, ganttBarId);
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        validateRoleManageTask(boardId,userId);
+        String role = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+
+        if (RoleName.ROLE_LEADER.toString().equals(role)) {
+            UUID teamLeaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+            if (!task.getCreatedBy().equals(teamLeaderMemberId)) {
+                throw new ForbiddenException("Team Leader can only deleted tasks they created");
+            }
+        } else if (!RoleName.ROLE_MANAGER.toString().equals(role)) {
+            throw new ForbiddenException("You are not have permission to deleted this task");
+        }
+
+        return taskRepository.deleteTaskByIdWithBoardIdAndGanttBarId(taskId, boardId, ganttBarId);
+    }
+
+    @Override
+    public HashSet<Task> getTaskByTitleWithBoardId(String title, UUID boardId) {
+        boardService.getBoardByBoardId(boardId);
+        List<Task> task = taskRepository.getTaskByTitleWithBoardId(title, boardId);
+        return new HashSet<>(task);
+    }
+
+    @Override
+    public void assignLeaderToTask(UUID taskId, UUID assigneeId) {
+        Task task = getTaskById(taskId);
+        validateCurrentUserRoles(task.getBoardId());
+        if (taskRepository.isAlreadyAssigned(taskId)) {
+            throw new ConflictException("Task's with ID " + taskId + " is already assigned Leader");
+        }
+
+        UUID currentUserId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        UUID assignerId = boardRepository.getMemberIdByUserIdAndBoardId(currentUserId, task.getBoardId());
+        System.out.println("assignerId: " + assignerId);
+
+
+        System.out.println("assigner id: " + assignerId);
+        UUID leaderId = taskRepository.findLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
+        if (leaderId == null) {
+            throw new ForbiddenException("You're not a leader of this board");
+        }
+
+
+        taskRepository.insertTaskAssignment(taskId, assignerId, leaderId);
+    }
 
 }

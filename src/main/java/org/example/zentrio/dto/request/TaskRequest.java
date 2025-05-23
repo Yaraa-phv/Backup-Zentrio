@@ -1,9 +1,8 @@
 package org.example.zentrio.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,14 +15,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class TaskRequest {
-    @NotBlank(message = "Task title cannot be blank!")
+
+    @NotNull
+    @NotBlank
     private String title;
+
+    @NotNull
+    @NotBlank
     private String description;
-    @FutureOrPresent(message = "Start Date better in present or future!")
-    @JsonSerialize
-    @JsonFormat
+
+    @FutureOrPresent
     private LocalDateTime startedAt;
-    @FutureOrPresent(message = "Start Date better in present or future!")
-    @JsonFormat
+
+    @FutureOrPresent
     private LocalDateTime finishedAt;
 }

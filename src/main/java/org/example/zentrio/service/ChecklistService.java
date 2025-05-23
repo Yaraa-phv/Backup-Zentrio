@@ -1,29 +1,47 @@
 package org.example.zentrio.service;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.example.zentrio.dto.request.ChecklistRequest;
+import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.model.Task;
+import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
 public interface ChecklistService {
-    Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest);
+    Checklist createChecklist(ChecklistRequest checklistRequest, UUID taskId);
 
-    UUID checkExistedTaskId(UUID taskId, UUID currentUserId);
+    Checklist getChecklistById(UUID checklistId);
 
-    UUID checkTaskIdToGetChecklist(UUID taskId);
+    ApiResponse<HashSet<Checklist>> getAllChecklistsByTaskId(UUID taskId, Integer page, Integer size);
 
-    HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId);
+    Checklist updateChecklistByIdAndTaskId(ChecklistRequest checklistRequest, UUID checklistId, UUID taskId);
 
-    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
+    Checklist deleteChecklistByIdAndTaskId(UUID checklistId, UUID taskId);
 
-    HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
+    void assignMemberToChecklist(UUID checklistId, UUID taskId, UUID assignedBy, UUID assignedTo);
 
-    Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest);
 
-    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+//    Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest);
 
-    Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId);
+//    UUID checkExistedTaskId(UUID taskId, UUID currentUserId);
+//
+//    UUID checkTaskIdToGetChecklist(UUID taskId);
+//
+//    HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId);
+//
+//    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
+//
+//    HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
+//
+//    Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest);
+//
+//    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
+//
+//    Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId);
 }

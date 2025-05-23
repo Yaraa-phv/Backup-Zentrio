@@ -124,29 +124,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     }
 
-    @Override
-    public Workspace updateWorkspaceTitleByWorkspaceId(UUID workspaceId, String title) {
-
-        checkExistedWorkspaceId(workspaceId);
-        Workspace request = workspaceRepository.getWorkspaceById(workspaceId, currentUserId());
-        request.setTitle(title);
-        request.setUpdatedAt(LocalDateTime.now());
-
-        return workspaceRepository.updateWorkspaceTitleByWorkspaceId(request);
-
-    }
-
-    @Override
-    public Workspace updateWorkspaceDescriptionByWorkspaceId(UUID workspaceId, String description) {
-
-        getWorkspaceById(workspaceId);
-        Workspace request = workspaceRepository.getWorkspaceById(workspaceId, currentUserId());
-        request.setTitle(description);
-        request.setUpdatedAt(LocalDateTime.now());
-
-        return workspaceRepository.updateWorkspaceTitleByWorkspaceId(request);
-
-    }
 
     @Override
     public Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId) {

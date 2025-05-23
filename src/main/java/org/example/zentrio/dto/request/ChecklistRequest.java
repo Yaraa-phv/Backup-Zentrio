@@ -1,8 +1,9 @@
 package org.example.zentrio.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +16,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class ChecklistRequest {
-    @NotBlank(message = "Title cannot be blank!")
+
+    @NotNull
+    @NotBlank
     private String title;
-//    private Integer checklistOrder;
-    @JsonSerialize
-    @JsonFormat
+
+
+
+    @NotNull
+    @FutureOrPresent
     private LocalDateTime startedAt;
-    @JsonSerialize
-    @JsonFormat
+
+    @NotNull
+    @FutureOrPresent
     private LocalDateTime finishedAt;
-//    private UUID taskId;
 }

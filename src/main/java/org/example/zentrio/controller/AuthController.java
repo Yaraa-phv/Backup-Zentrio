@@ -109,12 +109,12 @@ public class AuthController {
 
     @Operation(summary = "Reset password", description = "Reset password for user that are forgot the password")
     @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<ResetPasswordRequest>> resetPassword(@Valid @RequestBody ResetPasswordRequest request,String email, String otp) {
+    public ResponseEntity<ApiResponse<ResetPasswordRequest>> resetPassword(@Valid @RequestBody ResetPasswordRequest request,String email) {
         ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
                 .success(true)
                 .message("Reset password successfully.")
                 .status(HttpStatus.CREATED)
-                .payload(authService.resetPassword(request,email,otp))
+                .payload(authService.resetPassword(request,email))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
@@ -132,5 +132,19 @@ public class AuthController {
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+
+    @PostMapping("/verify-reset-password")
+    public ResponseEntity<ApiResponse<?>> verifyReset(@Valid @RequestParam String email, @RequestParam String otp) {
+        authService.verifyReset(email, otp);
+        ApiResponse<?> response = ApiResponse.builder()
+                .success(true)
+                .message("Verified OTP reset successfully")
+                .payload(null)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

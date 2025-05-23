@@ -17,5 +17,5 @@ public class GanttChart {
     private String title;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private UUID board_id;
+    private UUID boardId;
 }

@@ -8,16 +8,13 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
-import org.example.zentrio.dto.response.DeleteApiResponse;
 import org.example.zentrio.model.Task;
-import org.example.zentrio.model.Workspace;
 import org.example.zentrio.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -29,128 +26,118 @@ import java.util.UUID;
 @Tag(name = "Task Controller")
 public class TaskController {
 
+
     private final TaskService taskService;
 
-    @Operation(summary = "Create task by board id, and gantt bar id")
-    @PostMapping("boards/{board-id}/gantt-bars/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<Task>> createTask(@PathVariable("board-id") UUID boardId, @PathVariable("gantt-bar-id") UUID ganttBarId, @RequestBody @Valid TaskRequest taskRequest) {
-        ApiResponse<Task> response = ApiResponse.<Task>builder()
+    @Operation(summary = "Create task by boards ID, and gantt bars ID", description = "Created task with boards ID and gantt bars ID")
+    @PostMapping("/boards/{board-id}/gantt-bars/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<Task>> createTaskByBoardIdAndGanttBarId(
+            @Valid @RequestBody TaskRequest taskRequest,
+            @PathVariable("board-id") UUID boardId,
+            @PathVariable("gantt-bar-id") UUID ganttBarId) {
+
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
                 .success(true)
-                .message("Created board successfully!")
+                .message("Created task successfully")
+                .payload(taskService.createTaskByBoardIdAndGanttBarId(taskRequest, boardId, ganttBarId))
                 .status(HttpStatus.CREATED)
-                .payload(taskService.createTask(boardId, ganttBarId, taskRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "Get all tasks by board id, and gantt bar id")
-    @GetMapping("boards/{board-id}/gantt-bars/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<HashSet<Task>>> getAllTasks(
-            @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
-            @RequestParam(defaultValue = "0") @Positive Integer page,
-            @RequestParam(defaultValue = "10") @Positive Integer size) {
-        ApiResponse<HashSet<Task>> response = taskService.getAllTasks(boardId,ganttBarId,page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
 
-    @Operation(summary = "Get task by task id")
+    @Operation(summary = "Get task by task ID", description = "GEt task by ID with current boards")
     @GetMapping("/{task-id}")
     public ResponseEntity<ApiResponse<Task>> getTaskById(@PathVariable("task-id") UUID taskId) {
-        ApiResponse<Task> response = ApiResponse.<Task>builder()
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
                 .success(true)
-                .message("Get task by id successfully!")
-                .status(HttpStatus.OK)
+                .message("Get task by ID successfully")
                 .payload(taskService.getTaskById(taskId))
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Get task by task title")
-    @GetMapping("boards/{board-id}/tasks/{title}")
-    public ResponseEntity<ApiResponse<HashMap<String, Task>>> getTaskByTitle(@PathVariable("board-id") UUID boardId, @PathVariable("title") String title) {
-        ApiResponse<HashMap<String, Task>> response = ApiResponse.<HashMap<String, Task>>builder()
-                .success(true)
-                .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)
-                .payload(taskService.getTaskByTitle(boardId, title))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Edit task by task id")
-    @PutMapping("/{task-id}")
-    public ResponseEntity<ApiResponse<Task>> updateTaskById(
+
+    @Operation(summary = "Get all task by board ID, and gantt bar ID", description = "Get all task by specific board ID with gantt bar ID")
+    @GetMapping("/boards/{board-id}/gantt-bars/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<List<Task>>> getTasksByBoardIdAndGanttBarId(
+            @PathVariable("board-id") UUID boardId,
+            @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @Positive @RequestParam(defaultValue = "1") Integer page,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        ApiResponse<List<Task>> apiResponse = taskService.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId, page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Update task by ID", description = "Updated task by ID with boards ID and gantt bars ID")
+    @PutMapping("/{task-id}/boards/{board-id}/gantt-bars/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<Task>> updateTaskByIdWithBoardIdAndGanttBarId(
+            @Valid @RequestBody TaskRequest taskRequest,
             @PathVariable("task-id") UUID taskId,
-            @RequestBody @Valid TaskRequest taskRequest) {
-        ApiResponse<Task> response = ApiResponse.<Task>builder()
+            @PathVariable("board-id") UUID boardId,
+            @PathVariable("gantt-bar-id") UUID ganttBarId) {
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
                 .success(true)
-                .message("Update task by id successfully!")
+                .message("Updated task by ID successfully")
+                .payload(taskService.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, boardId, ganttBarId))
                 .status(HttpStatus.OK)
-                .payload(taskService.updateTaskById(taskId, taskRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Edit task title by task id")
-    @PatchMapping("/title/{task-id}")
-    public ResponseEntity<ApiResponse<Task>> updateTaskTitleByTaskId(
+
+    @Operation(summary = "Deleted task by ID", description = "Deleted task by ID with boards ID and gantt bars ID")
+    @DeleteMapping("/{task-id}/boards/{board-id}/gantt-bars/{gantt-bar-id}")
+    public ResponseEntity<ApiResponse<Task>> deleteTaskByIdWithBoardIdAndGanttBarId(
             @PathVariable("task-id") UUID taskId,
-            @RequestBody String title) {
-        ApiResponse<Task> response = ApiResponse.<Task>builder()
+            @PathVariable("board-id") UUID boardId,
+            @PathVariable("gantt-bar-id") UUID ganttBarId) {
+
+        ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()
                 .success(true)
-                .message("Update task title by task id successfully!")
+                .message("Deleted task by ID successfully")
+                .payload(taskService.deleteTaskByIdWithBoardIdAndGanttBarId(taskId, boardId, ganttBarId))
                 .status(HttpStatus.OK)
-                .payload(taskService.updateTaskTitleByTaskId(taskId, title))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Edit task description by task id")
-    @PatchMapping("/{task-id}")
-    public ResponseEntity<ApiResponse<Task>> updateTaskDescriptionByTaskId(
+
+    @Operation(summary = "Get task by title", description = "Get task by title with specific boards ID")
+    @GetMapping("/{title}/boards/{board-id}")
+    public ResponseEntity<ApiResponse<HashSet<Task>>> getTaskByTitleWithBoardId(
+            @PathVariable("title") String title,
+            @PathVariable("board-id") UUID boardId) {
+        ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
+                .success(true)
+                .message("Get task by ID successfully")
+                .payload(taskService.getTaskByTitleWithBoardId(title, boardId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @Operation(summary = "Assigned role with task ID", description = "Assigned role leader tasks with specific users")
+    @PostMapping("/{task-id}/members/{assignee-id}")
+    public ResponseEntity<?> assignLeaderToTask(
             @PathVariable("task-id") UUID taskId,
-            @RequestBody String description) {
-        ApiResponse<Task> response = ApiResponse.<Task>builder()
+            @PathVariable("assignee-id") UUID assigneeId) {
+        taskService.assignLeaderToTask(taskId, assigneeId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
-                .message("Update task description by task id successfully!")
-                .status(HttpStatus.OK)
-                .payload(taskService.updateTaskDescriptionByTaskId(taskId, description))
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Delete task by task id")
-    @DeleteMapping("/{task-id}")
-    public ResponseEntity<DeleteApiResponse<Task>> deleteTaskByTaskId(
-            @PathVariable("task-id") UUID taskId) {
-
-        taskService.deleteTaskByTaskId(taskId);
-
-        DeleteApiResponse<Task> response = DeleteApiResponse.<Task>builder()
-                .success(true)
-                .message("Delete task by task id successfully!")
+                .message("Assigned role with task ID successfully")
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-
-
-    //From Fanau
 
 
 }

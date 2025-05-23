@@ -55,24 +55,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String profileImage = request.getProfileImage();
-
-        if (request.getGender().equals(Gender.FEMALE)){
-            if (!profileImage.isEmpty()){
-                request.setProfileImage(profileImage);
-            }else {
+        if (profileImage == null || profileImage.isEmpty() || profileImage.equalsIgnoreCase("string")) {
+            if (request.getGender().equals(Gender.FEMALE)) {
                 request.setProfileImage("https://i.pinimg.com/736x/60/a4/04/60a4046baaa616fd41ee84cf3ccc7953.jpg");
-            }
-        } else if (request.getGender().equals(Gender.MALE)) {
-            if (!profileImage.isEmpty()){
-                request.setProfileImage(profileImage);
-            }else {
+            } else if (request.getGender().equals(Gender.MALE)) {
                 request.setProfileImage("https://i.pinimg.com/736x/3e/9f/08/3e9f085ce52735854f9f2d4742f86659.jpg");
-            }
-        } else {
-            request.setGender(Gender.RATHER_NOT_TO_SAY);
-            if (!profileImage.isEmpty()){
-                request.setProfileImage(profileImage);
-            }else {
+            } else {
+                request.setGender(Gender.RATHER_NOT_TO_SAY);
                 request.setProfileImage("https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg");
             }
         }
@@ -176,6 +165,7 @@ public class AuthServiceImpl implements AuthService {
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String email = payload.getEmail();
+//        String googleId = (passwordEncoder.encode(payload.getSubject()));
         String googleId = payload.getSubject();
         String name = (String) payload.get("name");
         String picture = (String) payload.get("picture");
@@ -187,17 +177,16 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+
     @Override
-    public ResetPasswordRequest resetPassword(ResetPasswordRequest request, String email, String otp) {
+    public ResetPasswordRequest resetPassword(ResetPasswordRequest request,String email) {
         AppUser appUser = appUserRepository.getUserByEmail(email);
         if (appUser == null) {
             throw new BadRequestException("This email does not matched");
         }
-        appUser.setIsReset(false);
 
-        Boolean validateOtp = otpService.validateOtp(email, otp);
-        if (!validateOtp) {
-            throw new BadRequestException("The OTP entered is invalid or has expired");
+        if(!appUser.getIsReset()) {
+            throw new BadRequestException("This email isn't verify for reset");
         }
 
         String password = (request.getPassword());
@@ -209,7 +198,9 @@ public class AuthServiceImpl implements AuthService {
 
         request.setPassword(passwordEncoder.encode(password));
         request.setConfirmPassword(passwordEncoder.encode(confirmPassword));
-        return authRepository.resetPassword(request, email);
+        ResetPasswordRequest resetPasswordRequest = authRepository.resetPassword(request, email);
+        appUserRepository.updatedIsResetToFalse(appUser.getUserId());
+        return resetPasswordRequest;
     }
 
     @Override
@@ -230,6 +221,20 @@ public class AuthServiceImpl implements AuthService {
                 "Your OTP for Password Reset",
                 variables
         );
+    }
+
+    @Override
+    public void verifyReset(String email, String otp) {
+        AppUser appUser = appUserRepository.getUserByEmail(email);
+        if (appUser == null) {
+            throw new BadRequestException("This email does not exist");
+        }
+
+        boolean isValidateOtp = otpService.validateOtp(email, otp);
+        if (!isValidateOtp) {
+            throw new BadRequestException("The OTP entered is invalid or has expired. Please request for getting a new OTP and try again.");
+        }
+        appUserRepository.updatedIsResetToTrue(appUser.getUserId());
     }
 
 }

@@ -21,9 +21,9 @@ public class Task {
     private Boolean isDone;
     private Integer taskOrder;
     private String stage;
+    private UUID createdBy;
     private UUID boardId;
     private UUID ganttBarId;
-    private String ganttBarTitle;
-//    private Board boardId;
-//    private GanttBar ganttBarId;
+
+
 }

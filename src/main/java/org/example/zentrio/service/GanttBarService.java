@@ -1,6 +1,7 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
+
+
 import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.model.GanttBar;
 
@@ -8,18 +9,15 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GanttBarService {
-    GanttBar creatGanntBar(UUID ganntBartId, GanttBarRequest ganttBarRequest);
+    GanttBar createGanttBarByGanttChartId(GanttBarRequest ganttBarRequest, UUID ganttChartId);
 
-    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganntChartId);
+    GanttBar getGanttBarById(UUID ganttBarId);
 
+    List<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId);
 
-    GanttBar getGanttBarByGanttBartID(UUID geanntbarId);
+    GanttBar updateGanttBarByGanttBarId(GanttBarRequest ganttBarRequest, UUID ganttBarId);
 
+    GanttBar deleteGanttBarByGanttBarId(UUID ganttBarId);
 
-    GanttBar updateGanttBarByGanttBarId(UUID geanntbarId,  GanttBarRequest ganttBarRequest);
-
-    void deleteGanttBarByGanttBarId(UUID geanttbarId);
-
-    GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
 
 }

@@ -20,10 +20,6 @@ public interface WorkspaceService {
 
     Workspace updateWorkspaceById(UUID workspaceId, WorkspaceRequest workspaceRequest);
 
-    Workspace updateWorkspaceTitleByWorkspaceId(UUID workspaceId, String title);
-
-    Workspace updateWorkspaceDescriptionByWorkspaceId(UUID workspaceId, String description);
-
     UUID checkExistedWorkspaceId(UUID existedWorkspaceId);
 
     Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId);

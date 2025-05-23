@@ -22,6 +22,11 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendDynamicEmail(String toEmail, String templateName, String subject, Map<String, Object> variables) {
+
+        if (!toEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new BadRequestException("Invalid email address");
+        }
+
         Context context = new Context();
         context.setVariables(variables);  // set all variables dynamically
 
@@ -38,6 +43,43 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Failed to send email", e);
         }
     }
+
+
+    @Override
+    public void sendInvitations(String email) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new BadRequestException("Invalid email address");
+        }
+        try {
+            // Prepare the email template context with dynamic values
+            Context context = new Context();
+            context.setVariable("title", "You're Invited!");  // Title for the email
+            context.setVariable("message",
+                    "We would like to invite you to join our platform. Please click the button below to accept the invitation.");  // Message content
+            context.setVariable("inviteLink", "https://www.youtube.com/");  // Invitation link (replace with actual URL)
+
+            // Process the Thymeleaf template 'invite-member.html' (replace with the correct template name)
+            String processedHtml = templateEngine.process("invite-member", context);  // Template name
+
+            // Create the MimeMessage for sending the email
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            mimeMessageHelper.setSubject("You're Invited to Join Zentrio!");  // Email subject
+            mimeMessageHelper.setText(processedHtml, true);  // true means it will be sent as HTML content
+            mimeMessageHelper.setTo(email);  // The recipient email
+
+            // Send the email using JavaMailSender
+            javaMailSender.send(mimeMessage);
+
+            System.out.println("Invitation email sent to " + email);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send invitation email to " + email, e);
+        }
+    }
+
+
 
     @SneakyThrows
     @Override

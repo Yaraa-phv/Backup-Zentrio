@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.GanttChartRequest;
+import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.GanttChart;
 import org.example.zentrio.repository.GanttChartRepository;
@@ -22,43 +23,52 @@ public class GanttChartServiceImpl implements GanttChartService {
     private final GanttChartRepository ganttChartRepository;
     private final BoardService boardService;
 
-
     @Override
-    public GanttChart createGanttChart(UUID boardId, GanttChartRequest ganttChartRequest) {
-        return  ganttChartRepository.createGanttChart(boardId, ganttChartRequest, LocalDateTime.now());
-    }
+    public GanttChart createGanttChartByBoardId(GanttChartRequest ganttChartRequest, UUID boardId) {
+        boardService.getBoardByBoardId(boardId);
+        GanttChart existingGanttChart = ganttChartRepository.getGanttChartByBoardId(boardId);
 
-
-    @Override
-    public GanttChart getGanttChartByBoardId(UUID boardId) {
-
-        UUID existedBoardId = boardService.checkExistedBoardId(boardId);
-
-        return ganttChartRepository.getGanttChartByBoardId(existedBoardId);
-    }
-
-    @Override
-    public GanttChart updateGannntCjhartById(UUID ganttChartId, GanttChartRequest ganttChartRequest) {
-        return  ganttChartRepository.updateGannntCjhartById(ganttChartId, ganttChartRequest, LocalDateTime.now());
-    }
-
-    @Override
-    public Void deleteGanttChartByID(UUID ganttChartId) {
-        GanttChart ganttChart= ganttChartRepository.getGanttChartById(ganttChartId);
-        if (ganttChart == null) {
-            throw new NotFoundException("GanttChart id:"+ganttChartId+" not found");
+        if (existingGanttChart != null) {
+            throw new NotFoundException("Gantt chart for board id " + boardId + " already created");
         }
 
-        return ganttChartRepository.deleteGanttChartByID(ganttChartId);
+        // Create a new Gantt Chart
+        LocalDateTime now = LocalDateTime.now();
+        GanttChart ganttChart = new GanttChart();
+        ganttChart.setTitle(ganttChartRequest.getTitle());
+        ganttChart.setBoardId(boardId);
+        ganttChart.setCreatedAt(now);
+        ganttChart.setUpdatedAt(now);
+
+        return ganttChartRepository.createGanttChartByBoardId(ganttChartRequest, boardId);
     }
 
     @Override
-    public GanttChart getGanttChartByID(UUID ganttChartId) {
-        GanttChart ganttChart= ganttChartRepository.getGanttChartById(ganttChartId);
+    public GanttChart getGanttChartById(UUID ganttChartId) {
+        GanttChart ganttChart = ganttChartRepository.getGanttChartById(ganttChartId);
         if (ganttChart == null) {
-            throw new NotFoundException("GanttChart id:"+ganttChartId+" not found");
+            throw new NotFoundException("Gantt chart with " + ganttChartId + " not found");
         }
-        return  ganttChart;
+        return ganttChart;
     }
+
+    @Override
+    public GanttChart deleteGanttChartById(UUID ganttChartId) {
+        getGanttChartById(ganttChartId);
+        return ganttChartRepository.deleteGanttChartById(ganttChartId);
+    }
+
+    @Override
+    public GanttChart getAllGanttChartByBoardId(UUID boardId) {
+        boardService.getBoardByBoardId(boardId);
+        return ganttChartRepository.getAllGanttChartByBoardId(boardId);
+    }
+
+    @Override
+    public GanttChart updateGanttChartByGanttChartId(GanttChartRequest ganttChartRequest, UUID ganttChartId) {
+        getGanttChartById(ganttChartId);
+        return ganttChartRepository.updateGanttChartByGanttChartId(ganttChartRequest, ganttChartId);
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package org.example.zentrio.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Checklist {
     private UUID checklistId;
     private String title;
@@ -20,4 +22,5 @@ public class Checklist {
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
     private UUID taskId;
+    private UUID createdBy;
 }

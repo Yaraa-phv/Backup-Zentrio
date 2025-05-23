@@ -3,51 +3,30 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.BoardResponse;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ConflictException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
-import org.example.zentrio.repository.BoardRepository;
-import org.example.zentrio.repository.RoleRepository;
-import org.example.zentrio.repository.WorkspaceRepository;
+import org.example.zentrio.repository.*;
 import org.example.zentrio.service.BoardService;
-import org.example.zentrio.service.WorkspaceService;
-import org.springframework.context.support.BeanDefinitionDsl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final WorkspaceService workspaceService;
     private final WorkspaceRepository workspaceRepository;
     private final RoleRepository roleRepository;
-
-    @Override
-    public UUID checkExistedBoardId(UUID boardId) {
-
-        if (boardId == null) {
-            throw new NotFoundException("Request Board Id not found!");
-        }
-        Board boardById = boardRepository.getBoardByBoardId(boardId);
-        if (boardById == null) {
-            throw new NotFoundException("Board Id is not found!");
-        }
-
-        if (!boardId.equals(boardById.getBoardId())) {
-            throw new NotFoundException("Board Id can not find!");
-        } else {
-            return boardById.getBoardId();
-        }
-
-    }
+    private final AppUserRepository appUserRepository;
 
     @Override
     public Board createBoard(BoardRequest boardRequest, UUID workspaceId) {
@@ -58,13 +37,13 @@ public class BoardServiceImpl implements BoardService {
         }
         Board board = boardRepository.createBoard(boardRequest, workspaceId);
         UUID boardId = board.getBoardId();
-        UUID roleId = roleRepository.getRoleIdByRoleName("ROLE_MANAGER");
+        UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_MANAGER.toString());
         boardRepository.insertMember(userId, boardId, roleId);
         return board;
     }
 
     @Override
-    public ApiResponse<HashMap<String, Board>> getAllBoardsByWorkspaceId(UUID workspaceId, Integer page, Integer size) {
+    public ApiResponse<HashSet<Board>> getAllBoardsByWorkspaceId(UUID workspaceId, Integer page, Integer size) {
         Workspace existedWorkspaceIdById = workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
         if (existedWorkspaceIdById == null) {
             throw new NotFoundException("Workspace cannot found!");
@@ -73,15 +52,12 @@ public class BoardServiceImpl implements BoardService {
 
         List<Board> boardList = boardRepository.getAllBoardsByWorkspaceId(workspaceId, size, offset);
 
-        HashMap<String, Board> boards = new HashMap<>();
-        for (Board board : boardList) {
-            boards.put(board.getBoardId().toString(), board);
-        }
+        HashSet<Board> boards = new HashSet<>(boardList);
 
-        Integer totalElements = boardRepository.getBoardCountByWorkspaceId(workspaceId);
-        Integer totalPages = (int) Math.ceil(totalElements / (double) size);
+        int totalElements = boardRepository.getBoardCountByWorkspaceId(workspaceId);
+        int totalPages = (int) Math.ceil(totalElements / (double) size);
 
-        return ApiResponse.<HashMap<String, Board>>builder()
+        return ApiResponse.<HashSet<Board>>builder()
                 .success(true)
                 .message("Get all tasks successfully")
                 .payload(boards)
@@ -93,19 +69,10 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
-    public Board getBoardByWorkspaceIdAndBoardId(UUID workspaceId, UUID boardId) {
-        Workspace existedWorkspaceIdById = workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
-        if (existedWorkspaceIdById == null) {
-            throw new NotFoundException("Workspace cannot found!");
-        }
-        UUID existedWorkspaceId = existedWorkspaceIdById.getWorkspaceId();
-        return boardRepository.getBoardByWorkspaceIdAndBoardId(existedWorkspaceId, boardId);
-    }
-
-    @Override
     public Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId) {
+        getBoardByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
         if (roleName == null) {
             throw new NotFoundException("You're doesn't have a ROLE MANGER to update this board");
@@ -120,10 +87,9 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board deleteBoardByBoardId(UUID boardId) {
+        getBoardByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByUserIdAndBoardId(boardId, userId);
-
-        System.out.println("roleName: " + roleName);
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
         if (roleName == null) {
             throw new NotFoundException("You're doesn't have a ROLE MANGER to deleted this board");
@@ -155,14 +121,44 @@ public class BoardServiceImpl implements BoardService {
         return board;
     }
 
+
     @Override
-    public Board updateBoardTitleByBoardId(UUID boardId, String boardTitle) {
-        Board currentBoardId = boardRepository.getBoardByBoardId(boardId);
-        if (currentBoardId == null) {
-            throw new NotFoundException("Board id " + boardId + " not found");
+    public BoardResponse getBoardByBoardIdWithMember(UUID boardId) {
+        return boardRepository.getBoardByBoardIdWithMember(boardId);
+    }
+
+    @Override
+    public void assignRoleToBoard(UUID boardId, UUID assigneeId, RoleName roleName) {
+        getBoardByBoardId(boardId);
+        validateCurrentUserRoles(boardId);
+
+        AppUser userId = appUserRepository.getUserById(assigneeId);
+        if(userId == null) {
+            throw new NotFoundException("Assignee id " + assigneeId + " not found");
         }
 
-        return boardRepository.updateBoardTitleByBoardId(boardId, boardTitle);
+        if(roleName == RoleName.ROLE_MANAGER) {
+            throw new BadRequestException("Cannot assign users as a manager");
+        }
+
+        UUID existingMemberId  = boardRepository.getMemberIdByUserIdAndBoardId(assigneeId, boardId);
+
+        if (existingMemberId  != null) {
+            throw new ConflictException("Member with ID " + assigneeId + "is already assigned");
+        }
+
+        UUID roleId = roleRepository.getRoleIdByRoleName(roleName.toString());
+
+        roleRepository.insertToMember(assigneeId,boardId,roleId);
     }
+
+    public void validateCurrentUserRoles(UUID boardId){
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
+        if(roleName == null || !roleName.equals(RoleName.ROLE_MANAGER.toString())){
+            throw new ForbiddenException("You're not manager in this board can't assign role");
+        }
+    }
+
 
 }

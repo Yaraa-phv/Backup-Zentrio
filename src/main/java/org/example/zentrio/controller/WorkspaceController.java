@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,13 +26,12 @@ import java.util.UUID;
 @Tag(name = "Workspace Controller")
 public class WorkspaceController {
 
-    private final
-    WorkspaceService workspaceService;
+    private final WorkspaceService workspaceService;
 
-    @Operation(summary = "Create workspace")
+    @Operation(summary = "Create workspace", description = "Created workspace by current users")
     @PostMapping
-    public ResponseEntity<ApiResponse<Workspace>> createWorkspace(@RequestBody @Valid WorkspaceRequest workspaceRequest){
-        ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
+    public ResponseEntity<ApiResponse<Workspace>> createWorkspace(@RequestBody @Valid WorkspaceRequest workspaceRequest) {
+        ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()
                 .success(true)
                 .message("Created workspace successfully!")
                 .status(HttpStatus.CREATED)
@@ -44,22 +42,22 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get all workspaces")
+    @Operation(summary = "Get all workspaces", description = "Get all workspace for current users")
     @GetMapping
     public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(
-             @RequestParam(defaultValue = "1") @Positive Integer page,
-             @RequestParam(defaultValue = "10") @Positive Integer size
-    ){
+            @RequestParam(defaultValue = "1") @Positive Integer page,
+            @RequestParam(defaultValue = "10") @Positive Integer size
+    ) {
         ApiResponse<HashMap<String, Workspace>> response = workspaceService.getAllWorkspaces(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "Get workspace by id")
+    @Operation(summary = "Get workspace by ID", description = "Get workspace by ID with current users")
     @GetMapping("/{workspace-id}")
-    public ResponseEntity<ApiResponse<Workspace>> getWorkspaceById(@PathVariable("workspace-id") UUID workspaceId){
-        ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
+    public ResponseEntity<ApiResponse<Workspace>> getWorkspaceById(@PathVariable("workspace-id") UUID workspaceId) {
+        ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()
                 .success(true)
-                .message("Get workspace by id successfully!")
+                .message("Get workspace by ID successfully!")
                 .status(HttpStatus.OK)
                 .payload(workspaceService.getWorkspaceById(workspaceId))
                 .timestamp(LocalDateTime.now())
@@ -68,10 +66,10 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get workspace by title")
-    @GetMapping("/{title}")
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title){
-        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>> builder()
+    @Operation(summary = "Get workspace by title", description = "Get workspace by titles")
+    @GetMapping("/get-title/{title}")
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getWorkspaceByTitle(@PathVariable("title") String title) {
+        ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
                 .success(true)
                 .message("Get workspace by title successfully!")
                 .status(HttpStatus.OK)
@@ -82,12 +80,12 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit workspace by id")
-    @PutMapping("/{workspace-id}")
-    public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceById(@PathVariable("workspace-id") UUID workspaceId, @RequestBody @Valid WorkspaceRequest workspaceRequest){
-        ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
+    @Operation(summary = "Update workspace by ID", description = "Updated workspace by ID with current users")
+    @PutMapping("/update/{workspace-id}")
+    public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceById(@PathVariable("workspace-id") UUID workspaceId, @RequestBody @Valid WorkspaceRequest workspaceRequest) {
+        ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()
                 .success(true)
-                .message("Update workspace by id successfully!")
+                .message("Updated workspace by ID successfully!")
                 .status(HttpStatus.OK)
                 .payload(workspaceService.updateWorkspaceById(workspaceId, workspaceRequest))
                 .timestamp(LocalDateTime.now())
@@ -96,43 +94,16 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Edit workspace title by workspace id")
-    @PatchMapping("/{workspace-id}")
-    public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceTitleByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String title){
-        ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
-                .success(true)
-                .message("Update workspace title by workspace id successfully!")
-                .status(HttpStatus.OK)
-                .payload(workspaceService.updateWorkspaceTitleByWorkspaceId(workspaceId, title))
-                .timestamp(LocalDateTime.now())
-                .build();
 
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Edit workspace description by workspace id")
-    @PatchMapping("/descriptions/{workspace-id}")
-    public ResponseEntity<ApiResponse<Workspace>> updateWorkspaceDescriptionByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId, @RequestBody String description){
-        ApiResponse<Workspace> response = ApiResponse.<Workspace> builder()
-                .success(true)
-                .message("Update workspace description by workspace id successfully!")
-                .status(HttpStatus.OK)
-                .payload(workspaceService.updateWorkspaceDescriptionByWorkspaceId(workspaceId, description))
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Delete workspace by workspace id")
+    @Operation(summary = "Delete workspace by ID", description = "Deleted workspace by ID with current users")
     @DeleteMapping("/{workspace-id}")
-    public ResponseEntity<DeleteApiResponse<Workspace>> deleteWorkspaceByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId){
+    public ResponseEntity<DeleteApiResponse<Workspace>> deleteWorkspaceByWorkspaceId(@PathVariable("workspace-id") UUID workspaceId) {
 
         workspaceService.deleteWorkspaceByWorkspaceId(workspaceId);
 
         DeleteApiResponse<Workspace> response = DeleteApiResponse.<Workspace>builder()
                 .success(true)
-                .message("Delete workspace by workspace id successfully!")
+                .message("Deleted workspace by workspace id successfully!")
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -140,13 +111,13 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get all workspaces for all users")
+    @Operation(summary = "Get all workspaces for users", description = "Get all workspace for display to users")
     @GetMapping("/users")
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspacesForAllUsers(){
+    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspacesForAllUsers() {
 
         ApiResponse<HashMap<String, Workspace>> response = ApiResponse.<HashMap<String, Workspace>>builder()
                 .success(true)
-                .message("Get all workspaces for all users!")
+                .message("Get all workspaces for all users successfully")
                 .payload(workspaceService.getAllWorkspacesForAllUsers())
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -155,13 +126,13 @@ public class WorkspaceController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get workspace by workspace id for all users")
+    @Operation(summary = "Get workspace by workspace ID for users", description = "Get workspace by ID to display for users")
     @GetMapping("/users/{workspace-id}")
-    public ResponseEntity<ApiResponse<Workspace>> getWorkspaceByIdForAllUsers(@PathVariable("workspace-id") UUID workspaceId){
+    public ResponseEntity<ApiResponse<Workspace>> getWorkspaceByIdForAllUsers(@PathVariable("workspace-id") UUID workspaceId) {
 
         ApiResponse<Workspace> response = ApiResponse.<Workspace>builder()
                 .success(true)
-                .message("Get workspace by workspace id for all users!")
+                .message("Get workspace by workspace ID for users successfully")
                 .payload(workspaceService.getWorkspaceByIdForAllUsers(workspaceId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
