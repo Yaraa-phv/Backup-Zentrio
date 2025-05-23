@@ -16,10 +16,10 @@ import java.util.UUID;
 @Builder
 public class Achievement {
     private UUID achievementId;
-    private String achievementName;
+//    private String achievementName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Map<String, List<Board>> details;
+    private Map<String, Object> details;
     private UUID userId;
 
 }

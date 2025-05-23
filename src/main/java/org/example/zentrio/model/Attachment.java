@@ -17,6 +17,6 @@ public class Attachment {
     private UUID attachmentId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Map<String, String> details;
+    private Map<String, Object> details;
     private UUID checklistId;
 }

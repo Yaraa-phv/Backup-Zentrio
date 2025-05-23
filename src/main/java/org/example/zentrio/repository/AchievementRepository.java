@@ -13,15 +13,14 @@ public interface AchievementRepository {
     @Results(id = "achievementMapper",value = {
             @Result(property = "achievementId",column = "achievement_id"),
             @Result(property = "userId",column = "user_id"),
-            @Result(property = "achievementName",column = "achievement_name"),
             @Result(property = "details",column = "details",typeHandler = JsonbTypeHandler.class),
             @Result(property = "createdAt",column = "created_at"),
             @Result(property = "updatedAt",column = "updated_at"),
     })
 
     @Select("""
-        INSERT INTO achievement (achievement_name,details,user_id)
-        VALUES(#{req.achievementName},
+        INSERT INTO achievements (details,user_id)
+        VALUES(
                #{req.details,jdbcType=OTHER, typeHandler = org.example.zentrio.utility.JsonbTypeHandler},
                #{userId})
         RETURNING *
@@ -29,9 +28,8 @@ public interface AchievementRepository {
     Achievement createAchievement(@Param("req") AchievementRequest achievementRequest, UUID userId);
 
     @Select("""
-        UPDATE achievement
-        SET achievement_name = #{req.achievementName},
-            details = #{req.details,jdbcType=OTHER, typeHandler= org.example.zentrio.utility.JsonbTypeHandler}
+        UPDATE achievements
+        SET details = #{req.details,jdbcType=OTHER, typeHandler= org.example.zentrio.utility.JsonbTypeHandler}
         WHERE user_id = #{userId}
         RETURNING *
     """)
@@ -39,12 +37,12 @@ public interface AchievementRepository {
     Achievement updateAchievement(@Param("req") AchievementRequest achievementRequest, UUID userId);
 
     @Select("""
-        SELECT COUNT(*) FROM achievement WHERE user_id = #{userId}
+        SELECT COUNT(*) FROM achievements WHERE user_id = #{userId}
     """)
     boolean isAchievementExist(UUID userId);
 
     @Select("""
-        SELECT * FROM achievement WHERE user_id = #{userId}
+        SELECT * FROM achievements WHERE user_id = #{userId}
     """)
     @ResultMap("achievementMapper")
     Achievement getAllAchievementByCurrentUser(UUID userId);
