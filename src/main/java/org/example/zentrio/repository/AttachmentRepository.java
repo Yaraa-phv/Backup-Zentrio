@@ -27,7 +27,7 @@ public interface AttachmentRepository {
     Attachment createAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID checklistId);
 
     @Select("""
-        UPDATE attachment SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler}
+        UPDATE attachments SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler}
         WHERE attachment_id = #{attachmentId}
         RETURNING *
     """)

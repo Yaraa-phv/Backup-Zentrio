@@ -128,7 +128,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId) {
 
-        checkExistedWorkspaceId(workspaceId);
+        getWorkspaceById(workspaceId);
         return workspaceRepository.deleteWorkspaceByWorkspaceId(workspaceId, currentUserId());
     }
 
