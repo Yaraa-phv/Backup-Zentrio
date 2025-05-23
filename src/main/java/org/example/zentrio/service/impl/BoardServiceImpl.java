@@ -123,6 +123,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponse getBoardByBoardIdWithMember(UUID boardId) {
+        getBoardByBoardId(boardId);
         return boardRepository.getBoardByBoardIdWithMember(boardId);
     }
 

@@ -14,5 +14,5 @@ import java.util.UUID;
 public class Member {
     private UUID memberId;
     private AppUserResponse userResponse;
-    private Role roles;
+    private String roles;
 }

@@ -47,4 +47,11 @@ public interface RoleRepository {
                 AND r.role_name = 'ROLE_LEADER'
     """)
     String getRoleLeaderNameByBoardIdAndUserId(UUID boardId, UUID userId);
+
+
+    @Select("""
+        SELECT  role_name FROM roles 
+        WHERE role_id=#{roleId}
+        """)
+    String getRoleByRoleId(UUID roleId);
 }
