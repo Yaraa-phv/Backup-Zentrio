@@ -62,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment getCommentByCommentId(UUID commentId) {
         Comment comment= commentRepository.getCommentByCommentId(commentId);
+
         if (comment == null) {
             throw new NotFoundException("Comment not found");
         }
@@ -77,12 +78,16 @@ public class CommentServiceImpl implements CommentService {
         return comments;
         }
 
+
     @Override
     public Comment deleteCommentByCommentId(UUID commentId) {
+
         Comment  comment= getCommentByCommentId(commentId);
         Checklist checklist= checklistService.getChecklistChecklistId(comment.getChecklistId());
         Task task= taskService.getTaskById(checklist.getTaskId());
         String role= memberRepository.getRoleInTask(task.getBoardId(),userId(), task.getTaskId());
+        System.out.println(task.getTaskId());
+        System.out.println("role in task: "+ role);
         if (role == null) {
             UUID memberId= memberRepository.getMemberId(userId(),task.getBoardId());
             if (memberId ==null){
@@ -100,7 +105,7 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
-    //not work correct
+
     @Override
     public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
         Comment  comment = getCommentByCommentId(commentId);

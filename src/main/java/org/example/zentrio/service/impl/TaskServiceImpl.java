@@ -119,20 +119,26 @@ public class TaskServiceImpl implements TaskService {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 
         // Validate user has permission (Manager or TL)
-        validateRoleManageTask(boardId, userId);
-
+      //  validateRoleManageTask(boardId, userId);
+        Task task;
         // Determine the role of the user in the board
         String role = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
         System.out.println("role: " + role);
         if (role==null) {
             throw new ForbiddenException("You're not manager or teamLead in this board");
         }
-        UUID creatorMemberId;
+
+        UUID pmId= memberRepository.getIdByBoardId(boardId);
+
 
         if (RoleName.ROLE_MANAGER.toString().equals(role)) {
-            creatorMemberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, boardId);
+
+           task=  taskRepository.createTaskByBoardIdAndGanttBarId(taskRequest, boardId, ganttBarId, pmId);
         } else if (RoleName.ROLE_LEADER.toString().equals(role)) {
-            creatorMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+            UUID teamLeadId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+                task= taskRepository.createTaskByBoardIdAndGanttBarId(taskRequest, boardId, ganttBarId, teamLeadId);
+            // the same id
+            taskRepository.insertTaskAssignment(task.getTaskId(),pmId,teamLeadId);
 
         } else {
             throw new ForbiddenException("You're not a Manager or Team Leader in this board can't create task");
@@ -141,10 +147,6 @@ public class TaskServiceImpl implements TaskService {
         // Validate timing and references
         validateBoardAndGanttBarAndTaskTime(boardId, ganttBarId, taskRequest);
 
-        // Create the task with the correct "created_by" (manager or TL)
-        Task task = taskRepository.createTaskByBoardIdAndGanttBarId(taskRequest, boardId, ganttBarId, creatorMemberId);
-        // the same id
-        taskRepository.insertTaskAssignment(task.getTaskId(),creatorMemberId,creatorMemberId);
 
         return task;
     }
@@ -186,7 +188,7 @@ public class TaskServiceImpl implements TaskService {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 
         // Validate user role (Manager or Team Leader)
-        validateRoleManageTask(boardId, userId);
+       // validateRoleManageTask(boardId, userId);
         String role = memberRepository.getRolePmTeamLead(boardId, userId); // returns "MANAGER" or "TEAM_LEADER"
         System.out.println("role: " + role);
         if (role==null) {

@@ -147,7 +147,7 @@ public interface MemberRepository {
 
     @Select("""
         
-            SELECT  roles.role_name from roles
+        SELECT  roles.role_name from roles
         inner join public.members m on roles.role_id = m.role_id
         inner join  task_assignment tk on tk.assigned_to =m.member_id
         OR tk.assigned_by = member_id
@@ -168,4 +168,12 @@ public interface MemberRepository {
         
         """)
     String getRolePmTeamLead(UUID boardId, UUID userId);
+
+
+    @Select("""
+            SELECT  m.member_id FROM members m
+                INNER JOIN  roles r  ON r.role_id = m.role_id
+            WHERE  r.role_name= 'ROLE_MANAGER' AND m.board_id= #{boardId};
+            """)
+    UUID getIdByBoardId(UUID boardId);
 }
