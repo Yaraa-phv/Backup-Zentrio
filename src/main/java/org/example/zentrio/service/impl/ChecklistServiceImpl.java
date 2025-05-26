@@ -31,6 +31,7 @@ public class ChecklistServiceImpl implements ChecklistService {
     private final RoleRepository roleRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private  final CalendarRepository calendarRepository;
 
 
     private void validateChecklistWithTaskTime(ChecklistRequest checklistRequest, Task task) {
@@ -186,12 +187,15 @@ public class ChecklistServiceImpl implements ChecklistService {
         }
         return checklist;
     }
-
+    //not work correct yet should provide member id not user_id
     @Override
     public void assignMemberToChecklist(UUID checklistId, UUID taskId, UUID assignedBy, UUID assignedTo) {
         validateChecklistIdAndTaskId(checklistId, taskId);
         Task task = taskService.getTaskById(taskId);
-
+ //       UUID userID = memberRepository.getUserId(assignedTo, task.getTaskId());
+//        if (userID == null) {
+//            throw new ForbiddenException("User with ID " + assignedTo + " is not  member.");
+//        }
         System.out.println("assignBy " + assignedBy);
 
         // can replace taskRepository to memberRepository
@@ -214,6 +218,8 @@ public class ChecklistServiceImpl implements ChecklistService {
             throw new BadRequestException("Member with ID " + assigneeId + " is already assigned to this checklist");
         }
         checklistRepository.insertToChecklistAssignment(checklistId,assignerId,assigneeId);
+
+      //  checklistRepository.createCalendar(assignedTo, checklistId, task.getBoardId());
     }
 
 

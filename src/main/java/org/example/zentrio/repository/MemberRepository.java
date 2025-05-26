@@ -176,4 +176,14 @@ public interface MemberRepository {
             WHERE  r.role_name= 'ROLE_MANAGER' AND m.board_id= #{boardId};
             """)
     UUID getIdByBoardId(UUID boardId);
+
+
+
+    @Select("""
+            SELECT u.user_id FROM users u
+            INNER JOIN   members m ON m.user_id= u.user_id
+            WHERE  m.member_id= #{assignedTo} AND m.board_id= #{boardId}
+            """)
+    UUID getUserId(UUID assignedTo, UUID boardId);
+
 }

@@ -104,8 +104,8 @@ public interface TaskRepository {
     @Select("""
                 SELECT m.member_id FROM members m
                 INNER JOIN task_assignment ta ON m.member_id = ta.assigned_to
-                WHERE user_id = #{assignedBy}
-                AND task_id = #{taskId}
+                WHERE m.user_id = #{assignedBy}
+                AND ta.task_id = #{taskId}
             """)
     UUID findMemberIdByUserIdAndTaskId(UUID assignedBy, UUID taskId);
 

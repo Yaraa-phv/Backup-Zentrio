@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,16 +41,16 @@ public class WorkspaceController {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
     @Operation(summary = "Get all workspaces", description = "Get all workspace for current users")
     @GetMapping
-    public ResponseEntity<ApiResponse<HashMap<String, Workspace>>> getAllWorkspaces(
+    public ResponseEntity<ApiResponse<HashSet<Workspace>>> getAllWorkspaces(
             @RequestParam(defaultValue = "1") @Positive Integer page,
             @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
-        ApiResponse<HashMap<String, Workspace>> response = workspaceService.getAllWorkspaces(page, size);
+        ApiResponse<HashSet<Workspace>> response = workspaceService.getAllWorkspaces(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

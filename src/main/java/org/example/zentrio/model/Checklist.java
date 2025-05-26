@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,6 +23,7 @@ public class Checklist {
     private Integer checklistOrder;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
+    private List<MemberResponse> members;
     private UUID taskId;
     private UUID createdBy;
 }

@@ -36,11 +36,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         System.out.println(currentUserId);
         Workspace workspaceById = workspaceRepository.getWorkspaceById(existedWorkspaceId, currentUserId);
         if (workspaceById == null){
-            throw new BadRequestException("You have no permission to get this workspace!");
+            throw new NotFoundException("You have no permission to get this workspace!");
         }
         UUID workspaceId = workspaceById.getWorkspaceId();
         if (existedWorkspaceId == null){
-            throw new BadRequestException("You have no permission to get this workspace!");
+            throw new NotFoundException("You have no permission to get this workspace!");
         }
         if (!existedWorkspaceId.equals(workspaceId)){
             throw new NotFoundException("Workspace Id not found");
@@ -58,15 +58,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
     @Override
-    public ApiResponse<HashMap<String, Workspace>> getAllWorkspaces(Integer page, Integer size) {
+    public ApiResponse<HashSet<Workspace>> getAllWorkspaces(Integer page, Integer size) {
 
         Integer offset = (page -1) * size;
         UUID userId = currentUserId(); // Store once
 
-        HashMap<String, Workspace> workspaces = new HashMap<>();
+        HashSet<Workspace> workspaces = new HashSet<>(workspaceRepository.getAllWorkspaces(userId,size,offset));
 
         // Paginated list for current user
-        List<Workspace> workspaceList = workspaceRepository.getAllWorkspaces(userId,size,offset);
+     //   List<Workspace> workspaceList = workspaceRepository.getAllWorkspaces(userId,size,offset);
 
         // Count workspaces for this specific user
         Integer totalElements = workspaceRepository.countWorkspacesByUserId(userId);
@@ -74,11 +74,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         System.out.println("offset" + offset);
 
-        for (Workspace workspace : workspaceList) {
-            workspaces.put(workspace.getWorkspaceId().toString(), workspace);
-        }
+//        for (Workspace workspace : workspaceList) {
+//            workspaces.put(workspace.getWorkspaceId().toString(), workspace);
+//        }
 
-        return ApiResponse.<HashMap<String, Workspace>>builder()
+        return ApiResponse.<HashSet<Workspace>>builder()
                 .success(true)
                 .message("Get all workspaces successfully")
                 .payload(workspaces)
@@ -94,7 +94,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 //        checkExistedWorkspaceId(workspaceId);
         if (checkExistedWorkspaceId(workspaceId) == null){
-            throw new BadRequestException("Cannot access to get this workspace!");
+            throw new NotFoundException("Cannot access to get this workspace!");
         }
         return workspaceRepository.getWorkspaceById(workspaceId, currentUserId());
 

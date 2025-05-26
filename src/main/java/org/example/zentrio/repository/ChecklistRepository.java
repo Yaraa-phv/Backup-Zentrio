@@ -3,6 +3,7 @@ package org.example.zentrio.repository;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ChecklistRequest;
+import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.model.Task;
 
@@ -22,6 +23,8 @@ public interface ChecklistRepository {
             @Result(property = "checklistOrder", column = "checklist_order"),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
+            @Result(property = "members", column = "checklist_id",
+            many = @Many(select = "getMembersByChecklistId")),
             @Result(property = "taskId", column = "task_id"),
             @Result(property = "createdBy", column = "created_by")
     })
@@ -75,9 +78,11 @@ public interface ChecklistRepository {
 
 
     @Select("""
-                SELECT m.member_id FROM members m
-                WHERE m.board_id = #{boardId}
+              SELECT m.member_id FROM members m
+             INNER JOIN roles r ON m.role_id = r.role_id
+              WHERE m.board_id = #{boardId}
                 AND m.user_id = #{assignedTo}
+              AND r.role_name='ROLE_LEADER';
             """)
     UUID findMemberIdByBoardIdAndUserId(UUID boardId, UUID assignedTo);
 
@@ -96,6 +101,13 @@ public interface ChecklistRepository {
                     AND member_id = #{assigneeId}
             """)
     boolean checklistIsAssigned(UUID checklistId, UUID assigneeId);
+
+
+//    @Select("""
+//            INSERT INTO calendars(user_id, checklist_id, board_id)
+//                    VALUES (#{userID}, #{checklistId}, #{taskId});
+//            """)
+//    void createCalendar(UUID userID, UUID checklistId, UUID taskId);
 
 
 //    Checklist createChecklist(UUID taskId, @Param("request") ChecklistRequest checklistRequest);
@@ -153,6 +165,21 @@ public interface ChecklistRepository {
 //        SELECT * FROM checklists WHERE checklist_id = #{checklistId}
 //    """)
 //    Checklist getChecklistById(UUID checklistId);
+
+    @Select("""
+            SELECT
+                u.username AS userName,
+                u.profile_image AS image
+            FROM users u
+                     INNER JOIN members m ON u.user_id = m.user_id
+                  inner join checklist_assignments ch on m.member_id = ch.member_id
+            WHERE ch.checklist_id = #{checklistId};
+            """)
+    @Results(id = "memberChecklistMapper", value = {
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "userName", column = "name"),
+    })
+    List<MemberResponse> getMembersByChecklistId(UUID checklistId);
 
 
 }
