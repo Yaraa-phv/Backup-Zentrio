@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.FeedbackRequest;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.Feedback;
@@ -34,11 +35,11 @@ public class FeedbackServiceImpl implements FeedbackService {
     private void userRole(UUID boardId){
         String role= memberRepository.getRolePMByBoardIdAndUserId(boardId,userId());
         if (role == null){
-            throw new BadRequestException("You don't have any role here...");
+            throw new NotFoundException("You don't have any role here...");
         }
         System.out.println("role:"+role);
         if (!role.equals(RoleName.ROLE_MANAGER.name())) {
-            throw new BadRequestException("only ROLE_MANAGER allowed...");
+            throw new ForbiddenException("only ROLE_MANAGER allowed...");
         }
     }
 

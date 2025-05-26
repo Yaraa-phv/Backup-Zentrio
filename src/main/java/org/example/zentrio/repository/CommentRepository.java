@@ -6,8 +6,6 @@ import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Comment;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,8 +47,7 @@ public interface CommentRepository {
         DELETE FROM comments  WHERE comment_id= #{commentId}
         RETURNING *
         """)
-    @ResultMap("commentMapper")
-    Comment deleteCommentByCommentId(UUID commentId);
+    void deleteCommentByCommentId(UUID commentId);
 
     @Select("""
         UPDATE  comments 

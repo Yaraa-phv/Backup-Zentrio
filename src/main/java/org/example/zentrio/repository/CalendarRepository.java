@@ -105,7 +105,7 @@ public interface CalendarRepository {
         DELETE  FROM  calendars WHERE calendar_id= #{noteId}
         RETURNING*
         """)
-    @ResultMap("calendarMapper")
-    Calendar deleteCalendarByNoteId(UUID noteId);
+
+     Void deleteCalendarByNoteId(UUID noteId);
 
 }

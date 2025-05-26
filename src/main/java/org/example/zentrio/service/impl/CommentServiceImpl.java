@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.CommentRequest;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.CommentRepository;
@@ -53,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
          return   commentRepository.createComment(checklistId, commentRequest , LocalDateTime.now(), teamLeadId);
        }
        if (memberId == null) {
-           throw new BadRequestException("You are not member in this board");
+           throw new ForbiddenException("You are not member in this board");
        }
         return commentRepository.createComment(checklistId, commentRequest , LocalDateTime.now(), memberId);
 
@@ -80,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public Comment deleteCommentByCommentId(UUID commentId) {
+    public Void deleteCommentByCommentId(UUID commentId) {
 
         Comment  comment= getCommentByCommentId(commentId);
         Checklist checklist= checklistService.getChecklistChecklistId(comment.getChecklistId());
@@ -91,18 +92,18 @@ public class CommentServiceImpl implements CommentService {
         if (role == null) {
             UUID memberId= memberRepository.getMemberId(userId(),task.getBoardId());
             if (memberId ==null){
-                throw new BadRequestException("Member not found");
+                throw new ForbiddenException("Member not found");
             }
             if(memberId.equals(comment.getCommentBy())){
-                comment = commentRepository.deleteCommentByCommentId(commentId);
+                 commentRepository.deleteCommentByCommentId(commentId);
             }else {
-                throw new BadRequestException("This Comment does not belong to yours");
+                throw new ForbiddenException("This Comment does not belong to yours");
             }
         }
         if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
-              comment= commentRepository.deleteCommentByCommentId(commentId);
+             commentRepository.deleteCommentByCommentId(commentId);
         }
-        return comment;
+        return null;
     }
 
 
@@ -124,7 +125,7 @@ public class CommentServiceImpl implements CommentService {
             if(memberId.equals(comment.getCommentBy())){
                 comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
             }else {
-                throw new BadRequestException("This Comment does not belong to yours");
+                throw new ForbiddenException("This Comment does not belong to yours");
             }
         }
         if (RoleName.ROLE_MANAGER.name().equals(role) || RoleName.ROLE_LEADER.name().equals(role)){
@@ -137,17 +138,17 @@ public class CommentServiceImpl implements CommentService {
                    comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
                    System.out.println("Team lead");
                }else {
-                   throw new BadRequestException("This Comment does not belong to yours team lead");
+                   throw new ForbiddenException("This Comment does not belong to yours team lead");
                }
            } else if (pmId != null) {
                if (pmId.equals(comment.getCommentBy())) {
                    comment1 = commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
                    System.out.println("Pm lead");
                }else {
-                   throw new BadRequestException("This Comment does not belong to yours pm");
+                   throw new ForbiddenException("This Comment does not belong to yours pm");
                }
            }else {
-               throw new BadRequestException("This Comment does not belong to yours");
+               throw new ForbiddenException("This Comment does not belong to yours");
            }
         }
         return comment1;

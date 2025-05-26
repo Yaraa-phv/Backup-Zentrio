@@ -29,28 +29,28 @@ public class GanttChartController {
 
     private final GanttChartService ganttChartService;
 
-    @Operation(summary = "Create gantt chart")
-    @PostMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<GanttChart>> createGanttChart(@PathVariable("boardId") UUID boardId, @Valid @RequestBody GanttChartRequest ganttChartRequest){
+    @Operation(summary = "Create gantt chart by board ID ")
+    @PostMapping("/boards/board-id")
+    public ResponseEntity<ApiResponse<GanttChart>> createGanttChart(@Valid @RequestBody GanttChartRequest ganttChartRequest){
 
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
-                .message("Created GanttChart successfully!")
+                .message("Created gantt chart successfully!")
                 .status(HttpStatus.CREATED)
-                .payload(ganttChartService.createGanttChart(boardId, ganttChartRequest))
+                .payload(ganttChartService.createGanttChart( ganttChartRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
-    @Operation(summary = "Get  GanttChart By BoardID")
-    @GetMapping("/{boardId}")
-    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByBoardId(@PathVariable("boardId") UUID boardId){
+    @Operation(summary = "Get gantt chart by board ID")
+    @GetMapping("/boards/{board-id}")
+    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByBoardId(@PathVariable("board-id") UUID boardId){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
-                .message("Get  GanttChart successfully!")
+                .message("Get gantt chart successfully!")
                 .status(HttpStatus.FOUND)
                 .payload(ganttChartService.getGanttChartByBoardId(boardId))
                 .timestamp(LocalDateTime.now())
@@ -58,44 +58,49 @@ public class GanttChartController {
         return ResponseEntity.ok(response);}
 
 
-    @Operation(summary = "Update GanttChart By GanttChartID")
-    @PutMapping("/{ganttChartID}")
-    public ResponseEntity<ApiResponse<GanttChart>> updateGanttChartById(@PathVariable("ganttChartID") UUID ganttChartId,@Valid @RequestBody GanttChartRequest ganttChartRequest){
+    @Operation(summary = "Update gantt chart By gantt chart ID")
+    @PutMapping("/{gantt-chart-id}/boards/{board-id}")
+    public ResponseEntity<ApiResponse<GanttChart>> updateGanttChartById(@PathVariable("gantt-chart-id") UUID ganttChartId,
+                                                                        @PathVariable("board-id") UUID boardId,
+                                                                        @Valid @RequestBody GanttChartRequest ganttChartRequest){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
-                .message("Update GanttChart BY GanttChartID successfully!")
+                .message("Update gantt chart by gantt chart id successfully!")
                 .status(HttpStatus.CREATED)
-                .payload(ganttChartService.updateGanttChartById(ganttChartId, ganttChartRequest))
+                .payload(ganttChartService.updateGanttChartById(ganttChartId, boardId, ganttChartRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);}
 
 
 
-    @Operation(summary = "Delete GanttChart By GanttChartID")
-    @DeleteMapping("/{ganttChartID}")
-    public ResponseEntity<ApiResponse<Void>> deleteGanttChartByID(@PathVariable("ganttChartID") UUID ganttChartId){
+    @Operation(summary = "Delete gantt chart by gantt chart ID")
+    @DeleteMapping("/{gantt-chart-id}/boards/{board-id}")
+    public ResponseEntity<ApiResponse<Void>> deleteGanttChartByID(
+            @PathVariable("gantt-chart-id") UUID ganttChartId,
+            @PathVariable("board-id") UUID boardId
+            ){
 
         ApiResponse<Void> response = ApiResponse.<Void> builder()
                 .success(true)
-                .message("Delete GanttChart BY GanttChartID successfully!")
+                .message("Delete gantt chart by gantt chart id successfully!")
                 .status(HttpStatus.ACCEPTED)
-                .payload(ganttChartService.deleteGanttChartByID(ganttChartId))
+                .payload(ganttChartService.deleteGanttChartByID(ganttChartId,boardId))
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
 
-    @Operation(summary = "Get GanttChart By GanttChartID")
-    @GetMapping("/gantt-chartId/{ganttChartID}")
-    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByID(@PathVariable("ganttChartID") UUID ganttChartId){
+    @Operation(summary = "Get gantt chart by gantt chart ID")
+    @GetMapping("/{gantt-chart-id}")
+    public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByID(@PathVariable("gantt-chart-id") UUID ganttChartId){
 
         ApiResponse<GanttChart> response = ApiResponse.<GanttChart> builder()
                 .success(true)
-                .message("Get GanttChart BY GanttChartID successfully!")
-                .status(HttpStatus.FOUND)
+                .message("Get gantt chart by gantt chart id successfully!")
+                .status(HttpStatus.OK)
                 .payload(ganttChartService.getGanttChartByID(ganttChartId))
                 .timestamp(LocalDateTime.now())
                 .build();

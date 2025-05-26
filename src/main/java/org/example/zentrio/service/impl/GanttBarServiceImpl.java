@@ -30,12 +30,12 @@ public class GanttBarServiceImpl implements GanttBarService {
            throw new NotFoundException("GanttChart not found");
        }
         if (ganttBarRequest.getStartedAt() == null || ganttBarRequest.getFinishedAt() == null) {
-            throw new ConflictException("Start and finish times are required");
+            throw new BadRequestException("Start and finish times are required");
         }
        if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
            throw new BadRequestException("GanttBar already finished");
        }
-       ganttChartService.userRole(ganttChart.getBoard_id());
+       ganttChartService.userRole(ganttChart.getBoardId());
 
         return ganttBarRepository.createGanttBar(ganttChartId,ganttBarRequest);
     }
@@ -71,7 +71,7 @@ public class GanttBarServiceImpl implements GanttBarService {
             throw new BadRequestException("GanttBar already finished");
         }
         GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        ganttChartService.userRole(chart.getBoard_id());
+        ganttChartService.userRole(chart.getBoardId());
 
         GanttBar updatedGanttBar=ganttBarRepository.updateGanttBarByGanttBarId(ganttBarId,ganttBarRequest);
         return updatedGanttBar;
@@ -84,7 +84,7 @@ public class GanttBarServiceImpl implements GanttBarService {
             throw new NotFoundException("GanttBar not found");
         }
         GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        ganttChartService.userRole(chart.getBoard_id());
+        ganttChartService.userRole(chart.getBoardId());
 
         ganttBarRepository.deleteGanttBarByGanttBarId(ganttBarId);
     }

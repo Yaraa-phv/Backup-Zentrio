@@ -9,13 +9,13 @@ import java.util.UUID;
 
 public interface GanttChartService {
     void userRole(UUID boardID);
-    GanttChart createGanttChart(UUID boardId, GanttChartRequest ganttChartRequest);
+    GanttChart createGanttChart(GanttChartRequest ganttChartRequest);
 
     GanttChart getGanttChartByBoardId(UUID boardId);
 
-    GanttChart updateGanttChartById(UUID ganttChartId, GanttChartRequest ganttChartRequest);
+    GanttChart updateGanttChartById(UUID ganttChartId, UUID boardId ,GanttChartRequest ganttChartRequest);
 
-    Void deleteGanttChartByID(UUID ganttChartId);
+    Void deleteGanttChartByID(UUID ganttChartId,UUID boardId);
 
     GanttChart getGanttChartByID(UUID ganttChartId);
 

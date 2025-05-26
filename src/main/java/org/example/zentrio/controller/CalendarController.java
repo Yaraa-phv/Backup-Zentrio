@@ -25,14 +25,14 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @Operation(summary = "Get calendar",description = "Get calendar with tasks for current user")
-    @GetMapping("/{board_id}")
+    @Operation(summary = "Get calendar by board id",description = "Get calendar with tasks for current user")
+    @GetMapping("/boards/{board_id}")
     public ResponseEntity<ApiResponse<HashSet<Checklist>>> getCalendarForCurrentUser( @PathVariable("board_id") UUID board_id) {
         HashSet<Checklist> calendarTasks = calendarService.getCalendarForCurrentUser(board_id);
         ApiResponse<HashSet<Checklist
                 >> apiResponse = ApiResponse.<HashSet<Checklist>>builder()
                 .success(true)
-                .message("Get calendar successfully")
+                .message("Get calendar by board id successfully")
                 .payload(calendarTasks)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -42,14 +42,14 @@ public class CalendarController {
     }
 
 
-    @Operation(summary = "Create calendar",description = "Create calendar with tasks for current user")
-    @PostMapping("/create_note/{check_listId}")
-    public ResponseEntity<ApiResponse<Calendar>> CreateNoteInCalendar( @PathVariable("check_listId") UUID check_listId,
+    @Operation(summary = "Create note in calendar",description = "Create calendar with tasks for current user")
+    @PostMapping("/checklists/{checklist-id}")
+    public ResponseEntity<ApiResponse<Calendar>> CreateNoteInCalendar( @PathVariable("checklist-id") UUID check_listId,
                                                                @Valid @RequestBody    CalendarRequest calendarRequest) {
        Calendar calendarTasks = calendarService.CreateNoteInCalendar(check_listId, calendarRequest);
         ApiResponse<Calendar> apiResponse = ApiResponse.<Calendar>builder()
                 .success(true)
-                .message("Create note in  calendar successfully")
+                .message("Create note in  calendar by checklist id successfully")
                 .payload(calendarTasks)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -59,9 +59,9 @@ public class CalendarController {
     }
 
 
-    @Operation(summary = "Get note calendar",description = "Get note from calendar with tasks for current user")
-    @GetMapping("/get_note_by_noteId/{notedId}")
-    public ResponseEntity<ApiResponse<Calendar>> getCalendarById( @PathVariable("notedId") UUID notedId) {
+    @Operation(summary = "Get note in calendar",description = "Get note from calendar with tasks for current user")
+    @GetMapping("/{calendar-id}")
+    public ResponseEntity<ApiResponse<Calendar>> getCalendarById( @PathVariable("calendar-id") UUID notedId) {
         Calendar calendarTasks = calendarService.getCalendarById(notedId);
         ApiResponse<Calendar> apiResponse = ApiResponse.<Calendar>builder()
                 .success(true)
@@ -78,8 +78,8 @@ public class CalendarController {
 
 
     @Operation(summary = "Get all note from calendar",description = "Get all note from calendar ")
-    @GetMapping("/get_all_note/{checklistId}")
-    public ResponseEntity<ApiResponse<HashSet<Calendar>>> getAllCalendarByChecklistId( @PathVariable("checklistId") UUID checklistId) {
+    @GetMapping("/checklists/{checklist-id}")
+    public ResponseEntity<ApiResponse<HashSet<Calendar>>> getAllCalendarByChecklistId( @PathVariable("checklist-id") UUID checklistId) {
         HashSet<Calendar> calendarTasks = calendarService.getAllCalendarByChecklistId(checklistId);
         ApiResponse<HashSet<Calendar>> apiResponse = ApiResponse.<HashSet<Calendar>>builder()
                 .success(true)
@@ -93,9 +93,9 @@ public class CalendarController {
     }
 
 
-    @Operation(summary = "update note by id from calendar",description = "Update note by note id  from calendar ")
-    @PutMapping("/update_note/{noteId}")
-    public ResponseEntity<ApiResponse<Calendar>> UpdateCalendarByNoteId(@PathVariable("noteId") UUID noteId, @Valid @RequestBody CalendarRequest calendarRequest) {
+    @Operation(summary = "Update note by id from calendar",description = "Update note by note id  from calendar ")
+    @PutMapping("/{calendar-id}")
+    public ResponseEntity<ApiResponse<Calendar>> UpdateCalendarByNoteId(@PathVariable("calendar-id") UUID noteId, @Valid @RequestBody CalendarRequest calendarRequest) {
         Calendar calendarTasks = calendarService.UpdateCalendarByNoteId(noteId, calendarRequest);
         ApiResponse<Calendar> apiResponse = ApiResponse.<Calendar>builder()
                 .success(true)
@@ -111,13 +111,12 @@ public class CalendarController {
 
 
     @Operation(summary = "delete note by id from calendar",description = "Delete note by note id  from calendar ")
-    @DeleteMapping("/delete_note/{noteId}")
-    public ResponseEntity<ApiResponse<Calendar>> deleteCalendarByNoteId( @PathVariable("noteId") UUID noteId) {
-        Calendar calendarTasks = calendarService.deleteCalendarByNoteId(noteId);
-        ApiResponse<Calendar> apiResponse = ApiResponse.<Calendar>builder()
+    @DeleteMapping("/{calendar-id}")
+    public ResponseEntity<ApiResponse<Void>> deleteCalendarByNoteId( @PathVariable("calendar-id") UUID noteId) {
+         calendarService.deleteCalendarByNoteId(noteId);
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .success(true)
                 .message("Update note from calendar successfully")
-                .payload(calendarTasks)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();

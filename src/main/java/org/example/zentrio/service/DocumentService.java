@@ -1,6 +1,5 @@
 package org.example.zentrio.service;
 
-import com.google.api.services.drive.model.File;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,9 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DocumentService {
-    String deleteDocumentById(String accessToken, UUID documentId) throws GeneralSecurityException, IOException;
+    void deleteDocumentById(String accessToken, UUID documentId) throws GeneralSecurityException, IOException;
 
-    Document updateFolderName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException;
+    Document updateDocumentName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException;
 
     void shareFolder(String folderId, String emailAddress, String accessToken) throws IOException, GeneralSecurityException;
 
@@ -28,7 +27,7 @@ public interface DocumentService {
     List<Document> getAllDocuments(UUID accessToken);
 
 
-    List<Document> getAllPublicDocument();
+    List<Document> getAllPublicDocument(UUID boardId);
 
 
     List<Document> getDocumentByType(UUID boardId, FileTypes mimeType);

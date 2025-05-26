@@ -12,10 +12,7 @@ import org.example.zentrio.model.Report;
 import org.example.zentrio.service.ReportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,9 +28,9 @@ import java.util.UUID;
 public class ReportController {
     private final ReportService reportService;
 
-    @GetMapping
-    @Operation(summary = "Get Report By Board Id")
-    public ResponseEntity<ApiResponse<Report>> getReportByBoardId(@RequestParam UUID boardId) {
+    @GetMapping("/boards/{board-id}")
+    @Operation(summary = "Get report by board id")
+    public ResponseEntity<ApiResponse<Report>> getReportByBoardId(@PathVariable("board-id") UUID boardId) {
         ApiResponse<Report> apiResponse = ApiResponse.<Report>builder()
                 .success(true)
                 .message("Get profile successfully")

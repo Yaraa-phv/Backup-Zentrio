@@ -15,7 +15,7 @@ public interface CommentService {
 
     Set<Comment> getAllComments(UUID checkListId);
 
-    Comment deleteCommentByCommentId(UUID commentId);
+    Void deleteCommentByCommentId(UUID commentId);
 
 
     Comment UpdateCommentByCommentId(UUID commentId,  CommentRequest commentRequest);

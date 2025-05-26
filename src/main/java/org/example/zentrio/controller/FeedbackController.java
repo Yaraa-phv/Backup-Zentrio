@@ -26,7 +26,7 @@ public class FeedbackController {
 
     private final FeedbackService feedbackService;
 
-    @PostMapping("/{task-id}")
+    @PostMapping("/tasks/{task-id}")
     @Operation(summary = "creat feedback ")
     public ResponseEntity<ApiResponse<Feedback>>  createFeedback(
             @PathVariable("task-id") UUID taskId, @Valid @RequestBody FeedbackRequest feedbackRequest) {
@@ -37,16 +37,16 @@ public class FeedbackController {
                 .payload(feedbackService.createFeedback(taskId,feedbackRequest))
                 .timestamp(LocalDateTime.now())
                 .build();
-        return   ResponseEntity.ok(response);
+        return   ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping("/{task-id}")
+    @GetMapping("/tasks/{task-id}")
     @Operation(summary = "Geat all  feedback by taskId ")
     public ResponseEntity<ApiResponse<Set<Feedback>>>  getAllFeedback(
             @PathVariable("task-id") UUID taskId) {
         ApiResponse<Set<Feedback>> response = ApiResponse.<Set<Feedback>>builder()
                 .success(true)
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .message("Feedback Geat Successfully!")
                 .payload(feedbackService.getAllFeedback(taskId))
                 .timestamp(LocalDateTime.now())
@@ -54,13 +54,13 @@ public class FeedbackController {
         return   ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get-feedback-by-id/{feedback-id}")
+    @GetMapping("/{feedback-id}")
     @Operation(summary = "Geat all  feedback by taskId ")
     public ResponseEntity<ApiResponse<Feedback>>  getFeedbackById(
             @PathVariable("feedback-id") UUID feedbackId) {
         ApiResponse response = ApiResponse.<Feedback>builder()
                 .success(true)
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .message("Feedback Geat Successfully!")
                 .payload(feedbackService.getFeedbackById(feedbackId))
                 .timestamp(LocalDateTime.now())
@@ -76,7 +76,7 @@ public class FeedbackController {
             @PathVariable("feedback-id") UUID feedbackId, @Valid @RequestBody FeedbackRequest feedbackRequest) {
         ApiResponse response = ApiResponse.<Feedback>builder()
                 .success(true)
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .message("Feedback Geat Successfully!")
                 .payload(feedbackService.UpdateFeedbackById(feedbackId,feedbackRequest))
                 .timestamp(LocalDateTime.now())
@@ -91,7 +91,7 @@ public class FeedbackController {
         feedbackService.deleteFeedbackById(feedbackId);
         ApiResponse response = ApiResponse.<Void>builder()
                 .success(true)
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.OK)
                 .message("Delete Feedback By Feedback-Id Successfully!")
                 .timestamp(LocalDateTime.now())
                 .build();

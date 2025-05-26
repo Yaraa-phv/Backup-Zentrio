@@ -85,8 +85,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getAllPublicDocument() {
-        List<Document> documents= documentRepository.getAllPublicDocument( userId());
+    public List<Document> getAllPublicDocument(UUID boardId) {
+        Board board= boardRepository.getBoardByBoardId(boardId);
+        if (board == null) {
+            throw new NotFoundException("Board not found");
+        }
+        List<Document> documents= documentRepository.getAllPublicDocument(boardId );
         if (documents.isEmpty()) {
             throw new NotFoundException("No Public Document Found");
         }
@@ -245,7 +249,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document updateFolderName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException {
+    public Document updateDocumentName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException {
         Drive drive = createDriveService(accessToken);
 
         Document document= documentRepository.getDocumentById(documentId);
@@ -283,7 +287,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public String deleteDocumentById(String accessToken, UUID documentId)
+    public void deleteDocumentById(String accessToken, UUID documentId)
             throws GeneralSecurityException, IOException {
         Document document= documentRepository.getDocumentById(documentId);
         if (document == null) {
@@ -312,7 +316,6 @@ public class DocumentServiceImpl implements DocumentService {
         drive.files().delete(folderId).execute();
         documentRepository.deleteDocumentById(documentId);
 
-        return "Folder deleted with ID: " + folderId;
     }
 
 

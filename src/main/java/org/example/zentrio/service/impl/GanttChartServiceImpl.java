@@ -49,19 +49,19 @@ public class GanttChartServiceImpl implements GanttChartService {
 
 
     @Override
-    public GanttChart createGanttChart(UUID boardId, GanttChartRequest ganttChartRequest) {
+    public GanttChart createGanttChart( GanttChartRequest ganttChartRequest) {
 
-        GanttChart ganttChart = ganttChartRepository.getGanttChartByBoardId(boardId);
+        GanttChart ganttChart = ganttChartRepository.getGanttChartByBoardId(ganttChartRequest.getBoardId());
         if (ganttChart != null) {
             throw new ConflictException("Gantt Chart already exists");
         }
-        UUID memberId = memberRepository.getPmId(userId(), boardId);
+        UUID memberId = memberRepository.getPmId(userId(), ganttChartRequest.getBoardId());
         if (memberId == null) {
             throw new ForbiddenException(" You are not in member this board in");
         }
 
-        userRole(boardId);
-        return  ganttChartRepository.createGanttChart(boardId, ganttChartRequest, LocalDateTime.now(),memberId);
+        userRole(ganttChartRequest.getBoardId());
+        return  ganttChartRepository.createGanttChart( ganttChartRequest, LocalDateTime.now(),memberId);
     }
 
 
@@ -76,21 +76,21 @@ public class GanttChartServiceImpl implements GanttChartService {
     }
 
     @Override
-    public GanttChart updateGanttChartById(UUID ganttChartId, GanttChartRequest ganttChartRequest) {
+    public GanttChart updateGanttChartById(UUID ganttChartId,UUID boardId ,GanttChartRequest ganttChartRequest) {
         GanttChart chart= getGanttChartByID(ganttChartId);
-        userRole(chart.getBoard_id());
-        return  ganttChartRepository.updateGanttChartById(ganttChartId, ganttChartRequest, LocalDateTime.now());
+        userRole(chart.getBoardId());
+        return  ganttChartRepository.updateGanttChartById(ganttChartId,boardId, ganttChartRequest, LocalDateTime.now());
     }
 
     @Override
-    public Void deleteGanttChartByID(UUID ganttChartId) {
+    public Void deleteGanttChartByID(UUID ganttChartId, UUID boardId) {
         GanttChart ganttChart= ganttChartRepository.getGanttChartById(ganttChartId);
         if (ganttChart == null) {
             throw new NotFoundException("GanttChart id:"+ganttChartId+" not found");
         }
-        userRole(ganttChart.getBoard_id());
+        userRole(ganttChart.getBoardId());
 
-        return ganttChartRepository.deleteGanttChartByID(ganttChartId);
+        return ganttChartRepository.deleteGanttChartByID(ganttChartId,boardId);
     }
 
     @Override

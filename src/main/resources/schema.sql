@@ -139,6 +139,7 @@ CREATE TABLE calendars (
                            till_date TIMESTAMP ,
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                            checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                           comment_id UUID REFERENCES  comments(comment_id) ON  DELETE CASCADE ON  UPDATE CASCADE
 --                            board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

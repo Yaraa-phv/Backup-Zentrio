@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.google.api.services.drive.model.File;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/folder")
+@RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 public class DocumentController {
@@ -34,30 +33,30 @@ public class DocumentController {
 
 
 
-    @GetMapping("/get-all-document")
-    @Operation(summary = "Get All Document By BoardID")
-    public ResponseEntity<ApiResponse<List<Document>>>  getAllDocuments(@RequestParam UUID boardId) {
+    @GetMapping("/boards/{board-id}")
+    @Operation(summary = "Get all documents  by board id")
+    public ResponseEntity<ApiResponse<List<Document>>>  getAllDocuments(@PathVariable("board-id") UUID boardId) {
         // Call the DriveService to get the folders
         ApiResponse<List<Document>> response =  ApiResponse.<List<Document>>builder()
                 .success(true)
-                .message("Get All folder Successfully ")
+                .message("Get all folder Successfully ")
                 .payload(documentService.getAllDocuments(boardId))
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
 
-    @GetMapping("/get-document-by-documentId")
-    @Operation(summary = "Get Document By Document-Id")
-    public ResponseEntity<ApiResponse<Document>> getDocumentById( @RequestParam UUID documentId) {
+    @GetMapping("/{document-id}")
+    @Operation(summary = "Get document by document id")
+    public ResponseEntity<ApiResponse<Document>> getDocumentById( @PathVariable("document-id") UUID documentId) {
 
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
-                .message("Get Document By id  Successfully ")
+                .message("Get document by id  successfully ")
                 .payload(documentService.getDocumentById( documentId))
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -66,31 +65,31 @@ public class DocumentController {
 
 
 
-    @PostMapping("/create-document")
-    @Operation(summary = "Create Document")
-    public ResponseEntity<ApiResponse<Document>> createFolder(@RequestParam String accessToken,
-                                                              @RequestParam String folderName,
-                                                              @RequestParam FileTypes types,
-                                                              @RequestParam(required = false) String parentFolderId, @RequestParam  UUID boardId)
+    @PostMapping()
+    @Operation(summary = "Create document")
+    public ResponseEntity<ApiResponse<Document>> createDocument(@RequestParam String accessToken,
+                                                                @RequestParam String folderName,
+                                                                @RequestParam FileTypes types,
+                                                                @RequestParam(required = false) String parentFolderId, @RequestParam  UUID boardId)
             throws IOException, GeneralSecurityException {
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
-                .message("Folder create Successfully ")
+                .message("Document created Successfully ")
                 .payload(documentService.createFolder(accessToken, folderName,types, parentFolderId,  boardId))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
 
 
 
-    @PostMapping(value = "/upload-document"  ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Create Document by upload")
-    public ResponseEntity<ApiResponse<Document>> uploadFolder(@RequestParam String accessToken,
-                                                              @RequestParam MultipartFile multipartFile,
-                                                              @RequestParam  UUID boardId)
+    @PostMapping(value = "/{document-id}/"  ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create document by upload")
+    public ResponseEntity<ApiResponse<Document>> uploadDocument(@RequestParam String accessToken,
+                                                                @RequestParam MultipartFile multipartFile,
+                                                                @PathVariable("document-id")  UUID boardId)
             throws IOException, GeneralSecurityException {
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
@@ -99,38 +98,38 @@ public class DocumentController {
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
 
 
 
-    @DeleteMapping("/delete-document")
-    @Operation(summary = "Delete Document By Folder-Id")
-    public ResponseEntity<ApiResponse<String>> deleteDocumentById(@RequestParam String accessToken, @RequestParam UUID  documentId) throws GeneralSecurityException, IOException {
+    @DeleteMapping("/{document-id}")
+    @Operation(summary = "Delete document by document-id")
+    public ResponseEntity<ApiResponse<Void>> deleteDocumentById(@RequestParam String accessToken,
+                                                                  @PathVariable("document-id") UUID  documentId) throws GeneralSecurityException, IOException {
 
-
-        ApiResponse<String> response =  ApiResponse.<String>builder()
+            documentService.deleteDocumentById(accessToken, documentId);
+        ApiResponse<Void> response =  ApiResponse.<Void>builder()
                 .success(true)
                 .message("Document Deleted Successfully ")
-                .payload(documentService.deleteDocumentById(accessToken, documentId))
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/update-document-name")
-    @Operation(summary = "Update Document By Folder-Id")
-    public ResponseEntity<ApiResponse<Document>> updateFolderName(@RequestParam String accessToken,
-                                                   @RequestParam UUID documenetId,
-                                                   @RequestParam String newFolderName) throws GeneralSecurityException, IOException {
+    @PutMapping("/{document-id}")
+    @Operation(summary = "Update document name document id")
+    public ResponseEntity<ApiResponse<Document>> updateDocumentName(@RequestParam String accessToken,
+                                                                    @PathVariable("document-id") UUID documentId,
+                                                                    @RequestParam String documentName) throws GeneralSecurityException, IOException {
 
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
                 .message("Document Update Successfully ")
-                .payload(  documentService.updateFolderName(accessToken, documenetId, newFolderName))
-                .status(HttpStatus.CREATED)
+                .payload(  documentService.updateDocumentName(accessToken, documentId, documentName))
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -141,14 +140,15 @@ public class DocumentController {
     // Endpoint to share a folder with a specific email
     @PostMapping("/share-document")
     @Operation(summary = "Share Document with Specific   User")
-    public ResponseEntity<ApiResponse<String>> shareFolder(@RequestParam String folderId,
+    public ResponseEntity<ApiResponse<String>> shareFolder(
+                                @RequestParam String folderId,
                               @RequestParam String emailAddress,
                               @RequestParam String accessToken) throws GeneralSecurityException, IOException {
         documentService.shareFolder(folderId, emailAddress, accessToken);
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
                 .message("Folder Share  Successfully ")
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -156,31 +156,32 @@ public class DocumentController {
     }
 
 
-    @PostMapping("/public-document")
-    @Operation(summary = "Public Document By Document-Id")
-    public ResponseEntity<ApiResponse<String>> publicDocument(@RequestParam UUID documentId,
+    @PutMapping("/public-document/{document-id}")
+    @Operation(summary = "Public document by document id")
+    public ResponseEntity<ApiResponse<String>> publicDocument(@PathVariable("document-id") UUID documentId,
                                @RequestParam String accessToken) throws GeneralSecurityException, IOException {
 
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
                 .message("file create successfully ")
                 .payload(documentService.publicDocument(documentId, accessToken))
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
 
     }
 
-    @GetMapping("/get-public-document")
-    @Operation(summary = "Get All Public Document")
-    public ResponseEntity<ApiResponse<List<Document>>> getAllPublicDocument()  {
+    @GetMapping("get-public-documents/boards/{board-id}")
+    @Operation(summary = "Get all public documents")
+    public ResponseEntity<ApiResponse<List<Document>>> getAllPublicDocument(
+            @PathVariable("board-id") UUID boardId)  {
 
         ApiResponse<List<Document>> response =  ApiResponse.<List<Document>>builder()
                 .success(true)
-                .message("Get All Public  Document Successfully ")
-                .payload(documentService.getAllPublicDocument())
-                .status(HttpStatus.FOUND)
+                .message("Get all public  document successfully ")
+                .payload(documentService.getAllPublicDocument(boardId))
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -189,33 +190,33 @@ public class DocumentController {
 
 
 
-    @GetMapping("/get-document-name")
+    @GetMapping("boards/{board-id}/document/{document-name}")
     @Operation(summary = "Get Document By Name")
     public  ResponseEntity<ApiResponse<List<Document>>> getDocumentByName(
-            @RequestParam String folderName,
-            @RequestParam UUID boardId) {
+            @PathVariable("document-name") String DocumentName,
+            @PathVariable("board-id") UUID boardId) {
         // Call the DriveService to get the folders
         ApiResponse<List<Document>> response =  ApiResponse.<List<Document>>builder()
                 .success(true)
                 .message("Document Get By Name Successfully ")
-                .payload(documentService.getDocumentByName( folderName, boardId))
-                .status(HttpStatus.CREATED)
+                .payload(documentService.getDocumentByName( DocumentName, boardId))
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get-document-by-type")
+    @GetMapping("/boards/{board-id}/file-type/{mimeType}")
     @Operation(summary = "Get Document By Document Type")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentByType(
-            @RequestParam  UUID boardId ,
-            @RequestParam  FileTypes mimeType )  {
+            @PathVariable("board-id")  UUID boardId ,
+            @PathVariable("mimeType")  FileTypes mimeType )  {
 
         ApiResponse<List<Document>> response =  ApiResponse.<List<Document>>builder()
                 .success(true)
                 .message("file get successfully ")
                 .payload(documentService.getDocumentByType(boardId,mimeType))
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);

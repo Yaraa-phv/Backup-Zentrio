@@ -34,7 +34,7 @@ public class FileUploadDriveController {
 
         ApiResponse<List<File>> response =  ApiResponse.<List<File>>builder()
                 .success(true)
-                .message("file get succesfully ")
+                .message("file get successfully ")
                 .payload(fileService.getAllFilesByFolderId(accessToken,folderId))
                 .status(HttpStatus.FOUND)
                 .timestamp(LocalDateTime.now())
@@ -80,13 +80,11 @@ public class FileUploadDriveController {
         fileService.deleteFileById(accessToken, fileId);
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("file create successfully ")
                 .status(HttpStatus.ACCEPTED)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
-//        fileSevice.deleteFileById(accessToken, fileId);
-//        return ResponseEntity.ok("File deleted successfully.");
     }
 
 
@@ -99,7 +97,7 @@ public class FileUploadDriveController {
             @RequestParam(value = "folderId", required = false) String folderId) throws GeneralSecurityException, IOException {
         ApiResponse<File> response =  ApiResponse.<File>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("file create successfully ")
                 .status(HttpStatus.ACCEPTED)
                 .payload(fileService.createDriveFile(accessToken, name, type, folderId))
                 .timestamp(LocalDateTime.now())
@@ -153,7 +151,7 @@ public class FileUploadDriveController {
 
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("file create successfully ")
                 .payload(fileService.uploadImageToRootDrive(accessToken, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
@@ -172,13 +170,11 @@ public class FileUploadDriveController {
 
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
-                .message("file create succesfully ")
+                .message("file create successfully ")
                 .payload(fileService.uploadImageToFolderDrive(accessToken, folderId, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
-
-
         return ResponseEntity.ok(response);
 
 

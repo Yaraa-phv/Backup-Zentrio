@@ -1,5 +1,6 @@
 package org.example.zentrio.service.impl;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.CalendarRequest;
 import org.example.zentrio.dto.request.CommentRequest;
@@ -42,7 +43,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
 
             // Checklist finish time must be the same or after start time
-            if (calendarRequest.getTillDate().isBefore(LocalDateTime.now())) {
+            if (calendarRequest.getTillDate().isBefore(calendarRequest.getStartDate())) {
                 throw new BadRequestException("Checklist finish time cannot be before start time.");
             }
 
@@ -122,13 +123,14 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Calendar deleteCalendarByNoteId(UUID noteId) {
-       Calendar  calendar = getCalendarById(noteId);
-       if (calendar == null){
-           throw new NotFoundException("No calendar found ");
-       }
-       commentService.deleteCommentByCommentId(calendar.getCommentId());
-       Calendar calendarDelete =calendarRepository.deleteCalendarByNoteId(noteId);
+    public Void deleteCalendarByNoteId(UUID noteId) {
+        Calendar calendar = getCalendarById(noteId);
+        if (calendar == null) {
+            throw new NotFoundException("No calendar found ");
+        }
+        commentService.deleteCommentByCommentId(calendar.getCommentId());
+        calendarRepository.deleteCalendarByNoteId(noteId);
+
         return null;
     }
 }

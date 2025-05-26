@@ -32,31 +32,31 @@ public class CommentController {
     private final CommentService commentService;
 
 
-    @PostMapping("creat-comment/{checklistId}")
-    @Operation(summary = "Create Comment By Checklist ID")
+    @PostMapping("/checklist/{checklist-id}")
+    @Operation(summary = "Create comment by checklist id")
     public ResponseEntity<ApiResponse<Comment>> createComment
-            (@PathVariable("checklistId") UUID checklistId, @Valid @RequestBody CommentRequest commentRequest)
+            (@PathVariable("checklist-id") UUID checklistId, @Valid @RequestBody CommentRequest commentRequest)
     {
         ApiResponse<Comment>  response= ApiResponse.<Comment>builder()
                 .success(true)
-                .message("Create Comment by CheckListId Successfully")
+                .message("Create comment by checklist id Successfully")
                 .payload(commentService.createComment(checklistId,commentRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping("get-comment/{commentId}")
-    @Operation(summary = "Get Comment By Comment ID")
+    @GetMapping("/{comment-id}")
+    @Operation(summary = "Get comment by comment id")
     public ResponseEntity<ApiResponse<Comment>> getCommentByCommentId
-            (@PathVariable("commentId") UUID commentId)
+            (@PathVariable("comment-id") UUID commentId)
     {
         ApiResponse<Comment>  response= ApiResponse.<Comment>builder()
                 .success(true)
-                .message("Get Comment by Comment Successfully")
+                .message("Get comment by comment id successfully")
                 .payload(commentService.getCommentByCommentId(commentId))
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -64,46 +64,46 @@ public class CommentController {
 
 
 
-    @GetMapping("get-all-comments/{checkListId}")
-    @Operation(summary = "Get All Comments")
-    public ResponseEntity<ApiResponse<Set<Comment>>> getAllComments(@PathVariable("checkListId") UUID checkListId)
+    @GetMapping("/checklists/{checklist-id}")
+    @Operation(summary = "Get all comments by checklist id")
+    public ResponseEntity<ApiResponse<Set<Comment>>> getAllComments(@PathVariable("checklist-id") UUID checkListId)
     {
         ApiResponse<Set<Comment>>  response= ApiResponse.<Set<Comment>>builder()
                 .success(true)
-                .message("Get All Comments Successfully")
+                .message("Get all comments by checklist id successfully")
                 .payload(commentService.getAllComments(checkListId))
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
 
-    @DeleteMapping("delete-comment-byId/{commentId}")
-    @Operation(summary = "Delete  Comment by CommentId")
-    public ResponseEntity<ApiResponse<Comment>> deleteCommentByCommentId(@PathVariable("commentId") UUID commentId)
+    @DeleteMapping("/{comment-id}")
+    @Operation(summary = "Delete  comment by comment id")
+    public ResponseEntity<ApiResponse<Void>> deleteCommentByCommentId(@PathVariable("comment-id") UUID commentId)
     {
-        ApiResponse<Comment>  response= ApiResponse.<Comment>builder()
+        commentService.deleteCommentByCommentId(commentId);
+        ApiResponse<Void>  response= ApiResponse.<Void>builder()
                 .success(true)
-                .message("Delete  Comment by Comment-Id Successfully")
-                .payload(commentService.deleteCommentByCommentId(commentId))
-                .status(HttpStatus.FOUND)
+                .message("Delete  comment by comment id successfully")
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
     }
 
 
-    @PutMapping("update-comment-byId/{commentId}")
-    @Operation(summary = "Update  Comment by CommentId")
+    @PutMapping("/{comment-id}")
+    @Operation(summary = "Update  comment by comment id")
     public ResponseEntity<ApiResponse<Comment>> UpdateCommentByCommentId(
-            @PathVariable("commentId") UUID commentId, @Valid @RequestBody CommentRequest commentRequest)
+            @PathVariable("comment-id") UUID commentId, @Valid @RequestBody CommentRequest commentRequest)
     {
         ApiResponse<Comment>  response= ApiResponse.<Comment>builder()
                 .success(true)
-                .message("Update Comment by Comment-Id Successfully")
+                .message("Update comment by comment id successfully")
                 .payload(commentService.UpdateCommentByCommentId(commentId,commentRequest))
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);

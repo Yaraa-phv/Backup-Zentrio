@@ -19,5 +19,5 @@ public interface CalendarService {
 
     Calendar UpdateCalendarByNoteId(UUID noteId, CalendarRequest calendarRequest);
 
-    Calendar deleteCalendarByNoteId(UUID noteId);
+    Void deleteCalendarByNoteId(UUID noteId);
 }

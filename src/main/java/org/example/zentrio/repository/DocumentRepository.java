@@ -82,10 +82,10 @@ public interface DocumentRepository {
 
     @Select("""
         SELECT  * FROM  documents  
-        WHERE is_public= true AND user_id= #{userID}
+        WHERE is_public= true AND board_id= #{boardId}
         """)
     @ResultMap("folderMapper")
-    List<Document> getAllPublicDocument(UUID userID);
+    List<Document> getAllPublicDocument(UUID boardId);
 
     @Select("""
         SELECT * FROM documents 

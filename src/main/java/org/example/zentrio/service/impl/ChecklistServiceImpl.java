@@ -122,7 +122,7 @@ public class ChecklistServiceImpl implements ChecklistService {
     public Checklist getChecklistChecklistId(UUID checklistId) {
         Checklist checklist = checklistRepository.getChecklistById(checklistId);
         if (checklist == null) {
-            throw new BadRequestException("Checklist with ID " + checklistId + " not found!");
+            throw new NotFoundException("Checklist with ID " + checklistId + " not found!");
         }
         return checklist;
     }

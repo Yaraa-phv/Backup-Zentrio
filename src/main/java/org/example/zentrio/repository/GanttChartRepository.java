@@ -1,11 +1,8 @@
 package org.example.zentrio.repository;
-
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.GanttChartRequest;
 import org.example.zentrio.model.GanttChart;
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Mapper
@@ -14,7 +11,7 @@ public interface  GanttChartRepository {
 
     @Select("""
     INSERT INTO gantt_charts(title,created_at,board_id,created_by)
-    VALUES (#{request.title},#{localDateTime}, #{boardId}, #{memberId} )
+    VALUES (#{request.title},#{localDateTime}, #{request.boardId}, #{memberId} )
     RETURNING *
     """)
     @Results(id = "ganttChartMapper", value = {
@@ -23,9 +20,9 @@ public interface  GanttChartRepository {
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "createdBy", column = "created_by"),
-            @Result(property = "board_id", column = "board_id")
+            @Result(property = "boardId", column = "board_id")
     })
-    GanttChart createGanttChart(UUID boardId, @Param("request") GanttChartRequest ganttChartRequest, LocalDateTime localDateTime, UUID memberId);
+    GanttChart createGanttChart( @Param("request") GanttChartRequest ganttChartRequest, LocalDateTime localDateTime, UUID memberId);
 
     @Select("""
     SELECT * FROM gantt_charts  WHERE board_id = #{boardId}
@@ -46,15 +43,16 @@ public interface  GanttChartRepository {
         
         UPDATE gantt_charts SET  title= #{request.title},
                                  updated_at = #{now}
-        WHERE gantt_chart_id=#{ganttChartId}
+        WHERE gantt_chart_id=#{ganttChartId} AND board_id= {boardID}
         RETURNING *
         """)
     @ResultMap("ganttChartMapper")
-    GanttChart updateGanttChartById(UUID ganttChartId,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
+    GanttChart updateGanttChartById(UUID ganttChartId, UUID boardID,@Param("request") GanttChartRequest ganttChartRequest, LocalDateTime now);
 
 
     @Select("""
         DELETE FROM gantt_charts WHERE gantt_chart_id= #{ganttChartId}
+            AND board_id= #{boardId}
         """)
-    Void deleteGanttChartByID(UUID ganttChartId);
+    Void deleteGanttChartByID(UUID ganttChartId,UUID boardId);
 }
