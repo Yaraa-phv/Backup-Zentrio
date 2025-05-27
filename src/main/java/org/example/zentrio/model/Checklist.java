@@ -16,6 +16,7 @@ public class Checklist {
     private UUID checklistId;
     private String title;
     private Boolean isDone;
+    private String cover;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer checklistOrder;

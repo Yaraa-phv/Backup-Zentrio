@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.model.GanttBar;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
 
 @Mapper
@@ -25,29 +25,41 @@ public interface GanttBarRepository {
     GanttBar createGanttBarByGanttChartId(@Param("request") GanttBarRequest ganttBarRequest, UUID ganttChartId);
 
     @Select("""
-        SELECT * FROM gantt_bars WHERE gantt_bar_id = #{ganttBarId}
+        SELECT * FROM gantt_bars
+        WHERE gantt_bar_id = #{ganttBarId}
+        AND gantt_chart_id = #{ganttChartId}
     """)
     @ResultMap("ganttBarMapper")
-    GanttBar getGanttBarById(UUID ganttBarId);
+    GanttBar getGanttBarById(UUID ganttBarId, UUID ganttChartId);
 
     @Select("""
         SELECT * FROM gantt_bars WHERE gantt_chart_id = #{ganttChartId}
     """)
     @ResultMap("ganttBarMapper")
-    List<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId);
+    HashSet<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId);
 
     @Select("""
         UPDATE gantt_bars SET title = #{request.title}, started_at = #{request.startedAt}, finished_at = #{request.finishedAt}
         WHERE gantt_bar_id = #{ganttBarId}
+        AND gantt_chart_id = #{ganttChartId}
         RETURNING *
     """)
     @ResultMap("ganttBarMapper")
-    GanttBar updateGanttBarByGanttBarId(@Param("request") GanttBarRequest ganttBarRequest, UUID ganttBarId);
+    GanttBar updateGanttBarByGanttBarId(@Param("request") GanttBarRequest ganttBarRequest, UUID ganttBarId, UUID ganttChartId);
 
     @Select("""
-        DELETE FROM gantt_bars WHERE gantt_bar_id = #{ganttBarId}
+        DELETE FROM gantt_bars
+        WHERE gantt_bar_id = #{ganttBarId}
+        AND gantt_chart_id = #{ganttChartId}
         RETURNING *
     """)
     @ResultMap("ganttBarMapper")
-    GanttBar deleteGanttBarByGanttBarId(UUID ganttBarId);
+    void deleteGanttBarByGanttBarId(UUID ganttBarId, UUID ganttChartId);
+
+    @Select("""
+        SELECT * FROM gantt_bars
+        WHERE gantt_bar_id = #{ganttBarId}
+    """)
+    @ResultMap("ganttBarMapper")
+    GanttBar getGanttBarByGanttBarId(UUID ganttBarId);
 }

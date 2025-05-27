@@ -38,6 +38,12 @@ public interface RoleRepository {
     List<String> getRolesNameByBoardIdAndUserId(UUID boardId, UUID userId);
 
 
+    @Select("""
+        SELECT r.role_name FROM members m
+        INNER JOIN roles r ON r.role_id = m.role_id
+        WHERE m.user_id = #{userId}
+    """)
+    List<String> getRolesNameByUserId(UUID userId);
 
     @Select("""
           SELECT r.role_name FROM roles r INNER JOIN members m

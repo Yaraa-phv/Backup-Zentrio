@@ -4,10 +4,8 @@ import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.model.Checklist;
-import org.example.zentrio.model.Task;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 @Mapper
@@ -18,6 +16,7 @@ public interface ChecklistRepository {
             @Result(property = "checklistId", column = "checklist_id"),
             @Result(property = "title", column = "title"),
             @Result(property = "isDone", column = "is_done"),
+            @Result(property = "cover", column = "cover"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "checklistOrder", column = "checklist_order"),
@@ -99,61 +98,27 @@ public interface ChecklistRepository {
     boolean checklistIsAssigned(UUID checklistId, UUID assigneeId);
 
 
-//    Checklist createChecklist(UUID taskId, @Param("request") ChecklistRequest checklistRequest);
-//
-//    Checklist getChecklistByTaskId(UUID taskId);
-//
-//    @Select("""
-//        SELECT * FROM checklists WHERE task_id = #{taskId}
-//    """)
-//    @ResultMap("checklistMapper")
-//    List<Checklist> getAllChecklistByTaskId(UUID taskId);
-//
-//    @Select("""
-//        SELECT * FROM checklists WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
-//    """)
-//    @ResultMap("checklistMapper")
-//    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
-//
-//    @Select("""
-//        SELECT * FROM checklists WHERE task_id = #{taskId} AND title ILIKE '%' || #{title} || '%'
-//    """)
-//    @ResultMap("checklistMapper")
-//    List<Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
-//
-//    @Select("""
-//        UPDATE checklists SET
-//                              title = #{request.title},
-//                              started_at = #{request.startedAt},
-//                              finished_at = #{request.finishedAt}
-//        WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
-//        RETURNING *
-//    """)
-//    @ResultMap("checklistMapper")
-//    Checklist updateChecklistById(UUID taskId, UUID checklistId, @Param("request") ChecklistRequest checklistRequest);
-//
-//    @Select("""
-//        DELETE FROM checklists WHERE task_id = #{taskId} AND checklist_id = #{checklistId}
-//    """)
-//    @ResultMap("checklistMapper")
-//    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
-//
-//
-//
-//    @Select("""
-//                SELECT COUNT(*) FROM checklist_assignments
-//                WHERE checklist_id = #{checklistId}
-//                AND   member_id = #{memberId}
-//            """)
-//    boolean isExistByUserIdAndTaskId(UUID checklistId,UUID memberId);
-//
-//
-//
-//    // get checklist by checklist id
-//    @Select("""
-//        SELECT * FROM checklists WHERE checklist_id = #{checklistId}
-//    """)
-//    Checklist getChecklistById(UUID checklistId);
+    @Select("""
+                UPDATE checklists
+                SET cover = #{cover}
+                WHERE checklist_id = #{checklistId}
+                RETURNING *
+            """)
+    @ResultMap("checklistMapper")
+    void updateCover(UUID checklistId, String cover);
 
 
+    @Select("""
+                SELECT COUNT(*) FROM checklists
+                WHERE task_id = #{taskId}
+                AND is_done = false
+            """)
+    long countIncompleteByTaskId(UUID taskId);
+
+
+    @Select("""
+        UPDATE checklists SET is_done = true
+        WHERE checklist_id = #{checklistId}
+    """)
+    void updateStatusOfChecklistById(UUID checklistId);
 }

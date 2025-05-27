@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.example.zentrio.model.Board;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -19,5 +20,7 @@ public class GanttChartRequest {
     @NotNull
     @NotBlank
     private String title;
+
+    private UUID boardId;
 
 }

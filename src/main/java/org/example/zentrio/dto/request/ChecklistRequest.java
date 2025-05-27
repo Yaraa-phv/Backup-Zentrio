@@ -8,8 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.model.Attachment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +24,6 @@ public class ChecklistRequest {
     private String title;
 
 
-
     @NotNull
     @FutureOrPresent
     private LocalDateTime startedAt;
@@ -30,4 +31,5 @@ public class ChecklistRequest {
     @NotNull
     @FutureOrPresent
     private LocalDateTime finishedAt;
+
 }

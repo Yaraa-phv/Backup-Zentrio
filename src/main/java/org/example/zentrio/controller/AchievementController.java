@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class AchievementController {
-    private final AchievementService achievementService;
 
+    private final AchievementService achievementService;
 
     @Operation(summary = "Get achievement", description = "Get achievement for a user")
     @GetMapping

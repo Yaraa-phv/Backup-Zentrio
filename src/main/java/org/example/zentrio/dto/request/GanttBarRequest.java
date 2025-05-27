@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Data
@@ -28,6 +29,9 @@ public class GanttBarRequest {
     @NotNull
     @FutureOrPresent
     private LocalDateTime finishedAt;
+
+
+    private UUID ganttChartId;
 
 
 }

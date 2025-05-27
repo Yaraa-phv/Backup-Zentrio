@@ -11,44 +11,55 @@ import java.util.UUID;
 public interface AttachmentRepository {
 
     @Results(id = "attachmentMapper", value = {
-            @Result(property = "attachmentId",column = "attachment_id"),
-            @Result(property = "createdAt",column = "created_at"),
-            @Result(property = "updatedAt",column = "updated_at"),
-            @Result(property = "checklistId",column = "checklist_id"),
-            @Result(property = "details",column = "details",typeHandler = JsonbTypeHandler.class)
+            @Result(property = "attachmentId", column = "attachment_id"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "checklistId", column = "checklist_id"),
+            @Result(property = "details", column = "details", typeHandler = JsonbTypeHandler.class)
     })
 
     @Select("""
-        INSERT INTO attachment(created_at, updated_at, details,checklist_id)
-        VALUES (#{req.createdAt}, #{req.updatedAt}, #{req.details, jdbcType=OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler},
-                #{checklistId})
-        RETURNING *
-    """)
-    Attachment createAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID checklistId);
+                INSERT INTO attachments (details, checklist_id, created_by)
+                VALUES (#{req.details, jdbcType=OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler},
+                        #{checklistId},
+                        #{userId})
+                RETURNING *
+            """)
+    Attachment createAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID checklistId, UUID userId);
 
     @Select("""
-        UPDATE attachment SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler}
-        WHERE attachment_id = #{attachmentId}
-        RETURNING *
-    """)
+                UPDATE attachments SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler}
+                WHERE attachment_id = #{attachmentId}
+                RETURNING *
+            """)
+    @ResultMap("attachmentMapper")
     Attachment updateAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID attachmentId);
 
 
     @Select("""
-        SELECT * FROM attachment WHERE attachment_id = #{attachmentId}
-    """)
+                SELECT * FROM attachments WHERE attachment_id = #{attachmentId}
+            """)
     @ResultMap("attachmentMapper")
     Attachment getAttachmentById(UUID attachmentId);
 
     @Select("""
-        SELECT * FROM attachment WHERE checklist_id = #{checklistId}
-    """)
+                SELECT * FROM attachments
+                WHERE checklist_id = #{checklistId}
+            """)
     @ResultMap("attachmentMapper")
     Attachment getAttachmentByChecklistId(UUID checklistId);
 
 
     @Select("""
-        DELETE FROM attachment WHERE attachment_id = #{attachmentId}
+                DELETE FROM attachments
+                WHERE checklist_id = #{checklistId}
+                AND attachment_id = #{attachmentId}
+            """)
+    void deleteAttachmentById(UUID checklistId,UUID attachmentId);
+
+
+    @Select("""
+            SELECT COUNT(*) FROM attachments WHERE checklist_id = #{checklistId}
     """)
-    void deleteAttachmentById(UUID attachmentId);
+    int countByChecklistId(@Param("checklistId") UUID checklistId);
 }

@@ -9,11 +9,17 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Checklist;
+import org.example.zentrio.model.FileMetadata;
 import org.example.zentrio.service.ChecklistService;
+import org.example.zentrio.service.FileService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.UUID;
@@ -99,6 +105,48 @@ public class ChecklistController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
+    @Operation(summary = "Upload cover of checklist by checklist ID",description = "Upload cover of checklist specific checklist ID")
+    @PostMapping(value = "/{checklistId}/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<FileMetadata>> uploadCover(
+            @PathVariable UUID checklistId,
+            @RequestParam("file") MultipartFile file){
+        FileMetadata fileMetadata = checklistService.uploadChecklistCoverImage(checklistId,file);
+        ApiResponse<FileMetadata> apiResponse = ApiResponse.<FileMetadata>builder()
+                .success(true)
+                .message("Checklist cover uploaded successfully")
+                .payload(fileMetadata)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(apiResponse,HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get cover of checklist by checklist ID and File Name")
+    @GetMapping("/{checklist-id}/cover/{file-name}")
+    public ResponseEntity<?> checklistCoverByFileName(@PathVariable("checklist-id") UUID checklistId, @PathVariable("file-name") String fileName) throws IOException {
+        InputStream inputStream = checklistService.getFileByFileName(checklistId,fileName);
+        byte[] fileContent = inputStream.readAllBytes();
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.IMAGE_PNG)
+                .body(fileContent);
+    }
+
+
+    @Operation(summary = "Update status of checklist by ID",description = "Update status of checklist by specific checklist ID")
+    @PutMapping("/{checklist-id}")
+    public ResponseEntity<?> updateStatusOfChecklistById(@PathVariable("checklist-id") UUID checklistId){
+        checklistService.updateStatusOfChecklistById(checklistId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Updated status of checklist successfully")
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
 
     @Operation(summary = "Assigned member to checklist", description = "Assigned member to checklist with specific members ID")
     @PostMapping("{checklist-id}/tasks/{task-id}/members{assigned-by}/members/{assigned-to}/")

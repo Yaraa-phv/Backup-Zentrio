@@ -1,19 +1,18 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
+
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Checklist;
-import org.example.zentrio.model.Task;
-import org.springframework.http.ResponseEntity;
+import org.example.zentrio.model.FileMetadata;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 public interface ChecklistService {
+
     Checklist createChecklist(ChecklistRequest checklistRequest, UUID taskId);
 
     Checklist getChecklistById(UUID checklistId);
@@ -26,22 +25,11 @@ public interface ChecklistService {
 
     void assignMemberToChecklist(UUID checklistId, UUID taskId, UUID assignedBy, UUID assignedTo);
 
+    FileMetadata uploadChecklistCoverImage(UUID checklistId, MultipartFile file);
 
-//    Checklist createChecklist(UUID taskId, ChecklistRequest checklistRequest);
+    InputStream getFileByFileName(UUID checklistId,String fileName);
 
-//    UUID checkExistedTaskId(UUID taskId, UUID currentUserId);
-//
-//    UUID checkTaskIdToGetChecklist(UUID taskId);
-//
-//    HashMap<String, Checklist> getAllChecklistByTaskId(UUID taskId);
-//
-//    Checklist getChecklistByTaskIdAndChecklistId(UUID taskId, UUID checklistId);
-//
-//    HashMap<String, Checklist> getChecklistByTaskIdAndTitle(UUID taskId, String title);
-//
-//    Checklist updateChecklistById(UUID taskId, UUID checklistId, ChecklistRequest checklistRequest);
-//
-//    Checklist deleteChecklistByTaskIdAndChecklist(UUID taskId, UUID checklistId);
-//
-//    Checklist assignMemberToChecklist(UUID assignedByUserId, UUID assignToUserId, UUID checklistId, UUID taskId);
+    void updateStatusOfChecklistById(UUID checklistId);
+
+
 }

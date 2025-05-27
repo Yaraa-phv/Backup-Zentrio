@@ -17,7 +17,7 @@ public class ThirdPartyRequest {
 
     @NotNull
     @NotBlank
-    private String fullName;
+    private String username;
 
     @NotNull
     @NotBlank

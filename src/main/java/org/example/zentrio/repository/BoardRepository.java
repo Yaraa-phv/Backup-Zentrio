@@ -2,7 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
-import org.example.zentrio.dto.response.BoardResponse;
+import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
 
 import java.util.List;
@@ -18,8 +18,8 @@ public interface BoardRepository {
     void insertMember(UUID userId, UUID boardId, UUID roleId);
 
     @Select("""
-                INSERT INTO boards(title,description,cover,is_favourite,workspace_id)
-                VALUES(#{req.title},#{req.description},#{req.cover},#{req.isFavourite}, #{workspaceId})
+                INSERT INTO boards(title,description,cover,workspace_id)
+                VALUES(#{req.title},#{req.description},#{req.cover}, #{workspaceId})
                 RETURNING *
             """)
     @Results(id = "boardMapper", value = {
@@ -45,8 +45,7 @@ public interface BoardRepository {
     @Select("""
                 UPDATE boards SET title = #{request.title},
                                   description = #{request.description},
-                                  cover = #{request.cover},
-                                  is_favourite = #{request.isFavourite}
+                                  cover = #{request.cover}
                 WHERE board_id = #{boardId}
                 RETURNING *
             """)
@@ -55,11 +54,12 @@ public interface BoardRepository {
 
 
     @Select("""
-                DELETE FROM boards WHERE board_id = #{boardId}
-                RETURNING *
+                DELETE FROM boards
+                WHERE board_id = #{boardId}
+                AND workspace_id = #{workspaceId}
             """)
     @ResultMap("boardMapper")
-    Board deleteBoardByBoardId(UUID boardId);
+    void deleteBoardByBoardId(UUID boardId, UUID workspaceId);
 
 
     @Select("""
@@ -82,15 +82,18 @@ public interface BoardRepository {
 
 
     @Select("""
-                SELECT *  FROM boards WHERE board_id = #{boardId}
+               SELECT DISTINCT u.user_id, u.username, u.email FROM users u
+                INNER JOIN members m ON u.user_id = m.user_id
+                WHERE board_id = #{boardId}
             """)
-    @Results(id = "boardDataMapper", value = {
-            @Result(property = "board", column = "board_id",
-                    one = @One(select = "getBoardByBoardId")),
-            @Result(property = "members", column = "board_id",
-                    many = @Many(select = "org.example.zentrio.repository.MemberRepository.getMembersByBoardId"))
+    @Results(id = "boardWithMembersMap", value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "username", column = "username"),
+            @Result(property = "email", column = "email"),
+            @Result(property = "roles", column = "user_id",
+            many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId"))
     })
-    BoardResponse getBoardByBoardIdWithMember(UUID boardId);
+    List<MemberResponse> getBoardByBoardIdWithMember(UUID boardId);
 
 
     @Select("""
@@ -120,4 +123,27 @@ public interface BoardRepository {
                 LIMIT 1
             """)
     UUID getManagerMemberIdByUserIdAndBoardId(UUID userId, UUID boardId);
+
+    @Select("""
+                UPDATE boards SET image_url = #{imageUrl}
+                WHERE board_id = #{boardId}
+            """)
+    void updateCover(UUID boardId, String imageUrl);
+
+
+    @Select("""
+                UPDATE boards SET is_favourite = #{isFavourite}
+                WHERE board_id = #{boardId}
+            """)
+    void updateIsFavourite(UUID boardId, Boolean isFavourite);
+
+    @Select("""
+                SELECT member_id
+                FROM members m
+                INNER JOIN roles r ON m.role_id = r.role_id
+                WHERE board_id = #{boardId}
+                AND role_name = 'ROLE_MANAGER'
+                LIMIT 1
+            """)
+    UUID getManagerMemberIdByBoardId(UUID boardId);
 }

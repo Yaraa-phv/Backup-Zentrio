@@ -1,7 +1,6 @@
 package org.example.zentrio.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,12 +10,14 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class GanttChart {
-    private UUID ganttChartId;
-    private String title;
+
+public class Notification {
+    private UUID notificationId;
+    private String content;
+    private String type;
+    private Boolean isRead;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private UUID boardId;
-    private UUID createdBy;
+    private UUID taskId;
+    private UUID userId;
+
 }

@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.AttachmentRequest;
@@ -19,13 +20,16 @@ import java.util.UUID;
 @RequestMapping("api/v1/attachments")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
+@Tag(name = "Attachment Controller")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
-    @Operation(summary = "Get attachment", description = "Get attachment by checklist id")
-    @GetMapping("/{checklist-id}")
-    public ResponseEntity<ApiResponse<Attachment>> getAttachmentByChecklistId(@PathVariable("checklist-id") UUID checklistId) {
+    @Operation(summary = "Get attachment by checklist ", description = "Get attachment by checklist id")
+    @GetMapping("/checklists/{checklist-id}")
+    public ResponseEntity<ApiResponse<Attachment>> getAttachmentByChecklistId(
+            @PathVariable("checklist-id") UUID checklistId
+          ) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
                 .message("Get attachment by checklist id successfully")
@@ -51,12 +55,15 @@ public class AttachmentController {
     }
 
     @Operation(summary = "Update attachment", description = "Updated attachment by attachment id")
-    @PutMapping("/{attachment-id}")
-    public ResponseEntity<ApiResponse<Attachment>> updateAttachment(@Valid @RequestBody AttachmentRequest attachmentRequest, @PathVariable("attachment-id") UUID attachmentId) {
+    @PutMapping("/{attachment-id}/checklists/{checklist-id}")
+    public ResponseEntity<ApiResponse<Attachment>> updateAttachment(
+            @Valid @RequestBody AttachmentRequest attachmentRequest,
+            @PathVariable("checklist-id") UUID checklistId,
+            @PathVariable("attachment-id") UUID attachmentId) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
                 .message("Updated attachment successfully")
-                .payload(attachmentService.updateAttachment(attachmentRequest,attachmentId))
+                .payload(attachmentService.updateAttachment(attachmentRequest,checklistId,attachmentId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -65,12 +72,15 @@ public class AttachmentController {
     }
 
     @Operation(summary = "Delete attachment", description = "Deleted attachment by attachment id")
-    @DeleteMapping("/{attachment-id}")
-    public ResponseEntity<ApiResponse<Attachment>> deleteAttachmentById(@PathVariable("attachment-id") UUID attachmentId) {
+    @DeleteMapping("/{attachment-id}/checklists/{checklist-id}")
+    public ResponseEntity<ApiResponse<Attachment>> deleteAttachmentById(
+            @PathVariable("attachment-id") UUID attachmentId,
+            @PathVariable("checklist-id") UUID checklistId
+    ) {
         ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
                 .success(true)
                 .message("Deleted attachment successfully")
-                .payload(attachmentService.deleteAttachmentById(attachmentId))
+                .payload(attachmentService.deleteAttachmentById(checklistId,attachmentId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();

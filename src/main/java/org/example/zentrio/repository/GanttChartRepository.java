@@ -2,11 +2,9 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.GanttChartRequest;
-import org.example.zentrio.model.GanttBar;
 import org.example.zentrio.model.GanttChart;
 
-import java.time.LocalDateTime;
-import java.util.List;
+
 import java.util.UUID;
 
 @Mapper
@@ -17,14 +15,15 @@ public interface GanttChartRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
-            @Result(property = "boardId", column = "board_id")
+            @Result(property = "boardId", column = "board_id"),
+            @Result(property = "createdBy", column = "created_by")
     })
     @Select("""
-                INSERT INTO gantt_charts (title,board_id)
-                VALUES (#{request.title},#{boardId})
+                INSERT INTO gantt_charts (title,board_id,created_by)
+                VALUES (#{request.title},#{boardId},#{userId})
                 RETURNING *
             """)
-    GanttChart createGanttChartByBoardId(@Param("request") GanttChartRequest ganttChartRequest, UUID boardId);
+    GanttChart createGanttChartByBoardId(@Param("request") GanttChartRequest ganttChartRequest, UUID boardId, UUID userId);
 
     @Select("""
                 SELECT * FROM gantt_charts WHERE board_id = #{boardId}
@@ -34,23 +33,28 @@ public interface GanttChartRepository {
 
     @Select("""
                 UPDATE gantt_charts SET title = #{request.title}
+                WHERE gantt_chart_id = #{ganttChartId}
+                AND board_id = #{boardId}
                 RETURNING *
             """)
     @ResultMap("ganttChartMapper")
-    GanttChart updateGanttChartByGanttChartId(@Param("request") GanttChartRequest ganttChartRequest, UUID ganttChartId);
+    GanttChart updateGanttChartByGanttChartId(@Param("request") GanttChartRequest ganttChartRequest, UUID ganttChartId,UUID boardId);
 
     @Select("""
-                SELECT * FROM gantt_charts WHERE gantt_chart_id = #{ganttChartId}
+                SELECT * FROM gantt_charts
+                WHERE gantt_chart_id = #{ganttChartId}
+                AND board_id = #{boardId}
             """)
     @ResultMap("ganttChartMapper")
-    GanttChart getGanttChartById(UUID ganttChartId);
+    GanttChart getGanttChartByIdAndBoardId(UUID ganttChartId, UUID boardId);
 
     @Select("""
-                DELETE FROM gantt_charts WHERE gantt_chart_id = #{ganttChartId}
-                RETURNING *
+                DELETE FROM gantt_charts
+                WHERE gantt_chart_id = #{ganttChartId}
+                AND board_id = #{boardId}
             """)
     @ResultMap("ganttChartMapper")
-    GanttChart deleteGanttChartById(UUID ganttChartId);
+    void deleteGanttChartById(UUID ganttChartId, UUID boardId);
 
 
     @Select("""
@@ -60,4 +64,11 @@ public interface GanttChartRepository {
             """)
     @ResultMap("ganttChartMapper")
     GanttChart getGanttChartByBoardId(UUID boardId);
+
+    @Select("""
+        SELECT * FROM gantt_charts
+        WHERE gantt_chart_id = #{ganttChartId}
+    """)
+    @ResultMap("ganttChartMapper")
+    GanttChart getGanttChartByGanttChartId(UUID ganttChartId);
 }
