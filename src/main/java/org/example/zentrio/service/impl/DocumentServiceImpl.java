@@ -11,7 +11,9 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
 import com.google.api.services.drive.model.Permission;
+import com.google.api.services.drive.model.PermissionList;
 import lombok.RequiredArgsConstructor;
+import org.example.zentrio.dto.request.DocumentRequest;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
@@ -214,24 +216,19 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document createFolder(String accessToken, String folderName, FileTypes types, String parentFolderId, UUID boardId) throws GeneralSecurityException, IOException {
+    public Document createFolder(DocumentRequest documentRequest) throws GeneralSecurityException, IOException {
 
-        Board board= boardRepository.getBoardByBoardId(boardId);
+        Board board= boardRepository.getBoardByBoardId(documentRequest.getBoardId());
         if (board == null) {
-            throw new NotFoundException("Board not found with ID: " + boardId);
+            throw new NotFoundException("Board not found with ID: " + documentRequest.getBoardId());
         }
-        String documentType= getGoogleMimeType(types.toString());
-        Drive drive= createDriveService(accessToken);
+        String documentType= getGoogleMimeType(documentRequest.getTypes().toString());
+        Drive drive= createDriveService(documentRequest.getAccessToken());
 
         // Prepare folder metadata
         File fileMetadata = new File();
-        fileMetadata.setName(folderName);
+        fileMetadata.setName(documentRequest.getFolderName());
         fileMetadata.setMimeType(documentType);
-
-        // Set parent folder if provided
-        if (parentFolderId != null && !parentFolderId.isEmpty()) {
-            fileMetadata.setParents(List.of(parentFolderId));
-        }
 
         // Create the folder
 
@@ -241,7 +238,7 @@ public class DocumentServiceImpl implements DocumentService {
             if (folder == null) {
                 throw new NotFoundException("No folder created");
             }
-        Document document= documentRepository.createFolder(LocalDateTime.now() , folder.getMimeType() , userId() , boardId , folder.getWebViewLink() , folder.getName(),  folder.getId());
+        Document document= documentRepository.createFolder(LocalDateTime.now() , folder.getMimeType() , userId() , documentRequest.getBoardId() , folder.getWebViewLink() , folder.getName(),  folder.getId());
 
 
             return document;
@@ -383,6 +380,42 @@ public class DocumentServiceImpl implements DocumentService {
             tempFile.delete();
         }
     }
+    @Override
+    public String privateDocument(UUID documentId, String accessToken) throws GeneralSecurityException, IOException {
+        Document document = documentRepository.getDocumentById(documentId);
+        if (document == null) {
+            throw new NotFoundException("Document not found");
+        }
+        String folderId = document.getFolderId();
+        Drive drive = createDriveService(accessToken);
+
+        // Fetch existing permissions on the folder
+        PermissionList permissions = drive.permissions()
+                .list(folderId)
+                .setSupportsAllDrives(true)
+                .execute();
+
+        // Remove "anyone" permission if exists
+        for (Permission permission : permissions.getPermissions()) {
+            if ("anyone".equals(permission.getType())) {
+                drive.permissions().delete(folderId, permission.getId())
+                        .setSupportsAllDrives(true)
+                        .execute();
+                break; // Assuming only one 'anyone' permission
+            }
+        }
+
+        documentRepository.publicFolder(userId(), documentId, false); // Set document to private (false)
+
+        File folder = drive.files().get(folderId)
+                .setFields("id, name, webViewLink, iconLink")
+                .setSupportsAllDrives(true)
+                .execute();
+        documentRepository.publicFolder( userId(),documentId,false);
+
+        return "Folder access restricted successfully: " + folder.getWebViewLink();
+    }
+
 
 
 

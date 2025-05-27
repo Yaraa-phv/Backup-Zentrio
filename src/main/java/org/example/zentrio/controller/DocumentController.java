@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
+import org.example.zentrio.dto.request.DocumentRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 
 import org.example.zentrio.enums.FileTypes;
@@ -67,15 +68,12 @@ public class DocumentController {
 
     @PostMapping()
     @Operation(summary = "Create document")
-    public ResponseEntity<ApiResponse<Document>> createDocument(@RequestParam String accessToken,
-                                                                @RequestParam String folderName,
-                                                                @RequestParam FileTypes types,
-                                                                @RequestParam(required = false) String parentFolderId, @RequestParam  UUID boardId)
+    public ResponseEntity<ApiResponse<Document>> createDocument(@RequestBody DocumentRequest documentRequest)
             throws IOException, GeneralSecurityException {
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
                 .message("Document created Successfully ")
-                .payload(documentService.createFolder(accessToken, folderName,types, parentFolderId,  boardId))
+                .payload(documentService.createFolder(documentRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -158,7 +156,8 @@ public class DocumentController {
 
     @PutMapping("/public-document/{document-id}")
     @Operation(summary = "Public document by document id")
-    public ResponseEntity<ApiResponse<String>> publicDocument(@PathVariable("document-id") UUID documentId,
+    public ResponseEntity<ApiResponse<String>> publicDocument(
+                        @PathVariable("document-id") UUID documentId,
                                @RequestParam String accessToken) throws GeneralSecurityException, IOException {
 
         ApiResponse<String> response =  ApiResponse.<String>builder()
@@ -172,7 +171,7 @@ public class DocumentController {
 
     }
 
-    @GetMapping("get-public-documents/boards/{board-id}")
+    @GetMapping("public-documents/boards/{board-id}")
     @Operation(summary = "Get all public documents")
     public ResponseEntity<ApiResponse<List<Document>>> getAllPublicDocument(
             @PathVariable("board-id") UUID boardId)  {
@@ -222,6 +221,24 @@ public class DocumentController {
         return ResponseEntity.ok(response);
 
     }
+
+    @PutMapping("/{document-id}/private")
+    public ResponseEntity< ApiResponse<String>> makeDocumentPrivate(
+            @PathVariable("document-id") UUID documentId,
+            @RequestParam String accessToken
+    ) throws GeneralSecurityException, IOException {
+
+
+        ApiResponse<String> response =  ApiResponse.<String>builder()
+                .success(true)
+                .message("file create successfully ")
+                .payload(documentService.privateDocument(documentId, accessToken))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
 
 
 
