@@ -31,7 +31,6 @@ public interface ChecklistService {
 
     void updateStatusOfChecklistById(UUID checklistId);
 
-
     HashSet<Checklist> getAllChecklists();
 
     HashSet<Checklist> getAllChecklistsByCurrentUser();

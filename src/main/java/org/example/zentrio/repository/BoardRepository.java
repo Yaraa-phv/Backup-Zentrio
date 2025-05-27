@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
+import org.example.zentrio.model.Workspace;
 
 import java.util.HashSet;
 import java.util.List;
@@ -171,4 +172,5 @@ public interface BoardRepository {
     """)
     @ResultMap("boardMapper")
     HashSet<Board> getAllBoards();
+
 }

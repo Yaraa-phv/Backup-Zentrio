@@ -87,12 +87,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId) {
-        Workspace workspace = workspaceRepository.getWorkspaceByWorkspaceId(boardRequest.getWorkspaceId());
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Workspace workspace = workspaceRepository.getWorkspaceById(boardRequest.getWorkspaceId(),userId);
         if (workspace == null) {
             throw new NotFoundException("Workspace id " + boardRequest.getWorkspaceId() + " not found");
         }
         getBoardByBoardId(boardId);
-        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
         if (roleName == null) {
@@ -108,8 +108,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void deleteBoardByBoardId(UUID boardId, UUID workspaceId) {
-        getBoardByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        getBoardByBoardId(boardId);
+        Workspace workspace = workspaceRepository.getWorkspaceById(workspaceId, userId);
+        if (workspace == null) {
+            throw new NotFoundException("Workspace id " + workspaceId + " not found");
+        }
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
         if (roleName == null) {
@@ -125,11 +129,9 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board getBoardByBoardId(UUID boardId) {
         Board board = boardRepository.getBoardByBoardId(boardId);
-
         if (board == null) {
             throw new NotFoundException("Board id " + boardId + " not found");
         }
-
         return board;
     }
 

@@ -69,7 +69,7 @@ public interface WorkspaceRepository {
         DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
     """)
     @ResultMap("workspaceMapper")
-    Workspace deleteWorkspaceByWorkspaceId(UUID workspaceId, UUID userId);
+    void deleteWorkspaceByWorkspaceId(UUID workspaceId, UUID userId);
 
     @Select("""
         SELECT * FROM workspaces WHERE workspace_id = #{workspaceId}
