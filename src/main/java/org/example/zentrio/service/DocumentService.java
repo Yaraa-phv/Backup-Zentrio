@@ -1,5 +1,6 @@
 package org.example.zentrio.service;
 
+import org.example.zentrio.dto.request.DocumentRequest;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ public interface DocumentService {
 
     List<Document> getDocumentByName( String folderName, UUID boardId) ;
 
-    Document createFolder(String accessToken, String folderName, FileTypes types, String parentFolderId, UUID boardId) throws GeneralSecurityException, IOException;
+    Document createFolder(DocumentRequest documentRequest) throws GeneralSecurityException, IOException;
 
     Document getDocumentById(UUID documentId) ;
 
@@ -35,4 +36,6 @@ public interface DocumentService {
     Document uploadDocumentToDrive(String accessToken,
                                    MultipartFile multipartFile,
                                    UUID boardId) throws GeneralSecurityException, IOException;
+
+    String privateDocument(UUID documentId, String accessToken)throws GeneralSecurityException, IOException;
 }
