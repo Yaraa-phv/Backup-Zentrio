@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 @Service
@@ -62,5 +63,10 @@ public class AchievementServiceImpl implements AchievementService {
     public Achievement getAllAchievementByCurrentUser() {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         return achievementRepository.getAllAchievementByCurrentUser(userId);
+    }
+
+    @Override
+    public Achievement getAllAchievements() {
+        return achievementRepository.getAllAchievements();
     }
 }

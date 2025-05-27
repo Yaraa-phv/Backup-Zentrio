@@ -4,7 +4,8 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.model.Workspace;
 
-import java.time.LocalDateTime;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,12 @@ public interface WorkspaceRepository {
     List<Workspace> getAllWorkspaces(UUID userId,Integer limit,Integer offset);
 
     @Select("""
+        SELECT * FROM workspaces
+        WHERE workspace_id = #{workspaceId}
+    """)
+    Workspace getWorkspaceByWorkspaceId(UUID workspaceId);
+
+    @Select("""
          SELECT COUNT(*) FROM workspaces WHERE created_by = #{userId}
     """)
     Integer countWorkspacesByUserId(UUID userId);
@@ -51,20 +58,12 @@ public interface WorkspaceRepository {
     List<Workspace> getWorkspaceByTitle(String title);
 
     @Select("""
-        UPDATE workspaces SET title = #{request.title}, description = #{request.description}, updated_at = #{updatedAt}
+        UPDATE workspaces SET title = #{request.title}, description = #{request.description}
         WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
         RETURNING *
     """)
     @ResultMap("workspaceMapper")
-    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest, LocalDateTime updatedAt, UUID userId);
-
-    @Select("""
-        UPDATE workspaces SET title = #{request.title}, updated_at = #{request.updatedAt}
-        WHERE workspace_id = #{request.workspaceId}
-        RETURNING *
-    """)
-    @ResultMap("workspaceMapper")
-    Workspace updateWorkspaceTitleByWorkspaceId(@Param("request") Workspace titleRequest);
+    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest,UUID userId);
 
     @Select("""
         DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
@@ -82,7 +81,7 @@ public interface WorkspaceRepository {
         SELECT * FROM workspaces
     """)
     @ResultMap("workspaceMapper")
-    List<Workspace> getAllWorkspacesForAllUsers();
+    HashSet<Workspace> getAllWorkspacesForAllUsers();
 
 }
 

@@ -9,6 +9,7 @@ import org.example.zentrio.dto.request.*;
 import org.example.zentrio.dto.response.AppUserResponse;
 import org.example.zentrio.dto.response.TokenResponse;
 import org.example.zentrio.enums.Gender;
+import org.example.zentrio.enums.Verification;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ConflictException;
 import org.example.zentrio.jwt.JwtService;
@@ -98,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verify(String email, String otp) {
+    public void verify(String email, String otp, Verification type) {
         AppUser appUser = appUserRepository.getUserByEmail(email);
         if (appUser == null) {
             throw new BadRequestException("This email does not exist");
@@ -108,22 +109,51 @@ public class AuthServiceImpl implements AuthService {
         if (!isValidateOtp) {
             throw new BadRequestException("The OTP entered is invalid or has expired. Please request for getting a new OTP and try again.");
         }
-        appUserRepository.updateVerify();
+
+        switch (type) {
+            case VERIFY: {
+                if (appUser.getIsVerified()) {
+                    throw new BadRequestException("This email is already verified");
+                }
+                appUserRepository.updateVerify(appUser.getUserId());
+                break;
+            }
+            case RESET: {
+                appUserRepository.updatedIsResetToTrue(appUser.getUserId());
+                break;
+            }
+            default : throw new BadRequestException("Invalid OTP");
+        }
+
+
     }
 
     @Override
-    public void resend(String email) {
+    public void resend(String email, Verification type) {
         AppUser appUser = appUserRepository.getUserByEmail(email);
 
         if (appUser == null) {
             throw new BadRequestException("This email isn't matched");
         }
 
-        if (appUser.getIsVerified()) {
-            throw new BadRequestException("This is email already verified");
+        switch (type) {
+            case VERIFY: {
+                if (appUser.getIsVerified()) {
+                    throw new BadRequestException("This is email already verified");
+                }
+                String otp = otpService.generateOtp(appUser.getEmail());
+                emailService.sendEmail(otp, email);
+                break;
+            }
+            case RESET: {
+                String otp = otpService.generateOtp(appUser.getEmail());
+                emailService.sendEmail(otp, email);
+                break;
+            }
+            default:
+                throw new BadRequestException("Invalid OTP");
         }
-        String otp = otpService.generateOtp(appUser.getEmail());
-        emailService.sendEmail(otp, email);
+
     }
 
     @Override
@@ -141,7 +171,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    //    working better
     @Override
     public AppUserResponse registerThirdParty(ThirdPartyRequest request) {
         String password = passwordEncoder.encode(UUID.randomUUID().toString());
@@ -165,6 +194,9 @@ public class AuthServiceImpl implements AuthService {
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String email = payload.getEmail();
+        if(appUserRepository.getUserByEmail(email) != null) {
+            throw new BadRequestException("This email is already logged in.");
+        }
 //        String googleId = (passwordEncoder.encode(payload.getSubject()));
         String googleId = payload.getSubject();
         String name = (String) payload.get("name");
@@ -179,13 +211,13 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public ResetPasswordRequest resetPassword(ResetPasswordRequest request,String email) {
+    public ResetPasswordRequest resetPassword(ResetPasswordRequest request, String email) {
         AppUser appUser = appUserRepository.getUserByEmail(email);
         if (appUser == null) {
             throw new BadRequestException("This email does not matched");
         }
 
-        if(!appUser.getIsReset()) {
+        if (!appUser.getIsReset()) {
             throw new BadRequestException("This email isn't verify for reset");
         }
 
@@ -199,42 +231,11 @@ public class AuthServiceImpl implements AuthService {
         request.setPassword(passwordEncoder.encode(password));
         request.setConfirmPassword(passwordEncoder.encode(confirmPassword));
         ResetPasswordRequest resetPasswordRequest = authRepository.resetPassword(request, email);
+
         appUserRepository.updatedIsResetToFalse(appUser.getUserId());
+        System.out.println("is REset : " + appUser.getIsReset());
         return resetPasswordRequest;
     }
 
-    @Override
-    public void otpResetPassword(String email) {
-        AppUser appUser = appUserRepository.getUserByEmail(email);
-        if (appUser == null) {
-            throw new BadRequestException("This email does not login");
-        }
-
-        String otp = otpService.generateOtp(appUser.getEmail());
-
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("otp", otp);
-
-        emailService.sendDynamicEmail(
-                email,
-                "reset-password-email",
-                "Your OTP for Password Reset",
-                variables
-        );
-    }
-
-    @Override
-    public void verifyReset(String email, String otp) {
-        AppUser appUser = appUserRepository.getUserByEmail(email);
-        if (appUser == null) {
-            throw new BadRequestException("This email does not exist");
-        }
-
-        boolean isValidateOtp = otpService.validateOtp(email, otp);
-        if (!isValidateOtp) {
-            throw new BadRequestException("The OTP entered is invalid or has expired. Please request for getting a new OTP and try again.");
-        }
-        appUserRepository.updatedIsResetToTrue(appUser.getUserId());
-    }
 
 }

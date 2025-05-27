@@ -1,17 +1,22 @@
 package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
 import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.exception.BadRequestException;
-import org.example.zentrio.exception.ConflictException;
-import org.example.zentrio.exception.NotFoundException;
+import org.example.zentrio.exception.ForbiddenException;
+import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.GanttBar;
 import org.example.zentrio.model.GanttChart;
+import org.example.zentrio.repository.BoardRepository;
 import org.example.zentrio.repository.GanttBarRepository;
+import org.example.zentrio.repository.GanttChartRepository;
 import org.example.zentrio.service.GanttBarService;
 import org.example.zentrio.service.GanttChartService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,82 +25,80 @@ import java.util.UUID;
 public class GanttBarServiceImpl implements GanttBarService {
 
     private final GanttBarRepository ganttBarRepository;
-    private final GanttChartService ganttChartService;
-
-
-    @Override
-    public GanttBar  createGanttBar(UUID ganttChartId , GanttBarRequest ganttBarRequest) {
-       GanttChart ganttChart = ganttChartService.getGanttChartByID(ganttChartId);
-       if (ganttChart == null) {
-           throw new NotFoundException("GanttChart not found");
-       }
-        if (ganttBarRequest.getStartedAt() == null || ganttBarRequest.getFinishedAt() == null) {
-            throw new BadRequestException("Start and finish times are required");
-        }
-       if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
-           throw new BadRequestException("GanttBar already finished");
-       }
-       ganttChartService.userRole(ganttChart.getBoardId());
-
-        return ganttBarRepository.createGanttBar(ganttChartId,ganttBarRequest);
-    }
-
-
+    private final GanttChartRepository ganttChartRepository;
+    private final BoardRepository boardRepository;
 
     @Override
-    public List<GanttBar> getAllGanttBarByGanttChartID(UUID ganttChartId) {
-        GanttChart ganttChart= ganttChartService.getGanttChartByID(ganttChartId);
+    public GanttBar createGanttBarByGanttChartId(GanttBarRequest ganttBarRequest) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        GanttChart ganttChart = ganttChartRepository.getGanttChartByGanttChartId(ganttBarRequest.getGanttChartId());
         if (ganttChart == null) {
-            throw new NotFoundException("GanttChart not found");
+            throw new BadRequestException("GanttChart not found");
+        }
+        UUID memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, ganttChart.getBoardId());
+        if(memberId == null) {
+            throw new ForbiddenException("You're not a manager of this board can't create Gantt bar");
         }
 
-        return ganttBarRepository.getAllGanttBarByGanttChartID(ganttChartId);
+        return ganttBarRepository.createGanttBarByGanttChartId(ganttBarRequest, ganttBarRequest.getGanttChartId());
     }
 
     @Override
-    public GanttBar getGanttBarByGanttBartID(UUID ganttBarId) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
+    public GanttBar getGanttBarById(UUID ganttBarId, UUID ganttChartId) {
+        GanttBar ganttBar = ganttBarRepository.getGanttBarById(ganttBarId,ganttChartId);
         if (ganttBar == null) {
-            throw new NotFoundException("GanttBar not found");
+            throw new BadRequestException("Gantt bar with id " + ganttBarId + " not found");
         }
         return ganttBar;
     }
 
     @Override
-    public GanttBar updateGanttBarByGanttBarId(UUID ganttBarId, GanttBarRequest ganttBarRequest) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
-        if (ganttBar == null) {
-            throw new NotFoundException("GanttBar not found");
+    public HashSet<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId) {
+        GanttChart ganttChart = ganttChartRepository.getGanttChartByGanttChartId(ganttChartId);
+        if (ganttChart == null) {
+            throw new BadRequestException("Gantt chart not found");
         }
-        if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
-            throw new BadRequestException("GanttBar already finished");
-        }
-        GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        ganttChartService.userRole(chart.getBoardId());
-
-        GanttBar updatedGanttBar=ganttBarRepository.updateGanttBarByGanttBarId(ganttBarId,ganttBarRequest);
-        return updatedGanttBar;
+        return ganttBarRepository.getAllGanttBarsByGanttChartId(ganttChartId);
     }
 
     @Override
-    public void deleteGanttBarByGanttBarId(UUID ganttBarId) {
-        GanttBar ganttBar= ganttBarRepository.getGanttBarByGanttBartID(ganttBarId);
-        if (ganttBar == null) {
-            throw new NotFoundException("GanttBar not found");
+    public GanttBar updateGanttBarByGanttBarId(GanttBarRequest ganttBarRequest, UUID ganttBarId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        getGanttBarById(ganttBarId,ganttBarRequest.getGanttChartId());
+        GanttChart ganttChart = ganttChartRepository.getGanttChartByGanttChartId(ganttBarRequest.getGanttChartId());
+        if (ganttChart == null) {
+            throw new BadRequestException("Gantt chart not found");
         }
-        GanttChart chart= ganttChartService.getGanttChartByID(ganttBar.getGanttChartId());
-        ganttChartService.userRole(chart.getBoardId());
-
-        ganttBarRepository.deleteGanttBarByGanttBarId(ganttBarId);
+        UUID memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId,ganttChart.getBoardId());
+        if(memberId == null) {
+            throw new ForbiddenException("You're not a manager of this board can't updated Gantt bar");
+        }
+        return ganttBarRepository.updateGanttBarByGanttBarId(ganttBarRequest,ganttBarId,ganttBarRequest.getGanttChartId());
     }
 
     @Override
-    public GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId) {
-
-        if (ganttBarId == null){
-            throw new NotFoundException("Gantt Bar Id not found!");
+    public void deleteGanttBarByGanttBarId(UUID ganttBarId,UUID ganttChartId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        GanttChart ganttChart = ganttChartRepository.getGanttChartByGanttChartId(ganttChartId);
+        if (ganttChart == null) {
+            throw new BadRequestException("Gantt chart not found");
         }
-        return ganttBarRepository.getGanttBarByGanttChartIdAndGanttBarId(ganttChartId, ganttBarId);
+        getGanttBarById(ganttBarId,ganttChartId);
+        UUID memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId,ganttChart.getBoardId());
+        if(memberId == null) {
+            throw new ForbiddenException("You're not a manager of this board can't deleted Gantt bar");
+        }
+        ganttBarRepository.deleteGanttBarByGanttBarId(ganttBarId,ganttChartId);
     }
 
+    @Override
+    public HashSet<GanttBar> getAllGanttBarsForCurrentUser() {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        return ganttBarRepository.getAllGanttBarsForCurrentUser(userId);
+    }
+
+    @Override
+    public HashSet<GanttBar> getAllGanttBars() {
+        return ganttBarRepository.getAllGanttBars();
+    }
 }

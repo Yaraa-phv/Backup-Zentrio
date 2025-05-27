@@ -1,23 +1,23 @@
 package org.example.zentrio.service;
 
 
+
 import org.example.zentrio.dto.request.GanttChartRequest;
 import org.example.zentrio.model.GanttChart;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface GanttChartService {
-    void userRole(UUID boardID);
-    GanttChart createGanttChart(GanttChartRequest ganttChartRequest);
 
-    GanttChart getGanttChartByBoardId(UUID boardId);
+    GanttChart createGanttChartByBoardId(GanttChartRequest ganttChartRequest);
 
-    GanttChart updateGanttChartById(UUID ganttChartId, UUID boardId ,GanttChartRequest ganttChartRequest);
+    GanttChart getAllGanttChartByBoardId(UUID boardId);
 
-    Void deleteGanttChartByID(UUID ganttChartId,UUID boardId);
+    GanttChart updateGanttChartByGanttChartId(GanttChartRequest ganttChartRequest, UUID ganttChartId);
 
-    GanttChart getGanttChartByID(UUID ganttChartId);
+    GanttChart getGanttChartById(UUID ganttChartId,UUID boardId);
 
+    void deleteGanttChartById(UUID ganttChartId,UUID boardId);
 
+    GanttChart getGanttChartByCurrentUser();
 }

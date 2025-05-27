@@ -17,11 +17,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class GanttChartRequest {
 
-    @NotNull(message ="Board ID must not be null")
-    private UUID boardId;
 
     @NotNull
     @NotBlank
     private String title;
+
+    private UUID boardId;
 
 }

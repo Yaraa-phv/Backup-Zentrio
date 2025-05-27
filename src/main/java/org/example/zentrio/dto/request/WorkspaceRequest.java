@@ -21,5 +21,4 @@ public class WorkspaceRequest {
     @NotBlank(message = "description cannot be blank!")
     @NotNull
     private String description;
-//    private LocalDateTime updatedAt;
 }

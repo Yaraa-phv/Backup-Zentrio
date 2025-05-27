@@ -8,6 +8,7 @@ import org.example.zentrio.dto.request.*;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.AppUserResponse;
 import org.example.zentrio.dto.response.TokenResponse;
+import org.example.zentrio.enums.Verification;
 import org.example.zentrio.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,8 @@ public class AuthController {
 
     @Operation(summary = "Verify otp for user", description = "Verify user with email and OTP")
     @PostMapping("/verify")
-    public ResponseEntity<ApiResponse<?>> verify(@Valid @RequestParam String email, @RequestParam String otp) {
-        authService.verify(email, otp);
+    public ResponseEntity<ApiResponse<?>> verify(@Valid @RequestParam String email, @RequestParam String otp, @RequestParam Verification type) {
+        authService.verify(email, otp,type);
         ApiResponse<?> response = ApiResponse.builder()
                 .success(true)
                 .message("Verified OTP successfully")
@@ -67,8 +68,8 @@ public class AuthController {
 
     @Operation(summary = "Resend OTP user", description = "Resend OTP for user verification")
     @PostMapping("/resend")
-    public ResponseEntity<ApiResponse<?>> resend(@Valid @RequestParam String email) {
-        authService.resend(email);
+    public ResponseEntity<ApiResponse<?>> resend(@Valid @RequestParam String email,Verification type) {
+        authService.resend(email,type);
         ApiResponse<?> response = ApiResponse.builder()
                 .success(true)
                 .message("Resend OTP successfully")
@@ -120,31 +121,5 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "Request OTP reset-password", description = "Reset password for user that are forgot the password")
-    @PostMapping("/request-reset-password")
-    public ResponseEntity<ApiResponse<ResetPasswordRequest>> requestOtpReset(@Valid String email) {
-        authService.otpResetPassword(email);
-        ApiResponse<ResetPasswordRequest> apiResponse = ApiResponse.<ResetPasswordRequest>builder()
-                .success(true)
-                .message("Request otp for reset password successfully.")
-                .status(HttpStatus.CREATED)
-                .payload(null)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-    }
 
-
-    @PostMapping("/verify-reset-password")
-    public ResponseEntity<ApiResponse<?>> verifyReset(@Valid @RequestParam String email, @RequestParam String otp) {
-        authService.verifyReset(email, otp);
-        ApiResponse<?> response = ApiResponse.builder()
-                .success(true)
-                .message("Verified OTP reset successfully")
-                .payload(null)
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
 }

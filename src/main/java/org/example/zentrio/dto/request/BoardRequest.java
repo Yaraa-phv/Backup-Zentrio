@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,11 +20,9 @@ public class BoardRequest {
     @NotBlank
     private String title;
 
-    @NotNull
-    @NotBlank
     private String description;
 
     private String cover;
-    private Boolean isFavourite;
-    private Boolean isVerified;
+
+    private UUID workspaceId;
 }

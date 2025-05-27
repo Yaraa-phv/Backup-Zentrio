@@ -2,8 +2,10 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.TaskRequest;
+import org.example.zentrio.enums.Stage;
 import org.example.zentrio.model.Task;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,47 +109,74 @@ public interface TaskRepository {
                 WHERE m.user_id = #{assignedBy}
                 AND ta.task_id = #{taskId}
             """)
-    UUID findMemberIdByUserIdAndTaskId(UUID assignedBy, UUID taskId);
+    UUID getMemberIdByUserIdAndTaskId(UUID assignedBy, UUID taskId);
 
 
     @Select("""
-           
-            SELECT 1 FROM task_assignment ta
-                   INNER JOIN members m on m.member_id = ta.assigned_to
-                   INNER JOIN roles r ON m.role_id = r.role_id
-                   WHERE task_id = #{taskId}
-                   AND m.user_id = #{leaderId}
-            LIMIT 1
+                SELECT m.member_id FROM members m
+                INNER JOIN roles r ON m.role_id = r.role_id
+                WHERE m.user_id = #{userId}
+                  AND m.board_id = #{boardId}
+                AND r.role_name = 'ROLE_LEADER'
+                LIMIT 1
             """)
-    Integer isLeaderAssignedToTask(UUID taskId, UUID leaderId);
-
-//    @Select("""
-//        SELECT m.member_id FROM members m
-//        INNER JOIN task_assignment ta ON m.member_id = ta.assigned_by
-//        WHERE ta.task_id = #{taskId}
-//        AND  m.user_id = #{userId}
-//    """)
+    UUID getLeaderIdByUserIdAndBoardId(UUID userId, UUID boardId);
 
 
     @Select("""
-        SELECT m.member_id FROM members m
-        INNER JOIN roles r ON m.role_id = r.role_id
-        WHERE m.board_id = #{boardId}
-        AND r.role_name = 'ROLE_MANAGER'
-    """)
-    UUID findMangerIdByUserIdAndBoardId(UUID boardId);
+                SELECT stage FROM tasks WHERE task_id = #{taskId}
+            """)
+    String getTaskStage(UUID taskId);
 
 
     @Select("""
-        SELECT m.member_id FROM members m
-        INNER JOIN roles r ON m.role_id = r.role_id
-        WHERE m.user_id = #{userId}
-          AND m.board_id = #{boardId}
-        AND r.role_name = 'ROLE_LEADER'
+                UPDATE tasks
+                SET stage = #{stage}
+                WHERE task_id = #{taskId}
+            """)
+    void updateTaskStage(UUID taskId, String stage);
+
+
+    @Select("""
+                UPDATE tasks SET is_done = #{isDone}
+                WHERE task_id = #{taskId}
+            """)
+    void updateStatusOfTaskById(UUID taskId, boolean isDone);
+
+
+    @Select("""
+        UPDATE tasks SET stage = #{stage}
+        WHERE task_id = #{taskId}
     """)
-    UUID findLeaderIdByUserIdAndBoardId(UUID userId,UUID boardId);
+    void updateProgressOfTaskById(UUID taskId, String stage);
 
 
+    @Select("""
+        SELECT r.role_name FROM members m
+        INNER JOIN task_assignment ta ON m.member_id = ta.assigned_to
+        INNER JOIN roles r ON m.role_id = r.role_id
+        WHERE ta.task_id = #{taskId}
+    """)
+    String getRoleNameByTaskId(UUID taskId);
 
 
+    @Select("""
+        SELECT * FROM tasks
+        WHERE task_id = #{taskId}
+        AND user_id = #{userId}
+    """)
+    @ResultMap("taskMapper")
+    Task getTaskByIdAndUserId(UUID taskId, UUID userId);
+
+    @Select("""
+        SELECT tasks.* FROM tasks WHERE created_by = #{userId}
+    """)
+    @ResultMap("taskMapper")
+    HashSet<Task> getAllTasksForCurrentUser(UUID userId);
+
+    @Select("""
+        SELECT * FROM tasks
+    """)
+    @ResultMap("taskMapper")
+    HashSet<Task> getAllTasks();
 }

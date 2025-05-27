@@ -1,5 +1,6 @@
 package org.example.zentrio.controller;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,15 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.GanttBar;
-import org.example.zentrio.model.GanttChart;
 import org.example.zentrio.service.GanttBarService;
-import org.example.zentrio.service.GanttChartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
 
 @RestController
@@ -28,80 +27,101 @@ public class GanttBarController {
 
     private final GanttBarService ganttBarService;
 
-    @PostMapping("/{gantt-chart-id}")
-    @Operation(summary = "Creat gantt bar by gantt chart ID")
-    public ResponseEntity<ApiResponse<GanttBar>> createGanttBar(
-            @PathVariable("gantt-chart-id") UUID ganttChartId, @Valid @RequestBody GanttBarRequest ganttBarRequest) {
-
-        ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
+    @Operation(summary = "Create gantt bars with gantt chart ID", description = "Created gantt bars with specific gantt charts ID")
+    @PostMapping("/gantt-charts/{gantt-chart-id}")
+    public ResponseEntity<ApiResponse<GanttBar>> createGanttBarByGanttChartId(
+            @Valid @RequestBody GanttBarRequest ganttBarRequest) {
+        ApiResponse<GanttBar> apiResponse = ApiResponse.<GanttBar>builder()
                 .success(true)
-                .message("Creat gantt bar successfully.")
-                .payload(ganttBarService.createGanttBar(ganttChartId,ganttBarRequest))
+                .message("Created gantt bar successfully")
+                .payload(ganttBarService.createGanttBarByGanttChartId(ganttBarRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
+    @Operation(summary = "Get gantt bar by ID AND gantt chart ID", description = "Get gantt bar with ID with current gantt chart ID")
+    @GetMapping("/{gantt-bar-id}/ganttCharts/{gantt-chart-id}")
+    public ResponseEntity<ApiResponse<GanttBar>> getGanttBarById(
+            @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @PathVariable("gantt-chart-id") UUID ganttChartId) {
+        ApiResponse<GanttBar> apiResponse = ApiResponse.<GanttBar>builder()
+                .success(true)
+                .message("Created gantt bar successfully")
+                .payload(ganttBarService.getGanttBarById(ganttBarId,ganttChartId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 
-
+    @Operation(summary = "Get all gantt bars by gantt charts ID", description = "Get all gantt bars by gantt charts ID")
     @GetMapping("/gantt-charts/{gantt-chart-id}")
-    @Operation(summary = "Get all gantt bars by gantt chart ID")
-    public ResponseEntity<ApiResponse<List<GanttBar>>> getAllGanttBarByGanttChartID(@PathVariable("gantt-chart-id") UUID ganttChartId){
-
-        ApiResponse<List<GanttBar>> response = ApiResponse.<List<GanttBar>>builder()
+    public ResponseEntity<ApiResponse<HashSet<GanttBar>>> getAllGanttBarsByGanttChartId(@PathVariable("gantt-chart-id") UUID ganttChartId) {
+        ApiResponse<HashSet<GanttBar>> apiResponse = ApiResponse.<HashSet<GanttBar>>builder()
                 .success(true)
-                .message("Get all gantt bar by gantt chart id successfully")
-                .payload(ganttBarService.getAllGanttBarByGanttChartID(ganttChartId))
+                .message("Get all gantt bars successfully")
+                .payload(ganttBarService.getAllGanttBarsByGanttChartId(ganttChartId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-
-    @GetMapping("/{gantt-bar-id}")
-    @Operation(summary = "Get gantt bar by gantt bar ID")
-    public ResponseEntity<ApiResponse<GanttBar>> getGanttBarByGanttBartID(@PathVariable("gantt-bar-id") UUID ganttBarId){
-
-        ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
+    @Operation(summary = "Update gantt bar by ID AND gantt chart ID", description = "Updated gantt bars by ID with current gantt charts")
+    @PutMapping("/{gantt-bar-id}/ganttCharts/{gantt-chart-id}")
+    public ResponseEntity<ApiResponse<GanttBar>> updateGanttBarByGanttBarId(
+            @Valid @RequestBody GanttBarRequest ganttBarRequest,
+            @PathVariable("gantt-bar-id") UUID ganttBarId) {
+        ApiResponse<GanttBar> apiResponse = ApiResponse.<GanttBar>builder()
                 .success(true)
-                .message("Get  gantt bar by gantt bar id successfully")
-                .payload( ganttBarService.getGanttBarByGanttBartID(ganttBarId))
+                .message("Updated gantt bar successfully")
+                .payload(ganttBarService.updateGanttBarByGanttBarId(ganttBarRequest, ganttBarId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-
-        @PutMapping("/{gantt-bar-id}/gantt-chart-")
-        @Operation(summary = "Update gantt bar  by gantt bar ID")
-        public ResponseEntity<ApiResponse<GanttBar>> updateGanttBarByGanttBarId(
-                @PathVariable("gantt-bar-id") UUID ganttBarId,  @Valid @RequestBody GanttBarRequest ganttBarRequest){
-
-            ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
-                    .success(true)
-                    .message("Update gantt bar  by gantt bar id successfully")
-                    .payload( ganttBarService.updateGanttBarByGanttBarId(ganttBarId, ganttBarRequest))
-                    .status(HttpStatus.OK)
-                    .timestamp(LocalDateTime.now())
-                    .build();
-            return ResponseEntity.ok(response);
-        }
-
-
-    @DeleteMapping("/{gantt-bar-id}")
-    @Operation(summary = "Delete gantt bar  by gantt bar ID")
-    public ResponseEntity<ApiResponse<GanttBar>> deleteGanttBarByGanttBarId(
-            @PathVariable("gantt-bar-id") UUID ganttBarId){
-        ganttBarService.deleteGanttBarByGanttBarId(ganttBarId);
-        ApiResponse<GanttBar> response = ApiResponse.<GanttBar>builder()
+    @Operation(summary = "Delete gantt bar", description = "Deleted gantt bar by ID with current gantt charts")
+    @DeleteMapping("/{gantt-bar-id}/ganttCharts/{gantt-chart-id}")
+    public ResponseEntity<?> deleteGanttBarByGanttBarId(
+            @PathVariable("gantt-bar-id") UUID ganttBarId,
+            @PathVariable("gantt-chart-id") UUID ganttChartId) {
+        ganttBarService.deleteGanttBarByGanttBarId(ganttBarId,ganttChartId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
-                .message("Delete gantt bar  by gantt bar id successfully")
+                .message("Deleted gantt bar successfully")
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @Operation(summary = "Get all gantt bar for current user",description = "Get all gantt bar for current users")
+    @GetMapping("/current")
+    public ResponseEntity<ApiResponse<HashSet<GanttBar>>> getAllGanttBarsForCurrentUser() {
+        ApiResponse<HashSet<GanttBar>> apiResponse = ApiResponse.<HashSet<GanttBar>>builder()
+                .success(true)
+                .message("Get all gantt bars for current users successfully")
+                .payload(ganttBarService.getAllGanttBarsForCurrentUser())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @Operation(summary = "Get all gantt bar",description = "Get all gantt bars for all users")
+    @GetMapping
+    public ResponseEntity<ApiResponse<HashSet<GanttBar>>> getAllGanttBars() {
+        ApiResponse<HashSet<GanttBar>> apiResponse = ApiResponse.<HashSet<GanttBar>>builder()
+                .success(true)
+                .message("Get all gantt bars successfully")
+                .payload(ganttBarService.getAllGanttBars())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }

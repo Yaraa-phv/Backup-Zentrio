@@ -13,17 +13,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/achievements")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class AchievementController {
+
     private final AchievementService achievementService;
 
-
     @Operation(summary = "Get achievement", description = "Get achievement for a user")
-    @GetMapping
+    @GetMapping("/current")
     ResponseEntity<ApiResponse<Achievement>> getAllAchievementsByCurrentUser() {
         ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
                 .success(true)
@@ -60,5 +62,18 @@ public class AchievementController {
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @Operation(summary = "Get all achievement ",description = "Get all achievement")
+    @GetMapping
+    public ResponseEntity<ApiResponse<Achievement>> getAllAchievements() {
+        ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
+                .success(true)
+                .message("Get all achievement successfully")
+                .payload(achievementService.getAllAchievements())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }

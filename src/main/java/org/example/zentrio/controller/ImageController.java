@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("api/v1/files")
 @RequiredArgsConstructor
-@Tag(name = "File Controller")
-public class FileController {
+@Tag(name = "Image Controller")
+public class ImageController {
     private final FileService fileService;
 
     @Operation(summary = "Upload a file", description = "Uploads a file and returns metadata about the uploaded file.")

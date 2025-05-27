@@ -40,8 +40,9 @@ public interface AppUserRepository {
 
     @Select("""
         UPDATE users SET is_verified = true
+        WHERE user_id = #{userId}
     """)
-    void updateVerify();
+    void updateVerify(UUID userId);
 
     @Select("""
         SELECT users.user_id FROM users WHERE email = #{email}

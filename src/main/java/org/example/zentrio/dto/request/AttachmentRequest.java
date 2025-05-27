@@ -13,8 +13,6 @@ import java.util.Map;
 @Builder
 @ToString
 public class AttachmentRequest {
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     @NotNull
     @Size(min = 1, max = 100)

@@ -46,4 +46,10 @@ public interface AchievementRepository {
     """)
     @ResultMap("achievementMapper")
     Achievement getAllAchievementByCurrentUser(UUID userId);
+
+    @Select("""
+        SELECT * FROM achievements
+    """)
+    @ResultMap("achievementMapper")
+    Achievement getAllAchievements();
 }

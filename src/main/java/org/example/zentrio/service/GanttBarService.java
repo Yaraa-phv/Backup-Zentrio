@@ -1,25 +1,26 @@
 package org.example.zentrio.service;
 
-import jakarta.validation.Valid;
+
+
 import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.model.GanttBar;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
 
 public interface GanttBarService {
-    GanttBar createGanttBar(UUID ganttBarId, GanttBarRequest ganttBarRequest);
+    GanttBar createGanttBarByGanttChartId(GanttBarRequest ganttBarRequest);
 
-    List<GanttBar> getAllGanttBarByGanttChartID(UUID ganttChartId);
+    GanttBar getGanttBarById(UUID ganttBarId, UUID ganttChartId);
+
+    HashSet<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId);
+
+    GanttBar updateGanttBarByGanttBarId(GanttBarRequest ganttBarRequest, UUID ganttBarId);
+
+    void deleteGanttBarByGanttBarId(UUID ganttBarId,UUID ganttChartId);
 
 
-    GanttBar getGanttBarByGanttBartID(UUID ganttBarId);
+    HashSet<GanttBar> getAllGanttBarsForCurrentUser();
 
-
-    GanttBar updateGanttBarByGanttBarId(UUID ganttBarId,  GanttBarRequest ganttBarRequest);
-
-    void deleteGanttBarByGanttBarId(UUID ganttBarId);
-
-    GanttBar getGanttBarByGanttChartIdAndGanttBarId(UUID ganttChartId, UUID ganttBarId);
-
+    HashSet<GanttBar> getAllGanttBars();
 }

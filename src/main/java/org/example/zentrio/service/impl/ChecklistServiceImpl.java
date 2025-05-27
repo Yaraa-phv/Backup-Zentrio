@@ -1,8 +1,12 @@
 package org.example.zentrio.service.impl;
 
+import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ForbiddenException;
@@ -11,15 +15,18 @@ import org.example.zentrio.model.*;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.ChecklistService;
 import org.example.zentrio.service.TaskService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.management.relation.Role;
+import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +37,10 @@ public class ChecklistServiceImpl implements ChecklistService {
     private final TaskRepository taskRepository;
     private final RoleRepository roleRepository;
     private final BoardRepository boardRepository;
-    private final MemberRepository memberRepository;
-    private  final CalendarRepository calendarRepository;
+    private final MinioClient minioClient;
+
+    @Value("${minio.bucket.name}")
+    private String bucketName;
 
 
     private void validateChecklistWithTaskTime(ChecklistRequest checklistRequest, Task task) {
@@ -70,59 +79,85 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     private void validateChecklistAccess(UUID taskId, UUID boardId, UUID userId) {
-        // Get roles again to check if Leader specific rules apply
+//      Fetch all roles assigned to the user for the board
         List<String> roles = roleRepository.getRolesNameByBoardIdAndUserId(boardId, userId);
+        roles = filterRoles(roles);
+
+//      Manager — full access
+        if (roles.contains(RoleName.ROLE_MANAGER.toString())) {
+            return;
+        }
+
+//      Leader — limited access (only to their own tasks)
         if (roles.contains(RoleName.ROLE_LEADER.toString())) {
             UUID leaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+            // Fetch the task
             Task task = taskService.getTaskById(taskId);
             if (task == null) {
                 throw new NotFoundException("Task with ID " + taskId + " not found.");
             }
+
+            // Validate that the leader created the task
             if (!task.getCreatedBy().equals(leaderMemberId)) {
                 throw new ForbiddenException("Team Leader can only manage checklists for tasks they created.");
             }
+
+            return;
         }
-        // Managers have full access, no further check needed
+
+//      Member — no permission
+        if (roles.contains(RoleName.ROLE_MEMBER.toString())) {
+            throw new ForbiddenException("Members are not allowed to create or manage checklists.");
+        }
+
+//      No valid role
+        throw new ForbiddenException("You do not have permission to manage checklists.");
     }
 
 
+    public List<String> filterRoles(List<String> roles) {
+        // If manager is present, return only manager
+        if (roles.contains(RoleName.ROLE_MANAGER.toString())) {
+            return List.of(RoleName.ROLE_MANAGER.toString());
+        }
+
+        // Otherwise, return unique leader and member roles only
+        return roles.stream()
+                .filter(role -> role.equals(RoleName.ROLE_LEADER.toString()) || role.equals(RoleName.ROLE_MEMBER.toString()))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
 
     @Override
-    public Checklist createChecklist(ChecklistRequest checklistRequest, UUID taskId) {
+    public Checklist createChecklist(ChecklistRequest checklistRequest) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        Task task = taskService.getTaskById(taskId);
+        Task task = taskService.getTaskById(checklistRequest.getTaskId());
+        validateChecklistAccess(checklistRequest.getTaskId(), task.getBoardId(), userId);
         validateChecklistWithTaskTime(checklistRequest, task);
-        //validateChecklistAccess(taskId,task.getBoardId(),userId);
-        String role = memberRepository.getRoleInTask(task.getBoardId(), userId , task.getTaskId());
-        Checklist checklist = new Checklist();
-        System.out.println(role);
-        if (role == null) {
-            throw new ForbiddenException("You don't have permission to perform this Task.");
-        }
-        if (role.equals(RoleName.ROLE_LEADER.name())) {
-            UUID teamLeadId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, task.getBoardId());
-            if(teamLeadId == null){
-                throw new ForbiddenException("You are not a teamLead of this board");
-            }else {
-                checklist= checklistRepository.createChecklist(checklistRequest, taskId,teamLeadId);
-            }
-        }
-        if (role.equals(RoleName.ROLE_MANAGER.name())) {
-            UUID pmId = memberRepository.getPmId(userId, task.getBoardId());
-            if(pmId == null){
-                throw new ForbiddenException("You are not a leader of this board");
-            }
-            checklist= checklistRepository.createChecklist(checklistRequest, taskId,pmId);
+        List<String> roles = roleRepository.getRolesNameByBoardIdAndUserId(task.getBoardId(), userId);
+        roles = filterRoles(roles);
+        UUID memberId;
+        if (roles.contains(RoleName.ROLE_MANAGER.toString())) {
+            memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, task.getBoardId());
+        } else if (roles.contains(RoleName.ROLE_LEADER.toString())) {
+            memberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, task.getBoardId());
+        } else {
+            throw new ForbiddenException("You do not have permission to create checklist.");
         }
 
-        return checklist;
+        if(memberId == null) {
+            throw new ForbiddenException("You're not a Manger or Leader in this board, can't create checklist");
+        }
+
+        return checklistRepository.createChecklist(checklistRequest, task.getTaskId(), memberId);
     }
 
     @Override
     public Checklist getChecklistChecklistId(UUID checklistId) {
         Checklist checklist = checklistRepository.getChecklistById(checklistId);
         if (checklist == null) {
-            throw new NotFoundException("Checklist with ID " + checklistId + " not found!");
+            throw new BadRequestException("Checklist with ID " + checklistId + " not found!");
         }
         return checklist;
     }
@@ -146,81 +181,136 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
-    public Checklist updateChecklistByIdAndTaskId(ChecklistRequest checklistRequest, UUID checklistId, UUID taskId) {
+    public Checklist updateChecklistByIdAndTaskId(ChecklistRequest checklistRequest, UUID checklistId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        Task task = taskService.getTaskById(taskId);
-        validateChecklistIdAndTaskId(checklistId, taskId);
-        validateChecklistWithTaskTime(checklistRequest,task);
-        //validateChecklistAccess(taskId,task.getBoardId(), userId);
-        Checklist checklist= new   Checklist();
-
-        String role = memberRepository.getRoleInTask(task.getBoardId(), userId, task.getTaskId());
-        if (role == null) {
-            throw new ForbiddenException("You don't have permission to perform this Task.");
-        }
-        if (role.equals(RoleName.ROLE_LEADER.name()) || role.equals(RoleName.ROLE_MANAGER.name())) {
-            checklist= checklistRepository.deleteChecklistByIdAndTaskId(checklistId,taskId);
-
-        }
-
-
-        return checklist;
+        Task task = taskService.getTaskById(checklistRequest.getTaskId());
+        validateChecklistIdAndTaskId(checklistId, checklistRequest.getTaskId());
+        validateChecklistWithTaskTime(checklistRequest, task);
+        validateChecklistAccess(checklistRequest.getTaskId(), task.getBoardId(), userId);
+        return checklistRepository.updateChecklistByIdAndTaskId(checklistRequest, checklistId, checklistRequest.getTaskId());
     }
 
     @Override
     public Checklist deleteChecklistByIdAndTaskId(UUID checklistId, UUID taskId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         Task task = taskService.getTaskById(taskId);
+        validateChecklistAccess(taskId, task.getBoardId(), userId);
         validateChecklistIdAndTaskId(checklistId, taskId);
-        //validateChecklistAccess(taskId,task.getBoardId(), userId);
-        Checklist checklist= new Checklist();
-        System.out.println( "task"+task.getTaskId());
-        System.out.println("user id"+userId);
-        System.out.println("board Id"+task.getBoardId());
-        String role = memberRepository.getRoleInTask(task.getBoardId(), userId, task.getTaskId());
-        if (role == null) {
-                throw new ForbiddenException("You don't have permission to perform this Task.");
-        }
-        if (role.equals(RoleName.ROLE_LEADER.name()) || role.equals(RoleName.ROLE_MANAGER.name())) {
-            checklist= checklistRepository.deleteChecklistByIdAndTaskId(checklistId,taskId);
-
-        }
-        return checklist;
+        return checklistRepository.deleteChecklistByIdAndTaskId(checklistId, taskId);
     }
-    //not work correct yet should provide member id not user_id
+
     @Override
     public void assignMemberToChecklist(UUID checklistId, UUID taskId, UUID assignedBy, UUID assignedTo) {
         validateChecklistIdAndTaskId(checklistId, taskId);
         Task task = taskService.getTaskById(taskId);
- //       UUID userID = memberRepository.getUserId(assignedTo, task.getTaskId());
-//        if (userID == null) {
-//            throw new ForbiddenException("User with ID " + assignedTo + " is not  member.");
-//        }
+
         System.out.println("assignBy " + assignedBy);
 
         // can replace taskRepository to memberRepository
-        UUID assignerId = taskRepository.findMemberIdByUserIdAndTaskId(assignedBy,taskId);
+        UUID assignerId = taskRepository.getMemberIdByUserIdAndTaskId(assignedBy, taskId);
         System.out.println("assignerId: " + assignerId);
 
-        String roleName = roleRepository.getRoleLeaderNameByBoardIdAndUserId(task.getBoardId(),assignedBy);
-        if(roleName == null || !roleName.equals(RoleName.ROLE_LEADER.toString())){
-            throw new ForbiddenException("User with id " + assignedBy + " are not the leader of this task can't be assigned to this checklist");
+        String roleName = roleRepository.getRoleLeaderNameByBoardIdAndUserId(task.getBoardId(), assignedBy);
+        if (roleName == null || !roleName.equals(RoleName.ROLE_LEADER.toString())) {
+            throw new ForbiddenException("User with id " + assignedTo + " are not the leader of this task can't be assigned to this checklist");
         }
 
         // can replace checklistRepository to memberRepository
-        UUID assigneeId = checklistRepository.findMemberIdByBoardIdAndUserId(task.getBoardId(),assignedTo);
+        UUID assigneeId = checklistRepository.findMemberIdByBoardIdAndUserId(task.getBoardId(), assignedTo);
         System.out.println("assigneeId: " + assigneeId);
-        if(assigneeId == null){
+        if (assigneeId == null) {
             throw new NotFoundException("You are not a member of this board can't be assigned to this checklist");
         }
 
-        if(checklistRepository.checklistIsAssigned(checklistId,assigneeId)){
+        if (checklistRepository.checklistIsAssigned(checklistId, assigneeId)) {
             throw new BadRequestException("Member with ID " + assigneeId + " is already assigned to this checklist");
         }
-        checklistRepository.insertToChecklistAssignment(checklistId,assignerId,assigneeId);
-
-      //  checklistRepository.createCalendar(assignedTo, checklistId, task.getBoardId());
+        checklistRepository.insertToChecklistAssignment(checklistId, assignerId, assigneeId);
     }
 
+
+
+    @SneakyThrows
+    @Override
+    public FileMetadata uploadChecklistCoverImage(UUID checklistId, MultipartFile file) {
+        getChecklistChecklistId(checklistId);
+        List<String> imageExtensions = new ArrayList<>();
+
+        for (ImageExtension imageExtension : ImageExtension.values()) {
+            imageExtensions.add(imageExtension.getExtension());
+        }
+
+        if (!imageExtensions.contains(StringUtils.getFilenameExtension(file.getOriginalFilename()))) {
+            throw new BadRequestException("Profile image must be a valid image URL ending with .png, .svg, .jpg, .jpeg, or .gif");
+        }
+
+        boolean bucketExits = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+
+        if (!bucketExits) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+        }
+
+        String fileName = file.getOriginalFilename();
+        fileName = UUID.randomUUID() + "." + StringUtils.getFilenameExtension(fileName);
+        checklistRepository.updateCover(checklistId, fileName);
+
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(fileName)
+                        .contentType(file.getContentType())
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .build()
+        );
+
+        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/v1/checklists/" + fileName)
+                .toUriString();
+
+        return FileMetadata.builder()
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .fileType(file.getContentType())
+                .fileSize(file.getSize())
+                .build();
+    }
+
+
+    @Override
+    public InputStream getFileByFileName(UUID checklistId,String fileName) {
+        getChecklistChecklistId(checklistId);
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(fileName)
+                            .build()
+            );
+        } catch (ErrorResponseException e) {
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
+                throw new NotFoundException("File not found: " + fileName);
+            }
+            throw new RuntimeException("MinIO error", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error accessing MinIO", e);
+        }
+    }
+
+    @Override
+    public void updateStatusOfChecklistById(UUID checklistId) {
+        getChecklistChecklistId(checklistId);
+        checklistRepository.updateStatusOfChecklistById(checklistId);
+    }
+
+    @Override
+    public HashSet<Checklist> getAllChecklists() {
+        return checklistRepository.getAllChecklists();
+    }
+
+    @Override
+    public HashSet<Checklist> getAllChecklistsByCurrentUser() {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        return checklistRepository.getAllChecklistsByCurrentUser(userId);
+    }
 
 }

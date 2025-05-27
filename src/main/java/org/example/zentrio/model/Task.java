@@ -24,6 +24,4 @@ public class Task {
     private UUID createdBy;
     private UUID boardId;
     private UUID ganttBarId;
-
-
 }

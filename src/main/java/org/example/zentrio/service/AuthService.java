@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.zentrio.dto.request.*;
 import org.example.zentrio.dto.response.AppUserResponse;
 import org.example.zentrio.dto.response.TokenResponse;
+import org.example.zentrio.enums.Verification;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -15,9 +16,9 @@ public interface AuthService {
 
     TokenResponse login(AuthRequest request);
 
-    void verify(String email, String otp);
+    void verify(String email, String otp, Verification type);
 
-    void resend(String email);
+    void resend(String email, Verification type);
 
     UUID getCurrentAppUserId();
 
@@ -27,7 +28,5 @@ public interface AuthService {
 
     ResetPasswordRequest resetPassword(ResetPasswordRequest request,String email);
 
-    void otpResetPassword(String email);
 
-    void verifyReset(String email, String otp);
 }
