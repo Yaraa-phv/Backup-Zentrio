@@ -2,6 +2,7 @@ package org.example.zentrio.service;
 
 import com.google.api.services.drive.model.File;
 import org.example.zentrio.dto.response.Res;
+import org.example.zentrio.enums.FileTypes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,11 +19,11 @@ public interface FileUploadService {
 
     void deleteFileById(String accessToken, String fileId) throws GeneralSecurityException, IOException;
 
-    File createDriveFile(String accessToken, String name, String type, String folderId) throws GeneralSecurityException, IOException;
+    File createDriveFile(String accessToken, String name, FileTypes type, String folderId) throws GeneralSecurityException, IOException;
 
     File renameDriveFile(String accessToken, String fileId, String newName) throws GeneralSecurityException, IOException;
 
     Res uploadImageToRootDrive(String accessToken, MultipartFile multipartFile) throws GeneralSecurityException, IOException;
 
-    Res uploadImageToFolderDrive(String accessToken, String folderId, MultipartFile multipartFile) throws GeneralSecurityException, IOException;
+    Res uploadFileToFolderDrive(String accessToken, String folderId, MultipartFile multipartFile) throws GeneralSecurityException, IOException;
 }

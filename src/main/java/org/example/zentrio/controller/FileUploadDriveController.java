@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.Res;
+import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.service.FileUploadService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -89,11 +90,11 @@ public class FileUploadDriveController {
 
 
 
-    @PostMapping("/create")
+    @PostMapping("/create/{file-type}")
     public ResponseEntity<ApiResponse<File>> createDriveFile(
             @RequestParam("accessToken") String accessToken,
             @RequestParam("name") String name,
-            @RequestParam("type") String type, // e.g., doc, sheet, slide
+            @PathVariable("file-type") FileTypes type, // e.g., doc, sheet, slide
             @RequestParam(value = "folderId", required = false) String folderId) throws GeneralSecurityException, IOException {
         ApiResponse<File> response =  ApiResponse.<File>builder()
                 .success(true)
@@ -102,7 +103,7 @@ public class FileUploadDriveController {
                 .payload(fileService.createDriveFile(accessToken, name, type, folderId))
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
 
 
 //        try {
@@ -127,7 +128,7 @@ public class FileUploadDriveController {
                 .success(true)
                 .message("rename file  successfully ")
                 .payload(fileService.renameDriveFile(accessToken, fileId, newName))
-                .status(HttpStatus.ACCEPTED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);
@@ -171,7 +172,7 @@ public class FileUploadDriveController {
         ApiResponse<Res> response =  ApiResponse.<Res>builder()
                 .success(true)
                 .message("file create successfully ")
-                .payload(fileService.uploadImageToFolderDrive(accessToken, folderId, multipartFile))
+                .payload(fileService.uploadFileToFolderDrive(accessToken, folderId, multipartFile))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();

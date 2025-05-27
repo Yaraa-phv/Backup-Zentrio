@@ -9,6 +9,7 @@ import com.google.api.services.drive.model.FileList;
 import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.response.Res;
+import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.service.FileUploadService;
@@ -94,10 +95,9 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
     @Override
-    public File createDriveFile(String accessToken, String name, String userInputType, String folderId) throws GeneralSecurityException, IOException {
-
+    public File createDriveFile(String accessToken, String name, FileTypes userInputType, String folderId) throws GeneralSecurityException, IOException {
         // Convert user input to official Google MIME type
-        String mimeType = getGoogleMimeType(userInputType);
+        String mimeType = getGoogleMimeType(userInputType.toString());
 
         Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
@@ -222,10 +222,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             case "slide":
             case "presentation":
                 return "application/vnd.google-apps.presentation";
-            case "drawing":
-                return "application/vnd.google-apps.drawing";
-            case "form":
-                return "application/vnd.google-apps.form";
             case "folder":
                 return "application/vnd.google-apps.folder";
             default:
@@ -270,41 +266,65 @@ public class FileUploadServiceImpl implements FileUploadService {
         return res;
     }
 
+
+
     @Override
-    public Res uploadImageToFolderDrive(String accessToken, String folderId, MultipartFile imageFile) throws GeneralSecurityException, IOException {
-        Res res = new Res();
+    public Res uploadFileToFolderDrive(String accessToken, String folderId, MultipartFile file)
+            throws GeneralSecurityException, IOException {
+
+        // Validate file name
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new BadRequestException("Invalid file name.");
+        }
+
+        // Validate file extension and map to Google MIME type
+        String extension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
+
+        String googleMimeType = switch (extension) {
+            case "doc", "docx" -> "application/vnd.google-apps.document";
+            case "xls", "xlsx" -> "application/vnd.google-apps.spreadsheet";
+            case "ppt", "pptx" -> "application/vnd.google-apps.presentation";
+            default -> throw new BadRequestException("Unsupported file type: " + extension);
+        };
+
         Drive drive = documentService.createDriveService(accessToken);
 
+        try (InputStream inputStream = file.getInputStream()) {
 
-        // Prepare file metadata: set the file name and the parent folder ID
-        File fileMetadata = new File();
-        fileMetadata.setName(imageFile.getOriginalFilename());
-        fileMetadata.setParents(Collections.singletonList(folderId)); // put the file in the specified folder
+            File fileMetadata = new File();
+            fileMetadata.setName(originalFilename);
+            fileMetadata.setMimeType(googleMimeType); // Tell Google to convert
+            fileMetadata.setParents(Collections.singletonList(folderId));
 
-        try (InputStream inputStream = imageFile.getInputStream()) {
-            // Prepare media content from the MultipartFile without writing a temp file
-            InputStreamContent mediaContent = new InputStreamContent(imageFile.getContentType(), inputStream);
-            mediaContent.setLength(imageFile.getSize());
+            // This is the original MIME type of the file (e.g. docx, xlsx, etc.)
+            String originalMimeType = file.getContentType();
+            InputStreamContent mediaContent = new InputStreamContent(originalMimeType, inputStream);
+            mediaContent.setLength(file.getSize());
 
-            // Create the file in Drive with the given metadata and content
-            File uploadedFile = drive.files().create(fileMetadata, mediaContent)
-                    .setFields("id")
+            File uploadedFile = drive.files()
+                    .create(fileMetadata, mediaContent)
+                    .setFields("id, webViewLink")
                     .execute();
 
-            String imageUrl = "https://drive.google.com/uc?export=view&id=" + uploadedFile.getId();
+            if (uploadedFile == null || uploadedFile.getId() == null) {
+                throw new RuntimeException("Upload failed — Google Drive did not return a file ID.");
+            }
 
+            String fileUrl = uploadedFile.getWebViewLink();
+
+            Res res = new Res();
             res.setStatus(201);
-            res.setMessage("Image successfully uploaded to My Drive.");
-            res.setUrl(imageUrl);
+            res.setMessage("File successfully uploaded and converted.");
+            res.setUrl(fileUrl);
+
+            return res;
+
         } catch (GoogleJsonResponseException e) {
             e.printStackTrace();
-            res.setStatus(500);
-            res.setMessage("Upload failed: " + e.getMessage());
-            throw e;
+            throw new BadRequestException("Upload failed: " + e.getMessage());
         }
-        return res;
     }
-
 
 
 

@@ -85,11 +85,11 @@ public class DocumentController {
 
 
 
-    @PostMapping(value = "/{document-id}/"  ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "boards/{board-id}/"  ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Create document by upload")
     public ResponseEntity<ApiResponse<Document>> uploadDocument(@RequestParam String accessToken,
                                                                 @RequestParam MultipartFile multipartFile,
-                                                                @PathVariable("document-id")  UUID boardId)
+                                                                @PathVariable("board-id")  UUID boardId)
             throws IOException, GeneralSecurityException {
         ApiResponse<Document> response =  ApiResponse.<Document>builder()
                 .success(true)
