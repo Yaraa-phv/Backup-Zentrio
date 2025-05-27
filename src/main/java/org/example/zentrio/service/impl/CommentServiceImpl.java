@@ -161,46 +161,6 @@ public class CommentServiceImpl implements CommentService {
         }
         return role.equals(RoleName.ROLE_MANAGER.name()) || role.equals(RoleName.ROLE_LEADER.name());
     }
-//    @Override
-//    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
-//        Comment comment = getCommentByCommentId(commentId);
-//        Checklist checklist = checklistService.getChecklistChecklistId(comment.getChecklistId());
-//        Task task = taskService.getTaskById(checklist.getTaskId());
-//
-//        if (!canModifyComment(comment, task)) {
-//            throw new BadRequestException("You don't have permission to update this comment");
-//        }
-//
-//        // Additional checks if needed for team lead or PM ownership
-//        String role = memberRepository.getRoleInTask(task.getBoardId(), userId(), task.getTaskId());
-//        if (role != null && (role.equals(RoleName.ROLE_MANAGER.name()) || role.equals(RoleName.ROLE_LEADER.name()))) {
-//            UUID teamLeadId = memberRepository.getTeamleadUUID(userId(), checklist.getTaskId());
-//            UUID pmId = memberRepository.getPmId(userId(), task.getBoardId());
-//
-//            if (teamLeadId != null && !teamLeadId.equals(comment.getMemberId())) {
-//                throw new BadRequestException("This Comment does not belong to your team lead");
-//            }
-//            if (pmId != null && !pmId.equals(comment.getMemberId())) {
-//                throw new BadRequestException("This Comment does not belong to your PM");
-//            }
-//        }
-//
-//        return commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-//    }
-
-//    @Override
-//    public Comment UpdateCommentByCommentId(UUID commentId, CommentRequest commentRequest) {
-//        Comment comment = getCommentByCommentId(commentId);  // fetch comment
-//
-//        if (!comment.getMemberId().equals(userId())) {
-//            throw new BadRequestException("You do not have permission to update this comment because you do not own it.");
-//        }
-//
-//        return commentRepository.UpdateCommentByCommentId(commentId, commentRequest);
-//    }
-
-
-
 
 
 }

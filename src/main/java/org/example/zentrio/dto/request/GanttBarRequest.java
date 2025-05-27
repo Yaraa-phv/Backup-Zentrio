@@ -30,7 +30,7 @@ public class GanttBarRequest {
     @FutureOrPresent
     private LocalDateTime finishedAt;
 
-
+    @NotNull
     private UUID ganttChartId;
 
 

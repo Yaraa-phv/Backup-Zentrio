@@ -21,6 +21,6 @@ public class GanttBar {
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
     private UUID ganttChartId;
-    private List<MemberResponse> teamLead;
+    private List<MemberResponse> teamLeader;
 
 }

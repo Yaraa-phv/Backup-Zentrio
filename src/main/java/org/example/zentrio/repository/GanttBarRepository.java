@@ -20,7 +20,7 @@ public interface GanttBarRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
-            @Result(property = "ganttChartId", column = "gantt_chart_id"),
+            @Result(property = "ganttChartId", column = "gantt_chart_id")
     })
     GanttBar createGanttBarByGanttChartId(@Param("request") GanttBarRequest ganttBarRequest, UUID ganttChartId);
 

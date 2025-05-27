@@ -32,7 +32,7 @@ public class GanttChartServiceImpl implements GanttChartService {
 
         Board board = boardRepository.getBoardByBoardId(ganttChartRequest.getBoardId());
         if (board == null) {
-            throw new NotFoundException("Board not found");
+            throw new NotFoundException("Board id " + ganttChartRequest.getBoardId() + " not found");
         }
         UUID memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, board.getBoardId());
         if (memberId == null) {
@@ -58,6 +58,10 @@ public class GanttChartServiceImpl implements GanttChartService {
 
     @Override
     public GanttChart getGanttChartById(UUID ganttChartId, UUID boardId) {
+        Board board = boardRepository.getBoardByBoardId(boardId);
+        if (board == null) {
+            throw new NotFoundException("Board id " + boardId + " not found");
+        }
         GanttChart ganttChart = ganttChartRepository.getGanttChartByIdAndBoardId(ganttChartId, boardId);
         if (ganttChart == null) {
             throw new NotFoundException("Gantt chart with " + ganttChartId + " not found");
@@ -86,7 +90,7 @@ public class GanttChartServiceImpl implements GanttChartService {
     public GanttChart getAllGanttChartByBoardId(UUID boardId) {
         Board board = boardRepository.getBoardByBoardId(boardId);
         if (board == null) {
-            throw new NotFoundException("Board not found");
+            throw new NotFoundException("Board id " +boardId + " not found");
         }
         return ganttChartRepository.getAllGanttChartByBoardId(boardId);
     }

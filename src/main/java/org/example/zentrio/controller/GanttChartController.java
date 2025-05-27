@@ -100,7 +100,7 @@ public class GanttChartController {
     }
 
 
-    @Operation(summary = "Get gantt chart by ID with current users",description = "Get gantt chart by ID with current users")
+    @Operation(summary = "Get gantt chart with current users",description = "Get gantt chart by ID with current users")
     @GetMapping("/current")
     public ResponseEntity<ApiResponse<GanttChart>> getGanttChartByCurrentUser() {
         ApiResponse<GanttChart> apiResponse = ApiResponse.<GanttChart>builder()
