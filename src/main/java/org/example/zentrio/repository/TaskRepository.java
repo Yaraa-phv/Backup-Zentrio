@@ -30,7 +30,7 @@ public interface TaskRepository {
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
             @Result(property = "createdBy", column = "created_by"),
             @Result(property = "creator", column = "created_by",
-            one = @One(select = "getDataOfUserCreator")),
+                    one = @One(select = "getDataOfUserCreator")),
 
     })
     @Select("""
@@ -165,15 +165,20 @@ public interface TaskRepository {
 
 
     @Select("""
-                SELECT * FROM tasks
-                WHERE task_id = #{taskId}
-                AND user_id = #{userId}
+                SELECT t.*
+                FROM tasks t
+                INNER JOIN members m ON t.created_by = m.member_id
+                WHERE t.task_id = #{taskId}
+                AND m.user_id = #{userId}
             """)
     @ResultMap("taskMapper")
     Task getTaskByIdAndUserId(UUID taskId, UUID userId);
 
     @Select("""
-                SELECT tasks.* FROM tasks WHERE created_by = #{userId}
+                SELECT t.*
+                FROM tasks t
+                INNER JOIN members m ON t.created_by = m.member_id
+                WHERE m.user_id = #{userId}
             """)
     @ResultMap("taskMapper")
     HashSet<Task> getAllTasksForCurrentUser(UUID userId);
@@ -190,11 +195,10 @@ public interface TaskRepository {
                 WHERE m.member_id = #{userId}
             """)
     @Results(id = "memberMapper", value = {
-            @Result(property = "username",column = "username"),
-            @Result(property = "imageUrl",column = "profile_image")
+            @Result(property = "username", column = "username"),
+            @Result(property = "imageUrl", column = "profile_image")
     })
     MemberResponseData getDataOfUserCreator(UUID userId);
-
 
 
 }

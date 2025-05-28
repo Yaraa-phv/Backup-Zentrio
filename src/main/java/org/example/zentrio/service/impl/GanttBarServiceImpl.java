@@ -37,12 +37,7 @@ public class GanttBarServiceImpl implements GanttBarService {
         if(memberId == null) {
             throw new ForbiddenException("You're not a manager of this board can't create Gantt bar");
         }
-        if (ganttBarRequest.getStartedAt() == null || ganttBarRequest.getFinishedAt() == null) {
-            throw new BadRequestException("Start and finish times are required");
-        }
-        if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
-            throw new BadRequestException("GanttBar already finished");
-        }
+
         return ganttBarRepository.createGanttBarByGanttChartId(ganttBarRequest, ganttBarRequest.getGanttChartId());
     }
 

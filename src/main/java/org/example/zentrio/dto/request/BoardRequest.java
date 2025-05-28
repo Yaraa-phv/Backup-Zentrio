@@ -24,6 +24,6 @@ public class BoardRequest {
 
     private String cover;
 
-
+    @NotNull
     private UUID workspaceId;
 }
