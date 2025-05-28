@@ -28,7 +28,7 @@ public class GanttBarController {
     private final GanttBarService ganttBarService;
 
     @Operation(summary = "Create gantt bars with gantt chart ID", description = "Created gantt bars with specific gantt charts ID")
-    @PostMapping("/gantt-charts/{gantt-chart-id}")
+    @PostMapping("/gantt-charts")
     public ResponseEntity<ApiResponse<GanttBar>> createGanttBarByGanttChartId(
             @Valid @RequestBody GanttBarRequest ganttBarRequest) {
         ApiResponse<GanttBar> apiResponse = ApiResponse.<GanttBar>builder()
@@ -70,7 +70,7 @@ public class GanttBarController {
     }
 
     @Operation(summary = "Update gantt bar by ID AND gantt chart ID", description = "Updated gantt bars by ID with current gantt charts")
-    @PutMapping("/{gantt-bar-id}/ganttCharts/{gantt-chart-id}")
+    @PutMapping("/{gantt-bar-id}/ganttCharts/")
     public ResponseEntity<ApiResponse<GanttBar>> updateGanttBarByGanttBarId(
             @Valid @RequestBody GanttBarRequest ganttBarRequest,
             @PathVariable("gantt-bar-id") UUID ganttBarId) {

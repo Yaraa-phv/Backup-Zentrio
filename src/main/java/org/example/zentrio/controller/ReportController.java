@@ -10,15 +10,15 @@ import org.example.zentrio.dto.response.ChecklistResponse;
 import org.example.zentrio.model.AllMember;
 import org.example.zentrio.model.Report;
 import org.example.zentrio.service.ReportService;
+import org.example.zentrio.service.impl.PdfService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/v1/reports")
@@ -27,6 +27,7 @@ import java.util.UUID;
 @Tag(name = "Report Controller")
 public class ReportController {
     private final ReportService reportService;
+    private final PdfService   pdfService;
 
     @GetMapping("/boards/{board-id}")
     @Operation(summary = "Get report by board id")
@@ -98,5 +99,29 @@ public class ReportController {
 //                .build();
 //        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
 //    }
+
+@GetMapping("/pdf/boards/{board-id}")
+@Operation(summary = "Generate report as pdf file by board id")
+public ResponseEntity<byte[]> generateProjectReport(@PathVariable("board-id") UUID boardId) {
+    Report report = reportService.getReportByBoardId(boardId); // You parse JSON into this DTO
+
+    Map<String, Object> data = new HashMap<>();
+    data.put("boardName", report.getBoardName());
+    data.put("creationDate", report.getCreationDate());
+    data.put("version", report.getVersion());
+    data.put("allMembers", report.getAllMembers());
+    data.put("allTasks", report.getAllTasks());
+
+    byte[] pdf = pdfService.generatePdf("project-report", data); // Use your pdfService like before
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_PDF);
+    headers.setContentDispositionFormData("attachment", report.getBoardName() + "-report.pdf");
+
+    return ResponseEntity.ok()
+            .headers(headers)
+            .body(pdf);
+}
+
 
 }
