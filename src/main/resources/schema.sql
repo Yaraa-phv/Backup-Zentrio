@@ -55,7 +55,7 @@ CREATE TABLE gantt_charts (
                               title VARCHAR(255) NOT NULL,
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                               updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                              created_by UUID REFERENCES members(member_id) ON DELETE CASCADE  ON UPDATE CASCADE ,
+                                created_by UUID REFERENCES members(member_id) ON DELETE CASCADE  ON UPDATE CASCADE ,
                               board_id UUID UNIQUE REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );

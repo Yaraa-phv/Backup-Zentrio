@@ -3,6 +3,7 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.FeedbackRequest;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.enums.Stage;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
@@ -45,12 +46,17 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public Feedback createFeedback( UUID taskId, FeedbackRequest feedbackRequest) {
+    public Feedback createFeedback( FeedbackRequest feedbackRequest) {
 
-        Task task= taskRepository.getTaskByTaskId(taskId);
+        Task task= taskRepository.getTaskByTaskId(feedbackRequest.getTaskId());
+
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
+        if (!task.getStatus().equals(Stage.COMPLETED.name())){
+        throw new BadRequestException("Task is not completed");}
+
+        UUID taskId=task.getTaskId();
         userRole(task.getBoardId());
         UUID memberId = memberRepository.getPmId(userId(),task.getBoardId());
         if (memberId == null) {
@@ -77,7 +83,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback UpdateFeedbackById(UUID feedbackId, FeedbackRequest feedbackRequest) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId,feedbackRequest.getTaskId());
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
@@ -88,8 +94,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public Feedback getFeedbackById(UUID feedbackId) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+    public Feedback getFeedbackById(UUID feedbackId, UUID taskId) {
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId, taskId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
@@ -98,8 +104,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public void deleteFeedbackById(UUID feedbackId) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+    public void deleteFeedbackById(UUID feedbackId, UUID taskId) {
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId, taskId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }

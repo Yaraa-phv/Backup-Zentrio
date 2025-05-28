@@ -25,7 +25,7 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @Operation(summary = "Get calendar by board id",description = "Get calendar with tasks for current user")
+    @Operation(summary = "Get calendar by board id and user id",description = "Get calendar with tasks for current user")
     @GetMapping("/boards/{board_id}")
     public ResponseEntity<ApiResponse<HashSet<Checklist>>> getCalendarForCurrentUser( @PathVariable("board_id") UUID board_id) {
         HashSet<Checklist> calendarTasks = calendarService.getCalendarForCurrentUser(board_id);
@@ -43,10 +43,10 @@ public class CalendarController {
 
 
     @Operation(summary = "Create note in calendar",description = "Create calendar with tasks for current user")
-    @PostMapping("/checklists/{checklist-id}")
-    public ResponseEntity<ApiResponse<Calendar>> CreateNoteInCalendar( @PathVariable("checklist-id") UUID check_listId,
+    @PostMapping("/checklists")
+    public ResponseEntity<ApiResponse<Calendar>> CreateNoteInCalendar(
                                                                @Valid @RequestBody    CalendarRequest calendarRequest) {
-       Calendar calendarTasks = calendarService.CreateNoteInCalendar(check_listId, calendarRequest);
+       Calendar calendarTasks = calendarService.CreateNoteInCalendar( calendarRequest);
         ApiResponse<Calendar> apiResponse = ApiResponse.<Calendar>builder()
                 .success(true)
                 .message("Create note in  calendar by checklist id successfully")

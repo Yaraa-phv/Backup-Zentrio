@@ -38,10 +38,10 @@ public interface FeedbackRepository {
 
 
     @Select("""
-        SELECT * FROM feedbacks WHERE feedback_id=#{feedbackId}
+        SELECT * FROM feedbacks WHERE feedback_id= #{feedbackId} AND task_id= #{taskId}
         """)
     @ResultMap("feedbackMapper")
-    Feedback getFeedbackById(UUID feedbackId);
+    Feedback getFeedbackById(UUID feedbackId,  UUID taskId);
 
 
 

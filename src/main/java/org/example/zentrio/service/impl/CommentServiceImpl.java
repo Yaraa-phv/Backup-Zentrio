@@ -36,7 +36,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment createComment(UUID checklistId, CommentRequest commentRequest) {
+    public Comment createComment( CommentRequest commentRequest) {
+      UUID  checklistId= commentRequest.getChecklistId();
       Checklist checklist=  checklistService.getChecklistChecklistId(checklistId);
       Task task= taskService.getTaskById(checklist.getTaskId());
       UUID memberId = memberRepository.getMemberId(userId(),task.getBoardId());

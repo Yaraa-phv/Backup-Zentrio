@@ -13,8 +13,8 @@ import java.util.UUID;
 public interface GanttBarRepository {
 
     @Select("""
-                            INSERT INTO gantt_bars(title, started_at, finished_at, gantt_chart_id)
-                            VALUES (#{request.title}, #{request.startedAt}, #{request.finishedAt} , #{ganttChartId})
+                            INSERT INTO gantt_bars(title, started_at, finished_at, gantt_chart_id,face)
+                            VALUES (#{request.title}, #{request.startedAt}, #{request.finishedAt} , #{ganttChartId}, #{request.face})
                             RETURNING *
             """)
     @Results(id = "ganttBarMapper", value = {
@@ -23,6 +23,7 @@ public interface GanttBarRepository {
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
             @Result(property = "ganttChartId", column = "gantt_chart_id"),
+            @Result(property = "face", column = "face"),
             @Result(property = "teamLeader", column = "gantt_bar_id",
             many = @Many(select = "teamLeadGanttBar"))
 
@@ -44,7 +45,10 @@ public interface GanttBarRepository {
     HashSet<GanttBar> getAllGanttBarsByGanttChartId(UUID ganttChartId);
 
     @Select("""
-                UPDATE gantt_bars SET title = #{request.title}, started_at = #{request.startedAt}, finished_at = #{request.finishedAt}
+                UPDATE gantt_bars SET title = #{request.title}, 
+                                      started_at = #{request.startedAt}, 
+                                      finished_at = #{request.finishedAt},
+                                      face= #{request.face}
                 WHERE gantt_bar_id = #{ganttBarId}
                 AND gantt_chart_id = #{ganttChartId}
                 RETURNING *

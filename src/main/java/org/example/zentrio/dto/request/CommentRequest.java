@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,9 @@ public class CommentRequest {
     @NotBlank
     @NotNull
     private String content;
+
+    @NotNull
+    private UUID checklistId;
 
 
 }

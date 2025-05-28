@@ -32,15 +32,15 @@ public class CommentController {
     private final CommentService commentService;
 
 
-    @PostMapping("/checklist/{checklist-id}")
+    @PostMapping("/checklist/")
     @Operation(summary = "Create comment by checklist id")
     public ResponseEntity<ApiResponse<Comment>> createComment
-            (@PathVariable("checklist-id") UUID checklistId, @Valid @RequestBody CommentRequest commentRequest)
+            (@Valid @RequestBody CommentRequest commentRequest)
     {
         ApiResponse<Comment>  response= ApiResponse.<Comment>builder()
                 .success(true)
                 .message("Create comment by checklist id Successfully")
-                .payload(commentService.createComment(checklistId,commentRequest))
+                .payload(commentService.createComment(commentRequest))
                 .status(HttpStatus.CREATED)
                 .timestamp(LocalDateTime.now())
                 .build();
