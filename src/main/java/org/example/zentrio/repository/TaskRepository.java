@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.TaskRequest;
+import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.model.Task;
 
@@ -26,7 +27,7 @@ public interface TaskRepository {
             @Result(property = "stage", column = "stage"),
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
-            @Result(property = "createdBy", column = "created_by")
+            @Result(property = "createdBy", column = "created_by"),
     })
     @Select("""
             INSERT INTO tasks(title, description,started_at, finished_at, stage, board_id, gantt_bar_id, created_by)
@@ -89,7 +90,7 @@ public interface TaskRepository {
     List<Task> getTaskByTitleWithBoardId(String title, UUID boardId);
 
     @Select("""
-                INSERT INTO task_assignment(task_id, assigned_by, assigned_to)
+                INSERT INTO task_assignments(task_id, assigned_by, assigned_to)
                 VALUES (#{taskId}, #{assignerId}, #{assignToUserId})
             """)
     void insertTaskAssignment(UUID taskId, UUID assignerId, UUID assignToUserId);
@@ -97,7 +98,7 @@ public interface TaskRepository {
 
     @Select("""
             SELECT EXISTS (
-            SELECT 1 FROM task_assignment ta
+            SELECT 1 FROM task_assignments ta
             WHERE ta.task_id = #{taskId})
             """)
     boolean isAlreadyAssigned(UUID taskId);
@@ -105,7 +106,7 @@ public interface TaskRepository {
 
     @Select("""
                 SELECT m.member_id FROM members m
-                INNER JOIN task_assignment ta ON m.member_id = ta.assigned_to
+                INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
                 WHERE m.user_id = #{assignedBy}
                 AND ta.task_id = #{taskId}
             """)
@@ -153,7 +154,7 @@ public interface TaskRepository {
 
     @Select("""
         SELECT r.role_name FROM members m
-        INNER JOIN task_assignment ta ON m.member_id = ta.assigned_to
+        INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
         INNER JOIN roles r ON m.role_id = r.role_id
         WHERE ta.task_id = #{taskId}
     """)
@@ -179,4 +180,14 @@ public interface TaskRepository {
     """)
     @ResultMap("taskMapper")
     HashSet<Task> getAllTasks();
+
+
+    @Select("""
+        SELECT u.username, u.email, r.role_name FROM members m
+        INNER JOIN users u ON m.user_id = u.user_id
+        INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
+        INNER JOIN roles r ON m.role_id = r.role_id
+        WHERE ta.task_id = '1b8caf99-3739-464c-bd4e-7e8785254294'
+    """)
+    HashSet<MemberResponse> getLeaderInformation(UUID taskId);
 }

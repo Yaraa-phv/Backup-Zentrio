@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.dto.response.MemberResponseData;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +22,6 @@ public class GanttBar {
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
     private UUID ganttChartId;
-    private List<MemberResponse> teamLeader;
+    private List<MemberResponseData> teamLeader;
 
 }

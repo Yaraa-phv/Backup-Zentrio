@@ -13,17 +13,6 @@ import java.util.UUID;
 @Mapper
 public interface CalendarRepository {
 
-
-//    @Select("""
-//        SELECT t.title,t.task_id FROM task_assignment
-//        INNER JOIN tasks t ON task_assignment.task_id = t.task_id
-//        INNER JOIN members ON task_assignment.assigned_to = members.member_id
-//        INNER JOIN calendars c ON t.task_id = c.task_id
-//        WHERE c.user_id = #{userId}
-//    """)
-//    List<Calendar> getCalendarForCurrentUser(UUID userId);
-
-
     @Results(id = "checklistMapperCalender", value = {
             @Result(property = "checklistId", column = "checklist_id"),
             @Result(property = "title", column = "title"),
@@ -42,7 +31,7 @@ public interface CalendarRepository {
             -- checklist assignment
                      LEFT JOIN checklist_assignments ca ON ch.checklist_id = ca.checklist_id
             -- task assignment
-                     LEFT JOIN task_assignment tsa ON ta.task_id = tsa.task_id
+                     LEFT JOIN task_assignments tsa ON ta.task_id = tsa.task_id
             -- member info
                      JOIN members m ON m.user_id = #{userId} AND m.board_id = #{boardId}
             -- roles
@@ -53,7 +42,7 @@ public interface CalendarRepository {
                 ca.member_id = m.member_id
                -- or task involvement
                OR tsa.assigned_to = m.member_id
-               OR tsa.assigned_by = m.member_id;   
+               OR tsa.assigned_by = m.member_id
           
             """)
     List<Checklist> getCalendarTasksForUser(UUID userId, UUID boardId);

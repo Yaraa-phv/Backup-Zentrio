@@ -2,9 +2,11 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.GanttBarRequest;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.GanttBar;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Mapper
@@ -20,7 +22,10 @@ public interface GanttBarRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
-            @Result(property = "ganttChartId", column = "gantt_chart_id")
+            @Result(property = "ganttChartId", column = "gantt_chart_id"),
+            @Result(property = "teamLeader", column = "gantt_bar_id",
+            many = @Many(select = "teamLeadGanttBar"))
+
     })
     GanttBar createGanttBarByGanttChartId(@Param("request") GanttBarRequest ganttBarRequest, UUID ganttChartId);
 
@@ -77,4 +82,23 @@ public interface GanttBarRepository {
     """)
     @ResultMap("ganttBarMapper")
     HashSet<GanttBar> getAllGanttBars();
+
+
+    @Select("""
+        
+            SELECT us.username AS name,us.profile_image AS image
+        FROM gantt_bars g
+                 JOIN tasks ts ON ts.gantt_bar_id = g.gantt_bar_id
+                 JOIN task_assignments ta ON ta.task_id = ts.task_id
+                 JOIN members m ON m.member_id = ta.assigned_to
+                 JOIN roles r on r.role_id= m.role_id
+                 JOIN users us ON us.user_id = m.user_id
+        WHERE g.gantt_bar_id = #{ganttBarId};
+        """)
+    @Results(id = "teamLeadGanttBarMapper", value = {
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "username", column = "name"),
+    })
+    List<MemberResponseData> teamLeadGanttBar(UUID ganttBarId);
+
 }

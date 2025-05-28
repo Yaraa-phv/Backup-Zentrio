@@ -3,6 +3,7 @@ package org.example.zentrio.repository;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.CommentRequest;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Comment;
 
 import java.time.LocalDateTime;
@@ -66,9 +67,9 @@ public interface CommentRepository {
         """)
     @Results(id = "memberResponseMapper", value = {
             @Result(property = "imageUrl", column = "image"),
-            @Result(property = "userName", column = "name"),
+            @Result(property = "username", column = "name"),
     })
-    MemberResponse getMemberByUserId(UUID memberId);
+    MemberResponseData getMemberByUserId(UUID memberId);
 
 
 }
