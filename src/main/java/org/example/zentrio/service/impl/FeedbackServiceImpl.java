@@ -53,7 +53,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
-        if (!task.getStatus().equals(Stage.COMPLETED.name())){
+        if ( task.getStatus() == null ||  !task.getStatus().equals(Stage.COMPLETED.name())){
         throw new BadRequestException("Task is not completed");}
 
         UUID taskId=task.getTaskId();

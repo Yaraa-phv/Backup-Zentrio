@@ -29,9 +29,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
 
         String fileName = details.get("fileName");
-//        if (fileName == null || fileName.trim().isEmpty()) {
-//            throw new BadRequestException("Attachment fileName is required in details.");
-//        }
+        if (fileName == null || fileName.trim().isEmpty()) {
+            throw new BadRequestException("Attachment fileName is required in details.");
+        }
 
         if (!fileName.matches(".*\\.(pdf|docx|png|jpg|jpeg|xlsx)$")) {
             throw new BadRequestException("Invalid file type for: " + fileName);

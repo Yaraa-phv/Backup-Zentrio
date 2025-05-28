@@ -4,164 +4,402 @@
     <meta charset="UTF-8"/>
     <title th:text="${boardName} + ' - Project Report'">Project Report</title>
     <style>
-        :root {
-            --primary: #2d74da;
-            --secondary: #f1f5f9;
-            --accent: #e0ecff;
-            --text: #333;
-            --muted: #777;
-            --border: #e2e8f0;
-            --bg: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
             padding: 40px;
-            max-width: 960px;
-            margin: auto;
-            font-size: 14px;
-
-        }
-
-        h2, h3 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .header, .footer {
             text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            position: relative;
         }
 
-        .footer {
-            margin-top: 40px;
-            border-top: 1px solid var(--border);
-            font-size: 12px;
-            color: var(--muted);
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 2.5rem;
+            font-weight: bold;
         }
 
-        .meta {
-            color: var(--muted);
-            font-size: 13px;
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .content {
+            padding: 40px;
         }
 
         .section {
-            margin-top: 40px;
+            margin-bottom: 48px;
         }
 
-        ul {
-            list-style: none;
-            padding-left: 0;
+        .section-header {
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
         }
 
-        ul li::before {
-            content: "• ";
-            color: var(--primary);
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 0;
         }
 
-        table {
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .team-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .role-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+
+        .member-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .member-count .label {
+            font-size: 0.875rem;
+            font-weight: normal;
+            color: #94a3b8;
+            margin-left: 8px;
+        }
+
+        .tasks-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+        }
+
+        .tasks-table table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            box-shadow: 0 0 0 1px var(--border);
         }
 
-        th, td {
-            border: 1px solid var(--border);
-            padding: 12px 14px;
+        .table-header {
+            background: #2563eb;
+            color: white;
+        }
+
+        .table-header th {
+            padding: 20px 24px;
+            font-weight: bold;
             text-align: left;
+            font-size: 0.875rem;
+            text-transform: uppercase;
         }
 
-        th {
-            background: var(--secondary);
-            color: var(--text);
+        .table-body tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: var(--accent);
+        .table-body tr:hover {
+            background: #f8fafc;
         }
 
-        .checklist {
-            background: #f8faff;
-            border: 1px solid var(--accent);
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 8px;
+        .table-body tr:last-child {
+            border-bottom: none;
+        }
+
+        .table-body td {
+            padding: 20px 24px;
+            vertical-align: top;
+        }
+
+        .task-name {
+            font-weight: bold;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .task-total {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .checklist-container {
+            max-width: 400px;
+        }
+
+        .checklist-item {
+            background: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+            border: 1px solid #e0f2fe;
+            border-radius: 8px;
+            padding: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(45, 116, 218, 0.05);
+            transition: transform 0.2s ease;
         }
 
-        .checklist strong {
-            display: block;
-            color: var(--primary);
+        .checklist-item:hover {
+            transform: translateX(4px);
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checklist-title {
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .checklist-detail {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 6px;
+            font-size: 0.875rem;
         }
 
-        .label {
-            font-weight: 500;
-            color: #555;
+        .checklist-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #64748b;
+            min-width: 60px;
+        }
+
+        .detail-value {
+            color: #1e293b;
+            text-align: right;
+        }
+
+        .attachment-info {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #f1f5f9;
+            padding: 24px 40px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .header {
+                padding: 32px 24px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .meta-info {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header th,
+            .table-body td {
+                padding: 16px 12px;
+            }
+
+            .checklist-container {
+                max-width: none;
+            }
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${boardName}">Project Dashboard</h1>
+        <p class="subtitle">Comprehensive Project Report</p>
 
-<div class="header">
-    <h2 th:text="${boardName}">Project Name</h2>
-    <div class="meta">
-        <p th:text="'Created on: ' + ${creationDate}">Created on: ...</p>
-        <p th:text="'Version: ' + ${version}">Version: ...</p>
+        <div class="meta-info">
+            <div class="meta-item">
+                <div class="meta-label">Created</div>
+                <div class="meta-value" th:text="${creationDate}">March 15, 2024</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Version</div>
+                <div class="meta-value" th:text="${version}">v2.1.0</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value">
+                    <span class="status-badge">Active</span>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="section">
-    <h3>Team Roles</h3>
-    <ul>
-        <li th:each="member : ${allMembers}">
-            <span th:text="${member.roleName} + ': ' + member.total"></span>
-        </li>
-    </ul>
-</div>
+    <div class="content">
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Team Composition</h2>
+            </div>
 
-<div class="section">
-    <h3>Tasks Overview</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Task</th>
-            <th>Total</th>
-            <th>Checklists</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="task : ${allTasks}">
-            <td th:text="${task.task}">TO DO</td>
-            <td th:text="${task.total}">0</td>
-            <td>
-                <div th:each="cl : ${task.checklist}" class="checklist">
-                    <strong th:text="${cl.title}">Checklist Item</strong>
-                    <div><span class="label">Start:</span> <span th:text="${cl.startedAt}">...</span></div>
-                    <div><span class="label">Finish:</span> <span th:text="${cl.finishedAt}">...</span></div>
-                    <div th:if="${cl.attachments != null}">
-                        <span class="label">Attachment:</span>
-                        <span th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'"></span>
+            <div class="team-grid">
+                <div th:each="member : ${allMembers}" class="team-card">
+                    <div class="role-name" th:text="${#strings.replace(member.roleName, 'ROLE_', '')}">Leader</div>
+                    <div class="member-count">
+                        <span th:text="${member.total}">5</span>
+                        <span class="label">members</span>
                     </div>
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+            </div>
+        </div>
 
-<div class="footer">
-    <p>Report generated automatically by Project Reporting System</p>
-</div>
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Tasks Overview</h2>
+            </div>
 
+            <div class="tasks-table">
+                <table>
+                    <thead class="table-header">
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Total Items</th>
+                        <th>Checklist Details</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-body">
+                    <tr th:each="task : ${allTasks}">
+                        <td>
+                            <div class="task-name" th:text="${task.task}">Development Phase</div>
+                        </td>
+                        <td>
+                            <div class="task-total" th:text="${task.total}">12</div>
+                        </td>
+                        <td>
+                            <div class="checklist-container">
+                                <div th:each="cl : ${task.checklist}" class="checklist-item">
+                                    <div class="checklist-title" th:text="${cl.title}">Database Setup</div>
+
+                                    <div class="checklist-detail">
+                                        <span class="detail-label">Started:</span>
+                                        <span class="detail-value" th:text="${cl.startedAt}">Mar 10, 2024</span>
+                                    </div>
+
+                                    <div class="checklist-detail">
+                                        <span class="detail-label">Finished:</span>
+                                        <span class="detail-value" th:text="${cl.finishedAt}">Mar 15, 2024</span>
+                                    </div>
+
+                                    <div th:if="${cl.attachments != null}" class="checklist-detail">
+                                        <span class="detail-label">File:</span>
+                                        <span class="detail-value">
+                                                    <span class="attachment-info"
+                                                          th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'">
+                                                        document.pdf (2.5MB)
+                                                    </span>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Report generated automatically by Project Reporting System</p>
+    </div>
+</div>
 </body>
 </html>
