@@ -2,7 +2,6 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
-import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.enums.Status;
@@ -14,7 +13,6 @@ import org.example.zentrio.model.*;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.*;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +27,6 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final BoardService boardService;
-    private final GanttBarService ganttBarService;
     private final RoleRepository roleRepository;
     private final BoardRepository boardRepository;
     private final GanttBarRepository ganttBarRepository;

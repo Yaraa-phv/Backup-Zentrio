@@ -64,6 +64,7 @@ CREATE TABLE gantt_charts (
 CREATE TABLE gantt_bars (
                             gantt_bar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                             title VARCHAR(255) NOT NULL,
+                            face VARCHAR(50)  NOT NULL,
                             started_at TIMESTAMP NOT NULL,
                             finished_at TIMESTAMP NOT NULL,
                             gantt_chart_id UUID REFERENCES gantt_charts(gantt_chart_id) ON DELETE CASCADE ON UPDATE CASCADE

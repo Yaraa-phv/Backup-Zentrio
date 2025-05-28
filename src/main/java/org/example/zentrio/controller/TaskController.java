@@ -185,7 +185,7 @@ public class TaskController {
     }
 
 
-    @Operation(summary = "Get task by ID with current user ID",description = "Get task by ID with current user ID")
+    @Operation(summary = "Get task by ID with current user",description = "Get task by ID with current user ID")
     @GetMapping("/{task-id}/users")
     public ResponseEntity<ApiResponse<Task>> getTaskByIdAndUserId(@PathVariable("task-id") UUID taskId) {
         ApiResponse<Task> apiResponse = ApiResponse.<Task>builder()

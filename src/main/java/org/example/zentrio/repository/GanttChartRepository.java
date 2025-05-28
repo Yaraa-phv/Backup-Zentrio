@@ -72,7 +72,6 @@ public interface GanttChartRepository {
     @ResultMap("ganttChartMapper")
     GanttChart getGanttChartByGanttChartId(UUID ganttChartId);
 
-
     @Select("""
                 SELECT ch.*
                 FROM gantt_charts ch
