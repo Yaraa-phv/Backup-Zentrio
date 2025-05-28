@@ -3,8 +3,11 @@ package org.example.zentrio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.dto.response.MemberResponseData;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,10 +21,11 @@ public class Task {
     private LocalDateTime updatedAt;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
-    private Boolean isDone;
+    private String status;
     private Integer taskOrder;
     private String stage;
-    private UUID createdBy;
     private UUID boardId;
     private UUID ganttBarId;
+    private UUID createdBy;
+    private MemberResponseData creator;
 }

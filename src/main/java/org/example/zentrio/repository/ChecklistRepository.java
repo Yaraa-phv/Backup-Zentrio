@@ -15,7 +15,7 @@ public interface ChecklistRepository {
     @Results(id = "checklistMapper", value = {
             @Result(property = "checklistId", column = "checklist_id"),
             @Result(property = "title", column = "title"),
-            @Result(property = "isDone", column = "is_done"),
+            @Result(property = "status", column = "status"),
             @Result(property = "cover", column = "cover"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),

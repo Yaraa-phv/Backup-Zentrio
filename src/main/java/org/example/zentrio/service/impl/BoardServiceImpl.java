@@ -88,11 +88,17 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board updateBoardByBoardId(BoardRequest boardRequest, UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Board board =  getBoardByBoardId(boardId);
+        if (board == null) {
+            throw new NotFoundException("Board id " + boardId + " not found");
+        }
+        if(!board.getWorkspaceId().equals(boardRequest.getWorkspaceId())) {
+            throw new NotFoundException("workspace id " + boardRequest.getWorkspaceId() + " not found");
+        }
         Workspace workspace = workspaceRepository.getWorkspaceById(boardRequest.getWorkspaceId(),userId);
         if (workspace == null) {
             throw new NotFoundException("Workspace id " + boardRequest.getWorkspaceId() + " not found");
         }
-        getBoardByBoardId(boardId);
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
 
         if (roleName == null) {

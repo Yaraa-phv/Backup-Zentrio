@@ -12,12 +12,10 @@ import org.example.zentrio.repository.BoardRepository;
 import org.example.zentrio.repository.GanttBarRepository;
 import org.example.zentrio.repository.GanttChartRepository;
 import org.example.zentrio.service.GanttBarService;
-import org.example.zentrio.service.GanttChartService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -39,7 +37,12 @@ public class GanttBarServiceImpl implements GanttBarService {
         if(memberId == null) {
             throw new ForbiddenException("You're not a manager of this board can't create Gantt bar");
         }
-
+        if (ganttBarRequest.getStartedAt() == null || ganttBarRequest.getFinishedAt() == null) {
+            throw new BadRequestException("Start and finish times are required");
+        }
+        if (ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
+            throw new BadRequestException("GanttBar already finished");
+        }
         return ganttBarRepository.createGanttBarByGanttChartId(ganttBarRequest, ganttBarRequest.getGanttChartId());
     }
 

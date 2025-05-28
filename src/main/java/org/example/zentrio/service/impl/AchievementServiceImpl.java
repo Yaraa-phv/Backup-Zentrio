@@ -30,14 +30,14 @@ public class AchievementServiceImpl implements AchievementService {
 
         LocalDateTime now = LocalDateTime.now();
         // created must be current time
-        if (!achievementRequest.getCreatedAt().isBefore(now)) {
-            throw new BadRequestException("created must be in the current time.");
-        }
-
-        // updatedAt must be after now
-        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
-            throw new BadRequestException("updated must be after the current time.");
-        }
+//        if (!achievementRequest.getCreatedAt().isBefore(now)) {
+//            throw new BadRequestException("created must be in the current time.");
+//        }
+//
+//        // updatedAt must be after now
+//        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
+//            throw new BadRequestException("updated must be after the current time.");
+//        }
         return achievementRepository.createAchievement(achievementRequest, userId);
     }
 
@@ -48,14 +48,14 @@ public class AchievementServiceImpl implements AchievementService {
         LocalDateTime now = LocalDateTime.now();
 
         // created must be current time
-        if (!achievementRequest.getCreatedAt().isBefore(now)) {
-            throw new BadRequestException("created must be in the current time.");
-        }
-
-        // updatedAt must be after now
-        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
-            throw new BadRequestException("updated must be after the current time.");
-        }
+//        if (!achievementRequest.getCreatedAt().isBefore(now)) {
+//            throw new BadRequestException("created must be in the current time.");
+//        }
+//
+//        // updatedAt must be after now
+//        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
+//            throw new BadRequestException("updated must be after the current time.");
+//        }
         return achievementRepository.updateAchievement(achievementRequest,userId);
     }
 

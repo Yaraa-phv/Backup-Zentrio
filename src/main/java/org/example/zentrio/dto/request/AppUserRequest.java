@@ -33,8 +33,5 @@ public class AppUserRequest {
     )
     private String password;
 
-//    @NotNull
-//    @NotBlank
-//    private String provider;
     private String profileImage;
 }
