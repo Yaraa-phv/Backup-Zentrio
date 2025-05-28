@@ -45,12 +45,14 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public Feedback createFeedback( UUID taskId, FeedbackRequest feedbackRequest) {
+    public Feedback createFeedback( FeedbackRequest feedbackRequest) {
 
-        Task task= taskRepository.getTaskByTaskId(taskId);
+        Task task= taskRepository.getTaskByTaskId(feedbackRequest.getTaskId());
+
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
+        UUID taskId=task.getTaskId();
         userRole(task.getBoardId());
         UUID memberId = memberRepository.getPmId(userId(),task.getBoardId());
         if (memberId == null) {
@@ -77,7 +79,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback UpdateFeedbackById(UUID feedbackId, FeedbackRequest feedbackRequest) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId,feedbackRequest.getTaskId());
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
@@ -88,8 +90,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public Feedback getFeedbackById(UUID feedbackId) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+    public Feedback getFeedbackById(UUID feedbackId, UUID taskId) {
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId, taskId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }
@@ -98,8 +100,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
     @Override
-    public void deleteFeedbackById(UUID feedbackId) {
-        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId);
+    public void deleteFeedbackById(UUID feedbackId, UUID taskId) {
+        Feedback feedback = feedbackRepository.getFeedbackById(feedbackId, taskId);
         if (feedback==null) {
             throw new NotFoundException("Feedback not found");
         }

@@ -73,12 +73,15 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public Calendar CreateNoteInCalendar(UUID checkListId , CalendarRequest calendarRequest) {
-    Checklist checklist = checklistService.getChecklistChecklistId(checkListId);
+    public Calendar CreateNoteInCalendar( CalendarRequest calendarRequest) {
+
+    Checklist checklist = checklistService.getChecklistChecklistId(calendarRequest.getChecklistId());
+    UUID checkListId= checklist.getChecklistId();
     validateNotedWithChecklist(calendarRequest, checklist);
         CommentRequest commentRequest = new CommentRequest();
         commentRequest.setContent(calendarRequest.getNoted());
-     Comment comment= commentService.createComment(checkListId,commentRequest );
+        commentRequest.setChecklistId(calendarRequest.getChecklistId());
+     Comment comment= commentService.createComment(commentRequest );
     Calendar calendar= calendarRepository.createCalendar(calendarRequest,LocalDateTime.now(), userId(), checkListId,comment.getId());
 
         return calendar;

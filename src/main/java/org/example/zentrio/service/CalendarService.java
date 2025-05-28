@@ -11,7 +11,7 @@ public interface CalendarService {
     HashSet<Checklist> getCalendarForCurrentUser(UUID board_id);
 
 
-    Calendar CreateNoteInCalendar(UUID checkListId, CalendarRequest calendarRequest);
+    Calendar CreateNoteInCalendar( CalendarRequest calendarRequest);
 
     Calendar getCalendarById(UUID notedId);
 

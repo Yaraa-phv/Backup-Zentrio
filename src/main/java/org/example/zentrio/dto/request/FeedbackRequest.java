@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +18,7 @@ public class FeedbackRequest{
     @NotBlank
     @NotNull
     private String comment;
+
+    @NotNull
+    private UUID taskId;
 }

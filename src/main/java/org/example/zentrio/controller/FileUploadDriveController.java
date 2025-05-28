@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 
 import com.google.api.services.drive.model.File;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class FileUploadDriveController {
 
 
     @GetMapping("/getFileBy-FolderID")
+    @Operation(summary= "Get all files by folder id")
     public ResponseEntity<ApiResponse<List<File>>> getAllFilesByFolderId(@RequestParam String accessToken,
                                             @RequestParam String folderId) throws IOException, GeneralSecurityException {
 
@@ -44,6 +46,7 @@ public class FileUploadDriveController {
     }
 
     @GetMapping("/getFileBy-typ")
+    @Operation(summary= "Get all files by file type")
     public ResponseEntity<ApiResponse<List<File>>> getFilesByMimeTypeInFolder(@RequestParam String accessToken,
                                                  @RequestParam  String mimeType ,
                                                  @RequestParam  String folderId ) throws IOException, GeneralSecurityException {
@@ -61,6 +64,7 @@ public class FileUploadDriveController {
     }
 
     @GetMapping("/file")
+    @Operation(summary= "Get all files by file id")
     public ResponseEntity<ApiResponse<File>> getFileById(@RequestParam String accessToken,
                                          @RequestParam String fileId) throws GeneralSecurityException, IOException {
 
@@ -76,6 +80,7 @@ public class FileUploadDriveController {
     }
 
     @DeleteMapping("/file")
+    @Operation(summary= "Delete fie by file id")
     public ResponseEntity<ApiResponse<String>> deleteFileById(@RequestParam String accessToken,
                                                  @RequestParam String fileId) throws GeneralSecurityException, IOException {
         fileService.deleteFileById(accessToken, fileId);
@@ -91,6 +96,7 @@ public class FileUploadDriveController {
 
 
     @PostMapping("/create/{file-type}")
+    @Operation(summary= "Create drive file")
     public ResponseEntity<ApiResponse<File>> createDriveFile(
             @RequestParam("accessToken") String accessToken,
             @RequestParam("name") String name,
@@ -120,6 +126,7 @@ public class FileUploadDriveController {
 
 
     @PatchMapping("/rename")
+    @Operation(summary= "Rename file ")
     public ResponseEntity<ApiResponse<File>> renameFile(
             @RequestParam("accessToken") String accessToken,
             @RequestParam("fileId") String fileId,
@@ -145,6 +152,7 @@ public class FileUploadDriveController {
 
 
     @PostMapping(value = "/upload-user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary= "Upload all file to drive road")
     public ResponseEntity<ApiResponse<Res>> uploadWithUserToken(
             @RequestParam("token") String accessToken,
             @RequestParam("file") MultipartFile multipartFile
@@ -163,6 +171,7 @@ public class FileUploadDriveController {
 
 
     @PostMapping(value = "/upload-image-to-drive", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary= "Upload image to folder")
     public ResponseEntity<ApiResponse<Res>>  uploadImageToFolderDrive (
             @RequestParam("token") String accessToken,
             @RequestParam("folderId") String folderId,

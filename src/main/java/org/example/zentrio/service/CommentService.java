@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface CommentService {
-    Comment createComment(UUID checklistId,  CommentRequest commentRequest);
+    Comment createComment(  CommentRequest commentRequest);
 
 
     Comment getCommentByCommentId(UUID commentId);

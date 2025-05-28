@@ -7,13 +7,13 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface FeedbackService {
-    Feedback createFeedback( UUID taskId,  FeedbackRequest feedbackRequest);
+    Feedback createFeedback(   FeedbackRequest feedbackRequest);
 
     Set<Feedback> getAllFeedback(UUID taskId);
 
     Feedback UpdateFeedbackById(UUID feedbackId, FeedbackRequest feedbackRequest);
 
-    Feedback getFeedbackById(UUID feedbackId);
+    Feedback getFeedbackById(UUID feedbackId , UUID taskId);
 
-    void deleteFeedbackById(UUID feedbackId);
+    void deleteFeedbackById(UUID feedbackId, UUID taskId);
 }
