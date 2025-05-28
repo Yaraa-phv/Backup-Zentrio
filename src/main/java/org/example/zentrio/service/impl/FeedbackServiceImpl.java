@@ -3,6 +3,7 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.FeedbackRequest;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.enums.Stage;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
@@ -52,6 +53,9 @@ public class FeedbackServiceImpl implements FeedbackService {
         if (task==null) {
             throw new NotFoundException("Task not found");
         }
+        if (!task.getStatus().equals(Stage.COMPLETED.name())){
+        throw new BadRequestException("Task is not completed");}
+
         UUID taskId=task.getTaskId();
         userRole(task.getBoardId());
         UUID memberId = memberRepository.getPmId(userId(),task.getBoardId());
