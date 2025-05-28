@@ -22,6 +22,7 @@ public class GanttChartRequest {
     @NotBlank
     private String title;
 
+    @NotNull
     private UUID boardId;
 
 }

@@ -18,7 +18,6 @@ public class WorkspaceRequest {
     @NotNull
     private String title;
 
-    @NotBlank(message = "description cannot be blank!")
-    @NotNull
+
     private String description;
 }
