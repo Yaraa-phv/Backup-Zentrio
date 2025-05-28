@@ -3,9 +3,11 @@ package org.example.zentrio.repository;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ChecklistRequest;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Checklist;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Mapper
@@ -22,6 +24,8 @@ public interface ChecklistRepository {
             @Result(property = "checklistOrder", column = "checklist_order"),
             @Result(property = "startedAt", column = "started_at"),
             @Result(property = "finishedAt", column = "finished_at"),
+            @Result(property = "members", column = "checklist_id",
+                    many = @Many(select = "getMembersByChecklistId")),
             @Result(property = "taskId", column = "task_id"),
             @Result(property = "createdBy", column = "created_by")
     })
@@ -133,4 +137,20 @@ public interface ChecklistRepository {
     """)
     @ResultMap("checklistMapper")
     HashSet<Checklist> getAllChecklistsByCurrentUser(UUID userId);
+
+    @Select("""
+            SELECT
+                u.username AS userName,
+                u.profile_image AS image
+            FROM users u
+                     INNER JOIN members m ON u.user_id = m.user_id
+                  inner join checklist_assignments ch on m.member_id = ch.member_id
+            WHERE ch.checklist_id = #{checklistId};
+            """)
+    @Results(id = "memberChecklistMapper", value = {
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "userName", column = "name"),
+    })
+    List<MemberResponseData> getMembersByChecklistId(UUID checklistId);
+
 }
