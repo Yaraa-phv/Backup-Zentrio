@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.enums.ChecklistStatus;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
@@ -297,9 +298,10 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
-    public void updateStatusOfChecklistById(UUID checklistId) {
+    public void updateStatusOfChecklistById(UUID checklistId, ChecklistStatus status) {
+
         getChecklistChecklistId(checklistId);
-        checklistRepository.updateStatusOfChecklistById(checklistId);
+        checklistRepository.updateStatusOfChecklistById(checklistId,status.toString());
     }
 
     @Override

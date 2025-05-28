@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.enums.ChecklistStatus;
+import org.example.zentrio.enums.Status;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.model.FileMetadata;
 import org.example.zentrio.service.ChecklistService;
@@ -133,8 +135,10 @@ public class ChecklistController {
 
     @Operation(summary = "Update status of checklist by ID",description = "Update status of checklist by specific checklist ID")
     @PutMapping("/{checklist-id}")
-    public ResponseEntity<?> updateStatusOfChecklistById(@PathVariable("checklist-id") UUID checklistId){
-        checklistService.updateStatusOfChecklistById(checklistId);
+    public ResponseEntity<?> updateStatusOfChecklistById(
+            @PathVariable("checklist-id") UUID checklistId,
+            ChecklistStatus status){
+        checklistService.updateStatusOfChecklistById(checklistId,status);
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Updated status of checklist successfully")

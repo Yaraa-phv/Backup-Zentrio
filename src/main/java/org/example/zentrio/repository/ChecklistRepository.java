@@ -121,10 +121,10 @@ public interface ChecklistRepository {
 
 
     @Select("""
-        UPDATE checklists SET is_done = true
+        UPDATE checklists SET status = #{status}
         WHERE checklist_id = #{checklistId}
     """)
-    void updateStatusOfChecklistById(UUID checklistId);
+    void updateStatusOfChecklistById(UUID checklistId,String status);
 
     @Select("""
         SELECT * FROM checklists

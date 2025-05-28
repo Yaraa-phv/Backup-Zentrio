@@ -167,35 +167,51 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void assignRoleToBoard(AssignedRoleRequest assignedRoleRequest) {
+        // Validate board existence and user permissions
         getBoardByBoardId(assignedRoleRequest.getBoardId());
         validateCurrentUserRoles(assignedRoleRequest.getBoardId());
+
+        // Check workspace existence
         Workspace workspace = workspaceRepository.getWorkspaceByWorkspaceId(assignedRoleRequest.getWorkspaceId());
         if (workspace == null) {
-            throw new NotFoundException("Workspace id not found");
+            throw new NotFoundException("Workspace ID not found");
         }
-        AppUser userId = appUserRepository.getUserById(assignedRoleRequest.getAssigneeId());
-        if (userId == null) {
+
+        // Check if assignee user exists
+        AppUser assignee = appUserRepository.getUserById(assignedRoleRequest.getAssigneeId());
+        if (assignee == null) {
             throw new NotFoundException("Assignee ID not found");
         }
 
-
         UUID roleId = roleRepository.getRoleIdByRoleName(assignedRoleRequest.getRoleName().toString());
-
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(),assignedRoleRequest.getAssigneeId());
-        System.out.println("roleName " + roleName);
-
-        String existingRole = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(),assignedRoleRequest.getAssigneeId());
-        System.out.println("existingRole " + existingRole);
-        if (existingRole != null) {
-            roleRepository.updateRoleForUserOnBoard(
-                    assignedRoleRequest.getAssigneeId(),
-                    assignedRoleRequest.getBoardId(),
-                    roleId);
-        }else {
-            roleRepository.insertToMember(assignedRoleRequest.getAssigneeId(), assignedRoleRequest.getBoardId(), roleId);
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(), assignedRoleRequest.getAssigneeId());
+        if(roleName.equals(RoleName.ROLE_MANAGER.toString())) {
+            throw new BadRequestException("User is already has role manager cannot assign role to this board");
         }
 
+        // Get all existing roles of the user on this board
+        List<String> existingRoles = roleRepository.getRolesNameByBoardIdAndUserId(
+                assignedRoleRequest.getBoardId(),
+                assignedRoleRequest.getAssigneeId()
+        );
+
+        final String MANAGER_ROLE = RoleName.ROLE_MANAGER.toString();
+        String newRoleName = assignedRoleRequest.getRoleName().toString();
+
+        // Prevent assigning more than one Manager role
+        if (MANAGER_ROLE.equals(newRoleName) && existingRoles.contains(MANAGER_ROLE)) {
+            throw new ConflictException("User already has Manager role on this board.");
+        }
+
+        // Prevent assigning duplicate roles
+        if (existingRoles.contains(newRoleName)) {
+            throw new ConflictException("User already has the role " + newRoleName);
+        }
+
+        // Assign the new role
+        roleRepository.insertToMember(assignedRoleRequest.getAssigneeId(), assignedRoleRequest.getBoardId(), roleId);
     }
+
 
     @SneakyThrows
     @Override

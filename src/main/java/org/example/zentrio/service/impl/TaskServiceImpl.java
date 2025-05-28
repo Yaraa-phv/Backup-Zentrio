@@ -281,12 +281,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void moveTask(UUID taskId, Stage stage) {
 
-
         // 1. Get current user info and boardId by taskId
         UUID currentUserId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         Task task = getTaskById(taskId);
         UUID boardId = task.getBoardId();
-        if(!task.getStatus().equals(Status.COMPLETED.toString())) {
+        if(task.getStatus() == null || !task.getStatus().equals(Status.COMPLETED.toString())) {
             throw new BadRequestException("You can't move tasks with status " + task.getStatus());
         }
 
@@ -338,6 +337,9 @@ public class TaskServiceImpl implements TaskService {
         String role = memberRepository.getRoleInTask(task.getBoardId(),userId,taskId);
         if(role == null) {
             throw new ForbiddenException("You do not have permission to update this task");
+        }
+        if(task.getStatus() == null ) {
+            throw new BadRequestException("You can't update tasks with status " + status);
         }
         if(RoleName.ROLE_MANAGER.toString().equals(role) || RoleName.ROLE_LEADER.toString().equals(role)){
             taskRepository.updateStatusOfTaskById(taskId,status.toString());

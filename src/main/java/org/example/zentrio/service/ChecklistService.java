@@ -3,6 +3,7 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.enums.ChecklistStatus;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.model.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,7 @@ public interface ChecklistService {
 
     InputStream getFileByFileName(UUID checklistId,String fileName);
 
-    void updateStatusOfChecklistById(UUID checklistId);
+    void updateStatusOfChecklistById(UUID checklistId, ChecklistStatus status);
 
     HashSet<Checklist> getAllChecklists();
 
