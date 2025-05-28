@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${boardName} + ' - Project Report'">Project Report</title>
+    <style>
+        :root {
+            --primary: #2d74da;
+            --secondary: #f1f5f9;
+            --accent: #e0ecff;
+            --text: #333;
+            --muted: #777;
+            --border: #e2e8f0;
+            --bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px;
+            max-width: 960px;
+            margin: auto;
+            font-size: 14px;
+
+        }
+
+        h2, h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header, .footer {
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .footer {
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .section {
+            margin-top: 40px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li::before {
+            content: "• ";
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: var(--accent);
+        }
+
+        .checklist {
+            background: #f8faff;
+            border: 1px solid var(--accent);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(45, 116, 218, 0.05);
+        }
+
+        .checklist strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .label {
+            font-weight: 500;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2 th:text="${boardName}">Project Name</h2>
+    <div class="meta">
+        <p th:text="'Created on: ' + ${creationDate}">Created on: ...</p>
+        <p th:text="'Version: ' + ${version}">Version: ...</p>
+    </div>
+</div>
+
+<div class="section">
+    <h3>Team Roles</h3>
+    <ul>
+        <li th:each="member : ${allMembers}">
+            <span th:text="${member.roleName} + ': ' + member.total"></span>
+        </li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>Tasks Overview</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Task</th>
+            <th>Total</th>
+            <th>Checklists</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="task : ${allTasks}">
+            <td th:text="${task.task}">TO DO</td>
+            <td th:text="${task.total}">0</td>
+            <td>
+                <div th:each="cl : ${task.checklist}" class="checklist">
+                    <strong th:text="${cl.title}">Checklist Item</strong>
+                    <div><span class="label">Start:</span> <span th:text="${cl.startedAt}">...</span></div>
+                    <div><span class="label">Finish:</span> <span th:text="${cl.finishedAt}">...</span></div>
+                    <div th:if="${cl.attachments != null}">
+                        <span class="label">Attachment:</span>
+                        <span th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'"></span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>Report generated automatically by Project Reporting System</p>
+</div>
+
+</body>
+</html>

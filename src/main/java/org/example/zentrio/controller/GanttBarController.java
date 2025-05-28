@@ -70,7 +70,7 @@ public class GanttBarController {
     }
 
     @Operation(summary = "Update gantt bar by ID AND gantt chart ID", description = "Updated gantt bars by ID with current gantt charts")
-    @PutMapping("/{gantt-bar-id}")
+    @PutMapping("/{gantt-bar-id}/ganttCharts/")
     public ResponseEntity<ApiResponse<GanttBar>> updateGanttBarByGanttBarId(
             @Valid @RequestBody GanttBarRequest ganttBarRequest,
             @PathVariable("gantt-bar-id") UUID ganttBarId) {

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Exile';
+    src: url('../fonts/Exile-Regular.ttf') format('truetype');
+}
+
+body {
+    font-family: 'Exile', serif;
+}
+

@@ -76,7 +76,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (title.isEmpty()) {
             throw new NotFoundException("Workspace with " + title + " not found!");
         }
-        return new HashSet<>(workspaceRepository.getWorkspaceByTitle(title));
+        HashSet<Workspace> workspaces=new  HashSet<>(workspaceRepository.getWorkspaceByTitle(title));
+        if (workspaces.isEmpty()) {
+            throw new NotFoundException("Workspace  not found!");
+        }
+        return workspaces;
     }
 
     @Override
