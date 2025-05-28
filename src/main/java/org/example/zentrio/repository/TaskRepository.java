@@ -3,6 +3,7 @@ package org.example.zentrio.repository;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.model.Task;
 
@@ -18,7 +19,7 @@ public interface TaskRepository {
             @Result(property = "taskId", column = "task_id"),
             @Result(property = "title", column = "title"),
             @Result(property = "description", column = "description"),
-            @Result(property = "isDone", column = "is_done"),
+            @Result(property = "status", column = "status"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "startedAt", column = "started_at"),
@@ -28,6 +29,9 @@ public interface TaskRepository {
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
             @Result(property = "createdBy", column = "created_by"),
+            @Result(property = "creator", column = "created_by",
+            one = @One(select = "getDataOfUserCreator")),
+
     })
     @Select("""
             INSERT INTO tasks(title, description,started_at, finished_at, stage, board_id, gantt_bar_id, created_by)
@@ -47,10 +51,9 @@ public interface TaskRepository {
 
     @Select("""
                 SELECT * FROM tasks WHERE board_id  = #{boardId} AND gantt_bar_id  = #{ganttBarId}
-                LIMIT #{limit} OFFSET #{offset}
             """)
     @ResultMap("taskMapper")
-    List<Task> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId, Integer limit, Integer offset);
+    HashSet<Task> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId);
 
     @Select("""
             SELECT COUNT(*) FROM tasks
@@ -139,55 +142,59 @@ public interface TaskRepository {
 
 
     @Select("""
-                UPDATE tasks SET is_done = #{isDone}
+                UPDATE tasks SET status = #{status}
                 WHERE task_id = #{taskId}
             """)
-    void updateStatusOfTaskById(UUID taskId, boolean isDone);
+    void updateStatusOfTaskById(UUID taskId, String status);
 
 
     @Select("""
-        UPDATE tasks SET stage = #{stage}
-        WHERE task_id = #{taskId}
-    """)
+                UPDATE tasks SET stage = #{stage}
+                WHERE task_id = #{taskId}
+            """)
     void updateProgressOfTaskById(UUID taskId, String stage);
 
 
     @Select("""
-        SELECT r.role_name FROM members m
-        INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
-        INNER JOIN roles r ON m.role_id = r.role_id
-        WHERE ta.task_id = #{taskId}
-    """)
+                SELECT r.role_name FROM members m
+                INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
+                INNER JOIN roles r ON m.role_id = r.role_id
+                WHERE ta.task_id = #{taskId}
+            """)
     String getRoleNameByTaskId(UUID taskId);
 
 
     @Select("""
-        SELECT * FROM tasks
-        WHERE task_id = #{taskId}
-        AND user_id = #{userId}
-    """)
+                SELECT * FROM tasks
+                WHERE task_id = #{taskId}
+                AND user_id = #{userId}
+            """)
     @ResultMap("taskMapper")
     Task getTaskByIdAndUserId(UUID taskId, UUID userId);
 
     @Select("""
-        SELECT tasks.* FROM tasks WHERE created_by = #{userId}
-    """)
+                SELECT tasks.* FROM tasks WHERE created_by = #{userId}
+            """)
     @ResultMap("taskMapper")
     HashSet<Task> getAllTasksForCurrentUser(UUID userId);
 
     @Select("""
-        SELECT * FROM tasks
-    """)
+                SELECT * FROM tasks
+            """)
     @ResultMap("taskMapper")
     HashSet<Task> getAllTasks();
 
-
     @Select("""
-        SELECT u.username, u.email, r.role_name FROM members m
-        INNER JOIN users u ON m.user_id = u.user_id
-        INNER JOIN task_assignments ta ON m.member_id = ta.assigned_to
-        INNER JOIN roles r ON m.role_id = r.role_id
-        WHERE ta.task_id = '1b8caf99-3739-464c-bd4e-7e8785254294'
-    """)
-    HashSet<MemberResponse> getLeaderInformation(UUID taskId);
+                SELECT u.username, u.profile_image FROM users u
+                INNER JOIN members m ON u.user_id = m.user_id
+                WHERE m.member_id = #{userId}
+            """)
+    @Results(id = "memberMapper", value = {
+            @Result(property = "username",column = "username"),
+            @Result(property = "imageUrl",column = "profile_image")
+    })
+    MemberResponseData getDataOfUserCreator(UUID userId);
+
+
+
 }

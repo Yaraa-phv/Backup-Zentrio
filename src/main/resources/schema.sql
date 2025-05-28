@@ -38,18 +38,16 @@ CREATE TABLE workspaces (
 );
 
 
--- Create the boards table
-CREATE TABLE boards (
-                        board_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                        title VARCHAR(255) NOT NULL,
-                        description TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        is_favourite BOOLEAN DEFAULT false,
-                        cover VARCHAR(255),
-                        image_url   VARCHAR(255),
-                        workspace_id UUID REFERENCES workspaces(workspace_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+
+-- Create the members table
+CREATE TABLE members (
+                         member_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                         role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                         user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                         board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 -- Create the gantt_charts table
 CREATE TABLE gantt_charts (
@@ -71,13 +69,19 @@ CREATE TABLE gantt_bars (
                             gantt_chart_id UUID REFERENCES gantt_charts(gantt_chart_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the members table
-CREATE TABLE members (
-                         member_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                         role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                         user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                         board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
+-- Create the boards table
+CREATE TABLE boards (
+                        board_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                        title VARCHAR(255) NOT NULL,
+                        description TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        is_favourite BOOLEAN DEFAULT false,
+                        cover VARCHAR(255),
+                        image_url   VARCHAR(255),
+                        workspace_id UUID REFERENCES workspaces(workspace_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 -- Create the tasks table
 CREATE TABLE tasks (
@@ -131,19 +135,6 @@ CREATE TABLE checklist_assignments (
 );
 
 
--- Create the calendars table
-CREATE TABLE calendars (
-                           calendar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                           noted TEXT,
-                           noted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
-                           till_date TIMESTAMP ,
-                           user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                           checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE,
-                           comment_id UUID REFERENCES  comments(comment_id) ON  DELETE CASCADE ON  UPDATE CASCADE
---                            board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-
 
 -- Create the comments table
 CREATE TABLE comments (
@@ -153,6 +144,19 @@ CREATE TABLE comments (
                           commented_by UUID REFERENCES members(member_id)  ON DELETE CASCADE ON UPDATE CASCADE,
                           checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- Create the calendars table
+CREATE TABLE calendars (
+                           calendar_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                           noted TEXT,
+                           noted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+                           till_date TIMESTAMP ,
+                           user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
+                           checklist_id UUID REFERENCES checklists(checklist_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                           comment_id UUID REFERENCES  comments(comment_id) ON  DELETE CASCADE ON  UPDATE CASCADE
+);
+
 
 -- Create the documents table
 CREATE TABLE documents (

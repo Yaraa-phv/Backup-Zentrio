@@ -12,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MemberResponse {
     private UUID userId;
-    private String imageUrl;
     private String username;
     private String email;
+    private String profileImage;
     private List<String> roles;
 }

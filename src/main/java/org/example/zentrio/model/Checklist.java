@@ -15,7 +15,7 @@ import java.util.UUID;
 public class Checklist {
     private UUID checklistId;
     private String title;
-    private Boolean isDone;
+    private String status;
     private String cover;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

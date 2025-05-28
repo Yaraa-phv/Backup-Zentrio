@@ -15,19 +15,6 @@ import java.util.Map;
 @Builder
 @ToString
 public class AchievementRequest {
-//
-//    @NotNull
-//    @NotBlank
-//    private String achievementName;
-
-//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
-//    private OffsetDateTime createdAt;
-//
-//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
-//    private OffsetDateTime updatedAt;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     @NotNull
     @Size(min = 1, max = 100)

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.Stage;
+import org.example.zentrio.enums.Status;
 import org.example.zentrio.model.Task;
 import org.example.zentrio.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -61,12 +62,16 @@ public class TaskController {
 
     @Operation(summary = "Get all task by board ID, and gantt bar ID", description = "Get all task by specific board ID with gantt bar ID")
     @GetMapping("/boards/{board-id}/gantt-bars/{gantt-bar-id}")
-    public ResponseEntity<ApiResponse<List<Task>>> getTasksByBoardIdAndGanttBarId(
+    public ResponseEntity<ApiResponse<HashSet<Task>>> getTasksByBoardIdAndGanttBarId(
             @PathVariable("board-id") UUID boardId,
-            @PathVariable("gantt-bar-id") UUID ganttBarId,
-            @Positive @RequestParam(defaultValue = "1") Integer page,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
-        ApiResponse<List<Task>> apiResponse = taskService.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId, page, size);
+            @PathVariable("gantt-bar-id") UUID ganttBarId) {
+        ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
+                .success(true)
+                .message("Updated task by ID successfully")
+                .payload(taskService.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
@@ -154,8 +159,8 @@ public class TaskController {
     @PutMapping("/{task-id}/status")
     public ResponseEntity<?> updateStatusOfTaskById(
             @PathVariable("task-id") UUID taskId,
-            @RequestParam boolean isDone) {
-        taskService.updateStatusOfTaskById(taskId,isDone);
+            @RequestParam Status status) {
+        taskService.updateStatusOfTaskById(taskId,status);
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Updated status task with task ID successfully")

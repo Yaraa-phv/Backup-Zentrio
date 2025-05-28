@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.enums.Stage;
+import org.example.zentrio.enums.Status;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ConflictException;
 import org.example.zentrio.exception.ForbiddenException;
@@ -33,6 +34,7 @@ public class TaskServiceImpl implements TaskService {
     private final BoardRepository boardRepository;
     private final GanttBarRepository ganttBarRepository;
     private final ChecklistRepository checklistRepository;
+    private final MemberRepository memberRepository;
 
 
     private void validateTaskTimeWithGanttBar(TaskRequest taskRequest, GanttBar ganttBar) {
@@ -166,14 +168,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ApiResponse<List<Task>> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId, Integer page, Integer size) {
-        int offset = (page - 1) * size;
+    public HashSet<Task> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId) {
         validateBoardAndGanttBar(boardId, ganttBarId);
-        List<Task> taskList = taskRepository.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId, size, offset);
-        Integer totalElements = taskRepository.countTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
-
-        int totalPages = (int) Math.ceil(totalElements / (double) size);
-        return ApiResponse.<List<Task>>builder().success(true).message("Get all tasks successfully").payload(taskList).status(HttpStatus.OK).timestamp(LocalDateTime.now()).pagination(new Pagination(page, totalElements, totalPages)).build();
+        return taskRepository.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
     }
 
     @Override
@@ -291,10 +288,9 @@ public class TaskServiceImpl implements TaskService {
         UUID currentUserId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         Task task = getTaskById(taskId);
         UUID boardId = task.getBoardId();
-        if (!task.getIsDone()) {
-            throw new BadRequestException("You should update task status before moving");
+        if(!task.getStatus().equals(Status.COMPLETED.toString())) {
+            throw new BadRequestException("You should only move tasks in completed status");
         }
-
 
         // 2. Get user roles for the board
         List<String> userRoles = roleRepository.getRolesNameByBoardIdAndUserId(boardId, currentUserId);
@@ -338,9 +334,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateStatusOfTaskById(UUID taskId, boolean isDone) {
-        getTaskById(taskId);
-        taskRepository.updateStatusOfTaskById(taskId,isDone);
+    public void updateStatusOfTaskById(UUID taskId, Status status) {
+       Task task = getTaskById(taskId);
+       UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String role = memberRepository.getRoleInTask(task.getBoardId(),userId,taskId);
+        if(role == null) {
+            throw new ForbiddenException("You do not have permission to update this task");
+        }
+        if(RoleName.ROLE_MANAGER.toString().equals(role) || RoleName.ROLE_LEADER.toString().equals(role)){
+            taskRepository.updateStatusOfTaskById(taskId,status.toString());
+        }
     }
 
     @Override
