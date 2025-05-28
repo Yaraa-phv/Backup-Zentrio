@@ -21,8 +21,8 @@ public class TaskRequest {
     @NotBlank
     private String title;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String description;
 
     @FutureOrPresent
