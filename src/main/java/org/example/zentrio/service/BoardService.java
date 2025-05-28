@@ -46,4 +46,5 @@ public interface BoardService {
 
     HashSet<Board> getAllBoards();
 
+    String acceptBoardInvitation(UUID boardId, String email);
 }

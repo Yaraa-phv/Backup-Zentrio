@@ -201,4 +201,8 @@ public interface TaskRepository {
     MemberResponseData getDataOfUserCreator(UUID userId);
 
 
+    @Select("""
+        SELECT board_id FROM tasks WHERE task_id = #{taskId}
+    """)
+    UUID getBoardIdByTaskId(UUID taskId);
 }

@@ -9,11 +9,15 @@ import org.example.zentrio.service.EmailService;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -46,7 +50,10 @@ public class EmailServiceImpl implements EmailService {
 
 
     @Override
-    public void sendInvitations(String email) {
+    public void sendInvitations(UUID boardId,String email) {
+
+       log.info("send invitations to email {}", email);
+
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             throw new BadRequestException("Invalid email address");
         }
@@ -56,6 +63,14 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("title", "You're Invited!");  // Title for the email
             context.setVariable("message",
                     "We would like to invite you to join our platform. Please click the button below to accept the invitation.");  // Message content
+
+            String acceptInvitationUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path("/api/boards/" + boardId + "/invitations/accept")
+                            .queryParam("email",email)
+                            .toUriString();
+
+            log.info("accept invitation {}", acceptInvitationUrl);
+
             context.setVariable("inviteLink", "https://www.youtube.com/");  // Invitation link (replace with actual URL)
 
             // Process the Thymeleaf template 'invite-member.html' (replace with the correct template name)

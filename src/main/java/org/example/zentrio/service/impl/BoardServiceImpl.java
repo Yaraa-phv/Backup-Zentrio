@@ -29,11 +29,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
@@ -176,15 +178,23 @@ public class BoardServiceImpl implements BoardService {
             throw new NotFoundException("Assignee ID not found");
         }
 
-        UUID existingMemberId = boardRepository.getMemberIdByUserIdAndBoardId(assignedRoleRequest.getAssigneeId(), assignedRoleRequest.getBoardId());
-
-        if (existingMemberId != null) {
-            throw new ConflictException("Member is already assigned");
-        }
 
         UUID roleId = roleRepository.getRoleIdByRoleName(assignedRoleRequest.getRoleName().toString());
 
-        roleRepository.insertToMember(assignedRoleRequest.getAssigneeId(), assignedRoleRequest.getBoardId(), roleId);
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(),assignedRoleRequest.getAssigneeId());
+        System.out.println("roleName " + roleName);
+
+        String existingRole = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(),assignedRoleRequest.getAssigneeId());
+        System.out.println("existingRole " + existingRole);
+        if (existingRole != null) {
+            roleRepository.updateRoleForUserOnBoard(
+                    assignedRoleRequest.getAssigneeId(),
+                    assignedRoleRequest.getBoardId(),
+                    roleId);
+        }else {
+            roleRepository.insertToMember(assignedRoleRequest.getAssigneeId(), assignedRoleRequest.getBoardId(), roleId);
+        }
+
     }
 
     @SneakyThrows
@@ -263,7 +273,7 @@ public class BoardServiceImpl implements BoardService {
     public void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests) {
         getBoardByBoardId(boardId);
         inviteRequests.forEach(inviteRequest -> {
-            emailService.sendInvitations(inviteRequest.getEmail());
+            emailService.sendInvitations(boardId,inviteRequest.getEmail());
         });
     }
 
@@ -286,6 +296,42 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public HashSet<Board> getAllBoards() {
         return boardRepository.getAllBoards();
+    }
+
+    @Override
+    public String acceptBoardInvitation(UUID boardId, String email) {
+
+        log.info("acceptBoardInvitation: boardId: {}, email: {}", boardId, email);
+            getBoardByBoardId(boardId);
+            AppUser appUser = appUserRepository.getUserByEmail(email);
+            if (appUser == null) {
+                // If the user is not found, redirect to the login/sign-in page.
+                // Note: This URL is just an example; the actual URL should be
+                // provided dynamically by the frontend.
+                return "https://www.youtube.com/watch?v=Pzi-VuPjcII";
+            }
+            UUID userId = appUser.getUserId();
+        System.out.println("acceptBoardInvitation: userId: " + userId);
+            UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_MEMBER.toString());
+            if (roleId == null) {
+                // If the user is not found, redirect to the login/sign-in page.
+                // Note: This URL is just an example; the actual URL should be
+                // provided dynamically by the frontend.
+                return "https://www.youtube.com/watch?v=Pzi-VuPjcII";
+            }
+            UUID existingMemberId = boardRepository.getMemberIdByUserIdAndBoardId(userId, boardId);
+            if (existingMemberId != null) {
+                // If the user exists, redirect them to the board page.
+                // Note: This URL is just an example; the actual URL should be
+                // obtained dynamically from the frontend.
+                return "http://localhost:8080/swagger-ui/index.html";
+            }
+            boardRepository.insertMember(userId, boardId, roleId);
+            // If a user is found and is not yet assigned to a board,
+            // upon acceptance, they should be redirected to the board page.
+            // Note: The URL shown here is just an example; the real URL
+            // should be dynamically obtained from the frontend.
+            return "http://localhost:8080/swagger-ui/index.html";
     }
 
     public void validateCurrentUserRoles(UUID boardId) {

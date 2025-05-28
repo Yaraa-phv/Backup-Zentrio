@@ -13,8 +13,8 @@ import java.util.UUID;
 public interface GanttBarRepository {
 
     @Select("""
-                            INSERT INTO gantt_bars(title, started_at, finished_at, gantt_chart_id,face)
-                            VALUES (#{request.title}, #{request.startedAt}, #{request.finishedAt} , #{ganttChartId}, #{request.face})
+                            INSERT INTO gantt_bars(title, face, started_at, finished_at, gantt_chart_id)
+                            VALUES (#{request.title}, #{request.face}, #{request.startedAt}, #{request.finishedAt} , #{ganttChartId})
                             RETURNING *
             """)
     @Results(id = "ganttBarMapper", value = {

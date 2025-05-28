@@ -63,7 +63,7 @@ public class TaskServiceImpl implements TaskService {
         boardService.getBoardByBoardId(boardId);
         GanttBar ganttBar = ganttBarRepository.getGanttBarByGanttBarId(ganttBarId);
         if(ganttBar == null) {
-            throw new NotFoundException("GanttBar not found.");
+            throw new NotFoundException("GanttBar id " + ganttBarId + " not found");
         }
     }
 
@@ -105,8 +105,8 @@ public class TaskServiceImpl implements TaskService {
 
     public void validateCurrentUserRoles(UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
-        if (roleName == null || !roleName.equals(RoleName.ROLE_MANAGER.toString())) {
+        List<String> roleName = roleRepository.getRolesNameByBoardIdAndUserId(boardId, userId);
+        if (roleName == null || !roleName.contains(RoleName.ROLE_MANAGER.toString())) {
             throw new ForbiddenException("You're not manager in this board can't assign role");
         }
     }
@@ -286,7 +286,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = getTaskById(taskId);
         UUID boardId = task.getBoardId();
         if(!task.getStatus().equals(Status.COMPLETED.toString())) {
-            throw new BadRequestException("You should only move tasks in completed status");
+            throw new BadRequestException("You can't move tasks with status " + task.getStatus());
         }
 
         // 2. Get user roles for the board

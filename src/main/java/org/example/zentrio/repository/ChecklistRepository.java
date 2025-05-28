@@ -111,7 +111,7 @@ public interface ChecklistRepository {
     @Select("""
                 SELECT COUNT(*) FROM checklists
                 WHERE task_id = #{taskId}
-                AND is_done = false
+                AND status != 'COMPLETED'
             """)
     long countIncompleteByTaskId(UUID taskId);
 
@@ -133,4 +133,9 @@ public interface ChecklistRepository {
     """)
     @ResultMap("checklistMapper")
     HashSet<Checklist> getAllChecklistsByCurrentUser(UUID userId);
+
+    @Select("""
+        SELECT created_by FROM checklists
+    """)
+    UUID getCreatorByChecklistId(UUID checklistId);
 }

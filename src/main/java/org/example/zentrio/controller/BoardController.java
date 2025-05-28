@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -210,6 +211,17 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+
+    @Operation(summary = "Accept board invitation", description = "Accept invitation to join a board using email")
+    @GetMapping("/{board-id}/invitations/accept")
+    public ResponseEntity<?> acceptInvitation(
+            @PathVariable("board-id") UUID boardId,
+            @RequestParam String email) {
+        String redirectUrl = boardService.acceptBoardInvitation(boardId, email);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(redirectUrl))
+                .build();
+    }
 
     @Operation(summary = "Get board by ID with current user ID",description = "Get board by ID with current user ID")
     @GetMapping("/{board-id}/users")
