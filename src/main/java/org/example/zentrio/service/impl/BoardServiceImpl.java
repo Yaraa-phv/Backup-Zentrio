@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
+import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.ImageExtension;
@@ -14,6 +15,7 @@ import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ConflictException;
 import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
+import org.example.zentrio.jwt.JwtService;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.BoardService;
@@ -43,6 +45,7 @@ public class BoardServiceImpl implements BoardService {
     private final MinioClient minioClient;
     private final WorkspaceService workspaceService;
     private final EmailService emailService;
+    private final JwtService jwtService;
 
     @Value("${minio.bucket.name}")
     private String bucketName;
@@ -257,9 +260,11 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void inviteMemberToBoard(UUID boardId, List<String> emails) {
+    public void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests) {
         getBoardByBoardId(boardId);
-        emails.forEach(emailService::sendInvitations);
+        inviteRequests.forEach(inviteRequest -> {
+            emailService.sendInvitations(inviteRequest.getEmail());
+        });
     }
 
     @Override

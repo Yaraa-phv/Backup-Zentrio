@@ -2,6 +2,7 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
+import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
@@ -37,11 +38,12 @@ public interface BoardService {
 
     void updateIsFavourite(UUID boardId, boolean isFavourite);
 
-    void inviteMemberToBoard(UUID boardId, List<String> emails);
+    void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests);
 
     Board getBoardByIdWithCurrentUserId(UUID boardId);
 
     HashSet<Board> getAllBoardsForCurrentUser();
 
     HashSet<Board> getAllBoards();
+
 }

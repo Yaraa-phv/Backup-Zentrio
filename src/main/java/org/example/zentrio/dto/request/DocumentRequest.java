@@ -19,15 +19,15 @@ public class DocumentRequest {
 
     @NotBlank
     @NotNull
-  private String accessToken;
+    private String accessToken;
 
     @NotBlank
     @NotNull
-  private String folderName;
+    private String folderName;
 
     @NotNull
-  private FileTypes types;
+    private FileTypes types;
 
     @NotNull
-  private UUID boardId;
+    private UUID boardId;
 }

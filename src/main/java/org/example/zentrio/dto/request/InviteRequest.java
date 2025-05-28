@@ -6,24 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
-
+import org.example.zentrio.enums.RoleRequest;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BoardRequest {
+public class InviteRequest {
 
     @NotNull
     @NotBlank
-    private String title;
-
-    private String description;
-
-    private String cover;
+    private String email;
 
     @NotNull
-    private UUID workspaceId;
+    private String roleName;
 }

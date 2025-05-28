@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
+import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
@@ -198,8 +199,8 @@ public class BoardController {
     @PostMapping("/{board-id}/users/invite")
     public ResponseEntity<?> inviteMemberToBoard(
             @PathVariable("board-id") UUID boardId,
-            @RequestBody List<String> emails) {
-        boardService.inviteMemberToBoard(boardId,emails);
+            @RequestBody List<InviteRequest> inviteRequests) {
+        boardService.inviteMemberToBoard(boardId,inviteRequests);
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Invited users to board successfully")
@@ -208,6 +209,7 @@ public class BoardController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
 
     @Operation(summary = "Get board by ID with current user ID",description = "Get board by ID with current user ID")
     @GetMapping("/{board-id}/users")

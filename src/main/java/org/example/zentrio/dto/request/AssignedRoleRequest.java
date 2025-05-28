@@ -1,5 +1,6 @@
 package org.example.zentrio.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AssignedRoleRequest {
+    @NotNull
     private UUID boardId;
+
+    @NotNull
     private UUID assigneeId;
+
+    @NotNull
     private RoleRequest roleName;
+
+    @NotNull
     private UUID workspaceId;
 }
