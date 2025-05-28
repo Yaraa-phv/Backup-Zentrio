@@ -21,9 +21,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final ChecklistRepository checklistRepository;
-    private final BoardRepository boardRepository;
-    private final TaskRepository taskRepository;
-    private final MemberRepository memberRepository;
 
 
     private void validateAttachmentDetails(AttachmentRequest attachment) {

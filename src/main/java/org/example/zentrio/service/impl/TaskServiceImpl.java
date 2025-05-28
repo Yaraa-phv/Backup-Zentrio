@@ -120,6 +120,7 @@ public class TaskServiceImpl implements TaskService {
         }
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
 
+
         // Validate user has permission (Manager or TL)
         validateRoleManageTask(board.getBoardId(), userId);
 
