@@ -6,13 +6,13 @@ import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.Attachment;
-import org.example.zentrio.model.Board;
 import org.example.zentrio.model.Checklist;
 import org.example.zentrio.repository.*;
 import org.example.zentrio.service.AttachmentService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -119,26 +119,22 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Attachment updateAttachment(AttachmentRequest attachmentRequest, UUID checklistId, UUID attachmentId) {
         validateChecklistAndAttachment(checklistId, attachmentId);
-        return attachmentRepository.updateAttachment(attachmentRequest, attachmentId);
+        return attachmentRepository.updateAttachment(attachmentRequest, attachmentId, LocalDateTime.now());
     }
 
     @Override
     public Attachment getAttachmentByChecklistId(UUID checklistId) {
         Attachment attachment = attachmentRepository.getAttachmentByChecklistId(checklistId);
         if (attachment == null) {
-            throw new BadRequestException("Attachment with id " + checklistId + " not found");
+            throw new BadRequestException("Attachment with checklist ID " + checklistId + " not found");
         }
         return attachment;
     }
 
     @Override
-    public Attachment deleteAttachmentById(UUID checklistId, UUID attachmentId) {
-        Attachment attachment = attachmentRepository.getAttachmentById(attachmentId);
-        if (attachment == null) {
-            throw new BadRequestException("Attachment with id " + attachmentId + " not found");
-        }
+    public void deleteAttachmentById(UUID checklistId, UUID attachmentId) {
+        validateChecklistAndAttachment(checklistId, attachmentId);
         attachmentRepository.deleteAttachmentById(checklistId, attachmentId);
-        return attachment;
     }
 
 }

@@ -73,14 +73,14 @@ public class AttachmentController {
 
     @Operation(summary = "Delete attachment", description = "Deleted attachment by attachment id")
     @DeleteMapping("/{attachment-id}/checklists/{checklist-id}")
-    public ResponseEntity<ApiResponse<Attachment>> deleteAttachmentById(
+    public ResponseEntity<?> deleteAttachmentById(
             @PathVariable("attachment-id") UUID attachmentId,
             @PathVariable("checklist-id") UUID checklistId
     ) {
-        ApiResponse<Attachment> apiResponse = ApiResponse.<Attachment>builder()
+        attachmentService.deleteAttachmentById(checklistId,attachmentId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Deleted attachment successfully")
-                .payload(attachmentService.deleteAttachmentById(checklistId,attachmentId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
