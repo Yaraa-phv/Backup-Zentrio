@@ -66,11 +66,14 @@ public class ChecklistController {
     @Operation(summary = "Get all checklist by tasks ID", description = "Get all checklist by specific tasks ID")
     @GetMapping("/tasks/{task-id}")
     public ResponseEntity<ApiResponse<HashSet<Checklist>>> getAllChecklistsByTaskId(
-            @PathVariable("task-id") UUID taskId,
-            @Positive @RequestParam(defaultValue = "1") Integer page,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
-        ApiResponse<HashSet<Checklist>> apiResponse = checklistService.getAllChecklistsByTaskId(taskId, page, size);
-
+            @PathVariable("task-id") UUID taskId) {
+        ApiResponse<HashSet<Checklist>> apiResponse = ApiResponse.<HashSet<Checklist>>builder()
+                .success(true)
+                .message("Get checklist by ID successfully")
+                .payload(checklistService.getAllChecklistsByTaskId(taskId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 

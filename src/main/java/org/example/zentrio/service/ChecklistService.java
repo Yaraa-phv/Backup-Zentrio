@@ -18,7 +18,7 @@ public interface ChecklistService {
 
     Checklist getChecklistChecklistId(UUID checklistId);
 
-    ApiResponse<HashSet<Checklist>> getAllChecklistsByTaskId(UUID taskId, Integer page, Integer size);
+    HashSet<Checklist> getAllChecklistsByTaskId(UUID taskId);
 
     Checklist updateChecklistByIdAndTaskId(ChecklistRequest checklistRequest, UUID checklistId);
 

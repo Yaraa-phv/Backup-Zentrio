@@ -55,10 +55,9 @@ public interface ChecklistRepository {
 
     @Select("""
                 SELECT * FROM checklists WHERE task_id = #{taskId}
-                LIMIT #{limit} OFFSET #{offset}
             """)
     @ResultMap("checklistMapper")
-    HashSet<Checklist> getAllChecklistsByTaskId(UUID taskId, Integer limit, Integer offset);
+    HashSet<Checklist> getAllChecklistsByTaskId(UUID taskId);
 
 
     @Select("""
@@ -135,7 +134,10 @@ public interface ChecklistRepository {
     HashSet<Checklist> getAllChecklists();
 
     @Select("""
-        SELECT * FROM checklists WHERE user_id = #{userId}
+        SELECT c.* FROM members m
+        INNER JOIN tasks ON m.member_id = tasks.created_by
+        INNER JOIN checklists c ON tasks.task_id = c.task_id
+        WHERE m.user_id = #{userId}
     """)
     @ResultMap("checklistMapper")
     HashSet<Checklist> getAllChecklistsByCurrentUser(UUID userId);

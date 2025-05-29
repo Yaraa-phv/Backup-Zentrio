@@ -18,6 +18,7 @@ import java.util.UUID;
 public class Checklist {
     private UUID checklistId;
     private String title;
+    private String description;
     private String status;
     private String cover;
     private LocalDateTime createdAt;
@@ -25,7 +26,7 @@ public class Checklist {
     private Integer checklistOrder;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
-    private List<MemberResponseData> members;
     private UUID taskId;
     private UUID createdBy;
+    private List<MemberResponseData> members;
 }

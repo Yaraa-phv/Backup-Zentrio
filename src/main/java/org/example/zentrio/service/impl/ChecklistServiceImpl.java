@@ -164,21 +164,12 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
-    public ApiResponse<HashSet<Checklist>> getAllChecklistsByTaskId(UUID taskId, Integer page, Integer size) {
-        taskService.getTaskById(taskId);
-        int offset = (page - 1) * size;
-        Integer totalElement = checklistRepository.countAllChecklistByTaskId(taskId);
-        HashSet<Checklist> checklistList = checklistRepository.getAllChecklistsByTaskId(taskId, size, offset);
-        int totalPages = (int) Math.ceil(totalElement / (double) size);
-
-        return ApiResponse.<HashSet<Checklist>>builder()
-                .success(true)
-                .message("Get all checklists by task ID successfully")
-                .payload(checklistList)
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .pagination(new Pagination(offset, size, totalPages))
-                .build();
+    public HashSet<Checklist> getAllChecklistsByTaskId(UUID taskId) {
+        Task task = taskRepository.getTaskByTaskId(taskId);
+        if (task == null) {
+            throw new NotFoundException("Task with ID " + taskId + " not found.");
+        }
+        return checklistRepository.getAllChecklistsByTaskId(taskId);
     }
 
     @Override
@@ -220,7 +211,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         UUID assigneeId = checklistRepository.findMemberIdByBoardIdAndUserId(task.getBoardId(), assignedTo);
         System.out.println("assigneeId: " + assigneeId);
         if (assigneeId == null) {
-            throw new NotFoundException("You are not a member of this board can't be assigned to this checklist");
+            throw new NotFoundException("User ID " + assignedTo + " are not a member of this board can't be assigned to this checklist");
         }
 
         if (checklistRepository.checklistIsAssigned(checklistId, assigneeId)) {

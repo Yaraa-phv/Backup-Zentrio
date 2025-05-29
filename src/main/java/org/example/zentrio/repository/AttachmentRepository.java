@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.AttachmentRequest;
 import org.example.zentrio.model.Attachment;
 import org.example.zentrio.utility.JsonbTypeHandler;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Mapper
@@ -28,12 +29,13 @@ public interface AttachmentRepository {
     Attachment createAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID checklistId, UUID userId);
 
     @Select("""
-                UPDATE attachments SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler}
+                UPDATE attachments SET details = #{req.details, jdbcType = OTHER, typeHandler=org.example.zentrio.utility.JsonbTypeHandler},
+                                       updated_at = #{updatedAt}
                 WHERE attachment_id = #{attachmentId}
                 RETURNING *
             """)
     @ResultMap("attachmentMapper")
-    Attachment updateAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID attachmentId);
+    Attachment updateAttachment(@Param("req") AttachmentRequest attachmentRequest, UUID attachmentId, LocalDateTime updatedAt);
 
 
     @Select("""

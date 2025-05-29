@@ -3,6 +3,7 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.AchievementRequest;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Achievement;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.repository.AchievementRepository;
@@ -27,36 +28,13 @@ public class AchievementServiceImpl implements AchievementService {
         if (isAlreadySetup) {
             throw new BadRequestException("You're already set up this achievement can't set up it again thank.");
         }
-
-        LocalDateTime now = LocalDateTime.now();
-        // created must be current time
-//        if (!achievementRequest.getCreatedAt().isBefore(now)) {
-//            throw new BadRequestException("created must be in the current time.");
-//        }
-//
-//        // updatedAt must be after now
-//        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
-//            throw new BadRequestException("updated must be after the current time.");
-//        }
         return achievementRepository.createAchievement(achievementRequest, userId);
     }
 
     @Override
     public Achievement updateAchievement(AchievementRequest achievementRequest) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-
-        LocalDateTime now = LocalDateTime.now();
-
-        // created must be current time
-//        if (!achievementRequest.getCreatedAt().isBefore(now)) {
-//            throw new BadRequestException("created must be in the current time.");
-//        }
-//
-//        // updatedAt must be after now
-//        if (!achievementRequest.getUpdatedAt().isAfter(now)) {
-//            throw new BadRequestException("updated must be after the current time.");
-//        }
-        return achievementRepository.updateAchievement(achievementRequest,userId);
+        return achievementRepository.updateAchievement(achievementRequest,userId,LocalDateTime.now());
     }
 
     @Override
@@ -69,4 +47,15 @@ public class AchievementServiceImpl implements AchievementService {
     public Achievement getAllAchievements() {
         return achievementRepository.getAllAchievements();
     }
+
+    @Override
+    public void deleteAchievement(UUID achievementId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Achievement achievement = achievementRepository.getAchievementById(achievementId);
+        if (achievement == null) {
+            throw new NotFoundException("Achievement not found");
+        }
+        achievementRepository.deletedAchievement(achievementId,userId);
+    }
+
 }

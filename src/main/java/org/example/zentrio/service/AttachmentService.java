@@ -12,5 +12,5 @@ public interface AttachmentService {
 
     Attachment getAttachmentByChecklistId(UUID checklistId);
 
-    Attachment deleteAttachmentById(UUID checklistId,UUID attachmentId);
+    void deleteAttachmentById(UUID checklistId,UUID attachmentId);
 }

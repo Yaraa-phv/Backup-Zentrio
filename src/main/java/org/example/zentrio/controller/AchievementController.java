@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/achievements")
@@ -50,18 +51,18 @@ public class AchievementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "Updated achievement", description = "update achievement for a user")
+    @Operation(summary = "Update achievement", description = "Updated achievement for a user")
     @PutMapping
     public ResponseEntity<ApiResponse<Achievement>> updateAchievement(@Valid @RequestBody AchievementRequest achievementRequest) {
         System.out.println("Details: " + achievementRequest.getDetails());
         ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
                 .success(true)
-                .message("Update achievement successfully")
+                .message("Updated achievement successfully")
                 .payload(achievementService.updateAchievement(achievementRequest))
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @Operation(summary = "Get all achievement ",description = "Get all achievement")
@@ -71,6 +72,20 @@ public class AchievementController {
                 .success(true)
                 .message("Get all achievement successfully")
                 .payload(achievementService.getAllAchievements())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Deleted achievement for current users",description = "Deleted achievement for current users")
+    @DeleteMapping("/achievement-id")
+    public ResponseEntity<?> deleteAchievement(@RequestParam("achievement-id") UUID achievementId) {
+        achievementService.deleteAchievement(achievementId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Deleted all achievement successfully")
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
