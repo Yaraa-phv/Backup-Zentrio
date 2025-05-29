@@ -1,10 +1,9 @@
 package org.example.zentrio.service.impl;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.CalendarRequest;
-import org.example.zentrio.dto.request.CommentRequest;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.*;
 import org.example.zentrio.repository.CalendarRepository;
@@ -34,7 +33,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
 
-    private void validateNotedWithChecklist(CalendarRequest calendarRequest, Checklist checklist) {
+    private void validateNoteWithTask(CalendarRequest calendarRequest, Task task) {
         LocalDateTime now = LocalDateTime.now();
 
         //  Checklist start time cannot be in the past
@@ -48,12 +47,12 @@ public class CalendarServiceImpl implements CalendarService {
             }
 
             // Checklist finish time must not exceed Task's finish time
-            if (calendarRequest.getTillDate().isAfter(checklist.getFinishedAt())) {
+            if (calendarRequest.getTillDate().isAfter(task.getFinishedAt())) {
                 throw new BadRequestException("Checklist finish time cannot exceed Task's finish time.");
             }
 
 //        // Checklist start time must not be before Task's start time
-            if (calendarRequest.getStartDate().isBefore(checklist.getStartedAt())) {
+            if (calendarRequest.getStartDate().isBefore(task.getStartedAt())) {
                 throw new BadRequestException("Checklist start time cannot be before Task's start time.");
             }
         }
@@ -61,9 +60,9 @@ public class CalendarServiceImpl implements CalendarService {
 
 
     @Override
-    public HashSet<Checklist> getCalendarForCurrentUser(UUID boardId) {
+    public HashSet<Task> getCalendarForCurrentUser(UUID boardId) {
         boardService.getBoardByBoardId(boardId);
-        HashSet<Checklist>  calendar=new HashSet<>(calendarRepository.getCalendarTasksForUser(userId(), boardId))  ;
+        HashSet<Task>  calendar=new HashSet<>(calendarRepository.getCalendarTasksForUser(userId(), boardId))  ;
         if (calendar.isEmpty()){
             throw new NotFoundException("No calendar found for userId: " + userId());
 
@@ -74,15 +73,9 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public Calendar CreateNoteInCalendar( CalendarRequest calendarRequest) {
-
-    Checklist checklist = checklistService.getChecklistChecklistId(calendarRequest.getChecklistId());
-    UUID checkListId= checklist.getChecklistId();
-    validateNotedWithChecklist(calendarRequest, checklist);
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.setContent(calendarRequest.getNoted());
-        commentRequest.setChecklistId(calendarRequest.getChecklistId());
-     Comment comment= commentService.createComment(commentRequest );
-    Calendar calendar= calendarRepository.createCalendar(calendarRequest,LocalDateTime.now(), userId(), checkListId,comment.getId());
+    Task   task= taskService.getTaskById(calendarRequest.getTaskId());
+        validateNoteWithTask(calendarRequest,task);
+    Calendar calendar= calendarRepository.createCalendar(calendarRequest,LocalDateTime.now(), userId());
 
         return calendar;
     }
@@ -97,9 +90,9 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public HashSet<Calendar> getAllCalendarByChecklistId(UUID checklistId) {
-            checklistService.getChecklistChecklistId(checklistId);
-        HashSet<Calendar> calendars= new HashSet<>(calendarRepository.getAllCalendarByChecklistId(checklistId));
+    public HashSet<Calendar> getAllCalendarByTaskId(UUID taskId) {
+          taskService.getTaskById(taskId);
+        HashSet<Calendar> calendars= new HashSet<>(calendarRepository.getAllNoteByTaskId(taskId,userId()));
         if (calendars.isEmpty()){
             throw new NotFoundException("No calendar found for userId: " + userId());
         }
@@ -112,27 +105,28 @@ public class CalendarServiceImpl implements CalendarService {
       if (calendar == null){
           throw new NotFoundException("No calendar found for userId: " + userId());
       }
+      Task  task= taskService.getTaskById(calendarRequest.getTaskId());
+      validateNoteWithTask(calendarRequest,task);
 
-      UUID checkListId = calendar.getCheckListId();
-        Checklist checklist = checklistService.getChecklistChecklistId(checkListId);
-        validateNotedWithChecklist(calendarRequest, checklist);
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.setContent(calendarRequest.getNoted());
-        commentService.UpdateCommentByCommentId(calendar.getCommentId(),commentRequest );
-        Calendar calendarUpdate= calendarRepository.UpdateCalendarByNoteId(calendarRequest,noteId);
-
+        Calendar calendarUpdate= calendarRepository.UpdateCalendarByNoteId(calendarRequest,noteId, userId());
+            if (calendarUpdate == null){
+                throw new NotFoundException("No calendar updated for userId: " + userId());
+            }
 
         return calendarUpdate;
     }
 
     @Override
-    public Void deleteCalendarByNoteId(UUID noteId) {
+    public Void deleteCalendarByNoteId(UUID noteId, UUID taskId) {
         Calendar calendar = getCalendarById(noteId);
+        System.out.println(calendar);
         if (calendar == null) {
             throw new NotFoundException("No calendar found ");
         }
-        commentService.deleteCommentByCommentId(calendar.getCommentId());
-        calendarRepository.deleteCalendarByNoteId(noteId);
+        if (!calendar.getUserId().equals(userId())) {
+            throw new ForbiddenException("You are not allowed to delete this calendar");
+        }
+      calendarRepository.deleteCalendarByNoteId(noteId, taskId,userId());
 
         return null;
     }
