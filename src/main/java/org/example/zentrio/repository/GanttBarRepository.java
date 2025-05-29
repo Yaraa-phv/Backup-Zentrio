@@ -60,9 +60,8 @@ public interface GanttBarRepository {
                 DELETE FROM gantt_bars
                 WHERE gantt_bar_id = #{ganttBarId}
                 AND gantt_chart_id = #{ganttChartId}
-                RETURNING *
+            
             """)
-    @ResultMap("ganttBarMapper")
     void deleteGanttBarByGanttBarId(UUID ganttBarId, UUID ganttChartId);
 
     @Select("""

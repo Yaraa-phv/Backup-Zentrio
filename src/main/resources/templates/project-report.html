@@ -5,48 +5,50 @@
     <title th:text="${boardName} + ' - Project Report'">Project Report</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: #1e293b;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9fafb;
+            color: #333;
             margin: 0;
             padding: 20px;
-            line-height: 1.6;
+            line-height: 1.5;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 960px;
             margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
             overflow: hidden;
+            padding: 30px 40px;
         }
 
         .header {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-            color: white;
-            padding: 40px;
             text-align: center;
-            position: relative;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .header h1 {
-            margin: 0 0 8px;
-            font-size: 2.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1.8rem;
+            margin: 0;
+            color: #1f2937;
         }
 
-        .header .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 24px;
+        .header p {
+            font-size: 1rem;
+            color: #6b7280;
+            margin: 8px 0 0;
         }
 
         .meta-info {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 30px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
 
@@ -55,156 +57,139 @@
         }
 
         .meta-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
+            font-size: 0.75rem;
+            color: #6b7280;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 4px;
         }
 
         .meta-value {
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 600;
+            color: #111827;
         }
 
         .status-badge {
-            background: #dcfce7;
-            color: #166534;
-            padding: 4px 12px;
-            border-radius: 20px;
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 5px 14px;
+            border-radius: 9999px;
             font-size: 0.75rem;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
         }
 
-        .content {
-            padding: 40px;
-        }
-
         .section {
-            margin-bottom: 48px;
+            margin-bottom: 40px;
         }
 
         .section-header {
-            margin-bottom: 24px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f1f5f9;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.3rem;
+            font-weight: 600;
             color: #2563eb;
             margin: 0;
         }
 
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
         }
 
         .team-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #374151;
+            box-shadow: none;
+            transition: box-shadow 0.3s ease;
         }
 
         .team-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-color: #2563eb;
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
         }
 
         .role-name {
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             color: #2563eb;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: capitalize;
         }
 
         .member-count {
             font-size: 2rem;
-            font-weight: bold;
-            color: #1e293b;
+            font-weight: 700;
+            color: #111827;
         }
 
         .member-count .label {
-            font-size: 0.875rem;
-            font-weight: normal;
-            color: #94a3b8;
-            margin-left: 8px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #6b7280;
+            margin-left: 6px;
         }
 
         .tasks-table {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-            width: 100%;
-        }
-
-        .tasks-table table {
             width: 100%;
             border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
         }
 
-        .table-header {
-            background: #2563eb;
-            color: white;
-        }
-
-        .table-header th {
-            padding: 20px 24px;
-            font-weight: bold;
+        .tasks-table th,
+        .tasks-table td {
+            padding: 14px 18px;
             text-align: left;
-            font-size: 0.875rem;
+        }
+
+        .tasks-table thead {
+            background-color: #2563eb;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
             text-transform: uppercase;
         }
 
-        .table-body tr {
-            border-bottom: 1px solid #f1f5f9;
+        .tasks-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
             transition: background-color 0.2s ease;
         }
 
-        .table-body tr:hover {
-            background: #f8fafc;
-        }
-
-        .table-body tr:last-child {
-            border-bottom: none;
-        }
-
-        .table-body td {
-            padding: 20px 24px;
-            vertical-align: top;
+        .tasks-table tbody tr:hover {
+            background-color: #eff6ff;
         }
 
         .task-name {
-            font-weight: bold;
+            font-weight: 600;
             color: #1e293b;
             font-size: 1rem;
         }
 
         .task-total {
-            font-size: 1.25rem;
-            font-weight: bold;
+            font-weight: 700;
             color: #2563eb;
+            font-size: 1.1rem;
         }
 
         .checklist-container {
-            max-width: 400px;
+            max-width: 360px;
         }
 
         .checklist-item {
-            background: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
-            border: 1px solid #e0f2fe;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
+            background: #f9fafb;
+            border: 1px solid #dbeafe;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             transition: transform 0.2s ease;
         }
 
@@ -212,22 +197,19 @@
             transform: translateX(4px);
         }
 
-        .checklist-item:last-child {
-            margin-bottom: 0;
-        }
-
         .checklist-title {
-            font-weight: bold;
+            font-weight: 600;
             color: #2563eb;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-size: 0.95rem;
         }
 
         .checklist-detail {
             display: flex;
             justify-content: space-between;
+            font-size: 0.85rem;
+            color: #4b5563;
             margin-bottom: 6px;
-            font-size: 0.875rem;
         }
 
         .checklist-detail:last-child {
@@ -235,63 +217,47 @@
         }
 
         .detail-label {
-            font-weight: bold;
-            color: #64748b;
+            font-weight: 700;
+            color: #6b7280;
             min-width: 60px;
         }
 
         .detail-value {
-            color: #1e293b;
+            color: #1f2937;
             text-align: right;
         }
 
         .attachment-info {
-            background: #10b981;
+            background-color: #10b981;
             color: white;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
             font-size: 0.75rem;
-            font-weight: bold;
+            font-weight: 700;
+            display: inline-block;
         }
 
         .footer {
-            background: #f1f5f9;
-            padding: 24px 40px;
             text-align: center;
-            color: #94a3b8;
-            font-size: 0.875rem;
-            border-top: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            border-top: 1px solid #e5e7eb;
+            padding: 18px 0 0;
+            margin-top: 40px;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 12px;
-            }
-
-            .content {
-                padding: 24px;
-            }
-
-            .header {
-                padding: 32px 24px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 20px;
             }
 
             .meta-info {
                 flex-direction: column;
-                gap: 16px;
+                gap: 12px;
             }
 
             .team-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .table-header th,
-            .table-body td {
-                padding: 16px 12px;
             }
 
             .checklist-container {
@@ -303,8 +269,8 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1 th:text="${boardName}">Project Dashboard</h1>
-        <p class="subtitle">Comprehensive Project Report</p>
+        <h1>Report from <span th:text="${boardName}">Project Dashboard</span></h1>
+        <p>Comprehensive Project Report</p>
 
         <div class="meta-info">
             <div class="meta-item">
@@ -348,14 +314,14 @@
 
             <div class="tasks-table">
                 <table>
-                    <thead class="table-header">
+                    <thead>
                     <tr>
                         <th>Task Name</th>
                         <th>Total Items</th>
                         <th>Checklist Details</th>
                     </tr>
                     </thead>
-                    <tbody class="table-body">
+                    <tbody>
                     <tr th:each="task : ${allTasks}">
                         <td>
                             <div class="task-name" th:text="${task.task}">Development Phase</div>
@@ -381,11 +347,11 @@
                                     <div th:if="${cl.attachments != null}" class="checklist-detail">
                                         <span class="detail-label">File:</span>
                                         <span class="detail-value">
-                                                    <span class="attachment-info"
-                                                          th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'">
-                                                        document.pdf (2.5MB)
-                                                    </span>
-                                                </span>
+                                            <span class="attachment-info"
+                                                  th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'">
+                                                document.pdf (2.5MB)
+                                            </span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

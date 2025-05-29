@@ -54,7 +54,6 @@ public interface GanttChartRepository {
                 WHERE gantt_chart_id = #{ganttChartId}
                 AND board_id = #{boardId}
             """)
-    @ResultMap("ganttChartMapper")
     void deleteGanttChartById(UUID ganttChartId, UUID boardId);
 
 

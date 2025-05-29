@@ -46,7 +46,7 @@ public interface CommentRepository {
 
     @Select("""
         DELETE FROM comments  WHERE comment_id= #{commentId}
-        RETURNING *
+     
         """)
     void deleteCommentByCommentId(UUID commentId);
 
