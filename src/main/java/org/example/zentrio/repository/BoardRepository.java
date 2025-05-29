@@ -6,6 +6,7 @@ import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.Workspace;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -47,12 +48,13 @@ public interface BoardRepository {
     @Select("""
                 UPDATE boards SET title = #{request.title},
                                   description = #{request.description},
-                                  cover = #{request.cover}
+                                  cover = #{request.cover},
+                                  updated_at= #{time}
                 WHERE board_id = #{boardId}
                 RETURNING *
             """)
     @ResultMap("boardMapper")
-    Board updateBoardByBoardId(@Param("request") BoardRequest boardRequest, UUID boardId);
+    Board updateBoardByBoardId(@Param("request") BoardRequest boardRequest, UUID boardId, LocalDateTime time);
 
 
     @Select("""

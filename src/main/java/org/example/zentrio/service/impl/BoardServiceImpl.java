@@ -114,7 +114,7 @@ public class BoardServiceImpl implements BoardService {
             throw new NotFoundException("You're doesn't have permission to update this board");
         }
 
-        return boardRepository.updateBoardByBoardId(boardRequest, boardId);
+        return boardRepository.updateBoardByBoardId(boardRequest, boardId, LocalDateTime.now());
     }
 
     @Override
