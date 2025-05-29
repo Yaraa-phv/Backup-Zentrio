@@ -196,7 +196,7 @@ public class BoardServiceImpl implements BoardService {
         String newRoleName = assignedRoleRequest.getRoleName().toString();
 
         // Prevent assigning more than one Manager role
-        if (MANAGER_ROLE.equals(newRoleName) && existingRoles.contains(MANAGER_ROLE)) {
+        if (MANAGER_ROLE.equals(newRoleName) || existingRoles.contains(MANAGER_ROLE)) {
             throw new ConflictException("User already has Manager role on this board.");
         }
 
