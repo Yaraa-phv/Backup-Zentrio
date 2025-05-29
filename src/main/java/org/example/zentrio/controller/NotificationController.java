@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.model.Notification;
 import org.example.zentrio.service.NotificationService;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/notifications")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
+@Tag(name = "Notification Controller")
 public class NotificationController {
 
     private final NotificationService notificationService;

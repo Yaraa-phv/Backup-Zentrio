@@ -4,6 +4,7 @@ package org.example.zentrio.controller;
 import com.google.api.services.drive.model.File;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.response.ApiResponse;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Drive Upload Controller")
 public class FileUploadDriveController {
 
     private final FileUploadService fileService;

@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequestMapping("api/v1/gantt-bars")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Gantt-bars Controller")
+@Tag(name = "Gantt Bars Controller")
 public class GanttBarController {
 
     private final GanttBarService ganttBarService;

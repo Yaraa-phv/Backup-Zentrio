@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.example.zentrio.dto.request.DocumentRequest;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Documentation Controller")
 public class DocumentController {
 
     private final DocumentService documentService;

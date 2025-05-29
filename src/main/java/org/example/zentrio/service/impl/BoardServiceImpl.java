@@ -348,14 +348,14 @@ public class BoardServiceImpl implements BoardService {
                 // If the user exists, redirect them to the board page.
                 // Note: This URL is just an example; the actual URL should be
                 // obtained dynamically from the frontend.
-                return "http://localhost:8080/swagger-ui/index.html";
+                return "http://35.187.228.225:9090/swagger-ui/index.htm";
             }
             boardRepository.insertMember(userId, boardId, roleId);
             // If a user is found and is not yet assigned to a board,
             // upon acceptance, they should be redirected to the board page.
             // Note: The URL shown here is just an example; the real URL
             // should be dynamically obtained from the frontend.
-            return "http://localhost:8080/swagger-ui/index.html";
+            return "http://35.187.228.225:9090/swagger-ui/index.htm";
     }
 
     public void validateCurrentUserRoles(UUID boardId) {
