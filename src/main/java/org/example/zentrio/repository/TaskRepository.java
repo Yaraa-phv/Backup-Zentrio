@@ -7,6 +7,7 @@ import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.model.Task;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -56,25 +57,19 @@ public interface TaskRepository {
     HashSet<Task> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId);
 
     @Select("""
-            SELECT COUNT(*) FROM tasks
-            WHERE board_id = #{boardId}
-            AND gantt_bar_id = #{ganttBarId}
-            """)
-    Integer countTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId);
-
-    @Select("""
                 UPDATE tasks SET
                                  title = #{request.title},
                                  description = #{request.description},
                                  started_at = #{request.startedAt},
-                                 finished_at = #{request.finishedAt}
+                                 finished_at = #{request.finishedAt},
+                                 updated_at = #{updatedAt}
                 WHERE task_id = #{taskId}
                 AND board_id = #{boardId}
                 AND gantt_bar_id = #{ganttBarId}
                 RETURNING *
             """)
     @ResultMap("taskMapper")
-    Task updateTaskByIdWithBoardIdAndGanttBarId(@Param("request") TaskRequest taskRequest, UUID taskId, UUID boardId, UUID ganttBarId);
+    Task updateTaskByIdWithBoardIdAndGanttBarId(@Param("request") TaskRequest taskRequest, UUID taskId, UUID boardId, UUID ganttBarId, LocalDateTime updatedAt);
 
     @Select("""
                 DELETE FROM tasks
@@ -202,7 +197,17 @@ public interface TaskRepository {
 
 
     @Select("""
-        SELECT board_id FROM tasks WHERE task_id = #{taskId}
-    """)
+                SELECT board_id FROM tasks WHERE task_id = #{taskId}
+            """)
     UUID getBoardIdByTaskId(UUID taskId);
+
+
+    @Select("""
+            SELECT EXISTS (
+            SELECT 1
+             FROM task_assignments tk
+            WHERE tk.task_id = #{taskId}
+              )
+            """)
+    boolean isTaskAssigned(UUID taskId);
 }

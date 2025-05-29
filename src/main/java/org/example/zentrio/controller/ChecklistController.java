@@ -75,7 +75,7 @@ public class ChecklistController {
     }
 
     @Operation(summary = "Update checklist by ID and task ID ", description = "Updated checklist by ID with specific tasks ID")
-    @PutMapping("/{checklist-id}/tasks/{task-id}")
+    @PutMapping("/{checklist-id}")
     public ResponseEntity<ApiResponse<Checklist>> updateChecklistByIdAndTaskId(
             @Valid @RequestBody ChecklistRequest checklistRequest,
             @PathVariable("checklist-id") UUID checklistId) {
@@ -107,7 +107,7 @@ public class ChecklistController {
 
 
     @Operation(summary = "Upload cover of checklist by checklist ID",description = "Upload cover of checklist specific checklist ID")
-    @PostMapping(value = "/{checklistId}/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{checklistId}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileMetadata>> uploadCover(
             @PathVariable UUID checklistId,
             @RequestParam("file") MultipartFile file){
@@ -134,7 +134,7 @@ public class ChecklistController {
 
 
     @Operation(summary = "Update status of checklist by ID",description = "Update status of checklist by specific checklist ID")
-    @PutMapping("/{checklist-id}")
+    @PutMapping("/{checklist-id}/status")
     public ResponseEntity<?> updateStatusOfChecklistById(
             @PathVariable("checklist-id") UUID checklistId,
             ChecklistStatus status){

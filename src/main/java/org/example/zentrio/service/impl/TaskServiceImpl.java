@@ -168,7 +168,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public HashSet<Task> getAllTasksByBoardIdAndGanttBarId(UUID boardId, UUID ganttBarId) {
         validateBoardAndGanttBar(boardId, ganttBarId);
-        return taskRepository.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
+        HashSet<Task> tasks= taskRepository.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("Task is empty nothing to updated");
+        }
+        return tasks;
+
     }
 
     @Override
@@ -210,7 +215,7 @@ public class TaskServiceImpl implements TaskService {
         validateBoardAndGanttBarAndTaskTime(taskRequest.getBoardId(), taskRequest.getGanttBarId(), taskRequest);
 
         // Step 7: Update the task in the DB
-        return taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, taskRequest.getBoardId(), taskRequest.getGanttBarId());
+        return taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, taskRequest.getBoardId(), taskRequest.getGanttBarId(),LocalDateTime.now());
     }
 
 
@@ -335,6 +340,7 @@ public class TaskServiceImpl implements TaskService {
        Task task = getTaskById(taskId);
        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         String role = memberRepository.getRoleInTask(task.getBoardId(),userId,taskId);
+        System.out.println("role : " + role);
         if(role == null) {
             throw new ForbiddenException("You do not have permission to update this task");
         }
@@ -348,7 +354,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void updateProgressOfTaskById(UUID taskId) {
-        getTaskById(taskId);
+        Task task = getTaskById(taskId);
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        System.out.println("task" + task.getBoardId());
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(task.getBoardId(),userId);
+        System.out.println("roleName: " + roleName);
+        if(roleName == null) {
+            throw new ForbiddenException("You do not have permission to update this task");
+        }
+
+
         taskRepository.updateProgressOfTaskById(taskId,Stage.IN_PROGRESS.toString());
     }
 

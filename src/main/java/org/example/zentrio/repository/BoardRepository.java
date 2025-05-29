@@ -4,7 +4,6 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
-import org.example.zentrio.model.Workspace;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -49,12 +48,12 @@ public interface BoardRepository {
                 UPDATE boards SET title = #{request.title},
                                   description = #{request.description},
                                   cover = #{request.cover},
-                                  updated_at= #{time}
+                                  updated_at= #{updatedAt}
                 WHERE board_id = #{boardId}
                 RETURNING *
             """)
     @ResultMap("boardMapper")
-    Board updateBoardByBoardId(@Param("request") BoardRequest boardRequest, UUID boardId, LocalDateTime time);
+    Board updateBoardByBoardId(@Param("request") BoardRequest boardRequest, UUID boardId, LocalDateTime updatedAt);
 
 
     @Select("""
@@ -93,6 +92,7 @@ public interface BoardRepository {
     @Results(id = "boardWithMembersMap", value = {
             @Result(property = "userId", column = "user_id"),
             @Result(property = "username", column = "username"),
+            @Result(property = "profileImage",column = "profile_image"),
             @Result(property = "email", column = "email"),
             @Result(property = "roles", column = "user_id",
                     many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId"))

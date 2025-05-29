@@ -188,7 +188,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         validateChecklistIdAndTaskId(checklistId, checklistRequest.getTaskId());
         validateChecklistWithTaskTime(checklistRequest, task);
         validateChecklistAccess(checklistRequest.getTaskId(), task.getBoardId(), userId);
-        return checklistRepository.updateChecklistByIdAndTaskId(checklistRequest, checklistId, checklistRequest.getTaskId());
+        return checklistRepository.updateChecklistByIdAndTaskId(checklistRequest, checklistId, checklistRequest.getTaskId(),LocalDateTime.now());
     }
 
     @Override

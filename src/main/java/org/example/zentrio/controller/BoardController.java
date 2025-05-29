@@ -11,6 +11,7 @@ import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.FileMetadata;
 import org.example.zentrio.service.BoardService;
@@ -216,8 +217,9 @@ public class BoardController {
     @GetMapping("/{board-id}/invitations/accept")
     public ResponseEntity<?> acceptInvitation(
             @PathVariable("board-id") UUID boardId,
-            @RequestParam String email) {
-        String redirectUrl = boardService.acceptBoardInvitation(boardId, email);
+            @RequestParam String email,
+            @RequestParam RoleRequest roleRequest) {
+        String redirectUrl = boardService.acceptBoardInvitation(boardId, email,roleRequest);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
                 .build();

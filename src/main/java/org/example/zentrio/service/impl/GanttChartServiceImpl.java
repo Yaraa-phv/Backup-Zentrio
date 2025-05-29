@@ -103,7 +103,7 @@ public class GanttChartServiceImpl implements GanttChartService {
         if (memberId == null) {
             throw new ForbiddenException("You're not a manager in this board can't updated gantt chart");
         }
-        return ganttChartRepository.updateGanttChartByGanttChartId(ganttChartRequest, ganttChartId, ganttChartRequest.getBoardId());
+        return ganttChartRepository.updateGanttChartByGanttChartId(ganttChartRequest, ganttChartId, ganttChartRequest.getBoardId(), LocalDateTime.now());
     }
 
 

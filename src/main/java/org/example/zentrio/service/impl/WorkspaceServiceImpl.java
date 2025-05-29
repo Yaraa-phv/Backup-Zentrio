@@ -86,7 +86,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public Workspace updateWorkspaceById(UUID workspaceId, WorkspaceRequest workspaceRequest) {
         getWorkspaceById(workspaceId);
-        return workspaceRepository.updateWorkspaceById(workspaceId, workspaceRequest, currentUserId());
+        return workspaceRepository.updateWorkspaceById(workspaceId, workspaceRequest, currentUserId(),LocalDateTime.now());
     }
 
 

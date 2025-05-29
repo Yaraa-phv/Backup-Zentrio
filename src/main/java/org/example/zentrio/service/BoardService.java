@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,5 +47,5 @@ public interface BoardService {
 
     HashSet<Board> getAllBoards();
 
-    String acceptBoardInvitation(UUID boardId, String email);
+    String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest);
 }

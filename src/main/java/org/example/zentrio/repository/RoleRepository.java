@@ -19,6 +19,7 @@ public interface RoleRepository {
                 ON r.role_id = m.role_id
                 WHERE board_id = #{boardId}
                 AND user_id = #{userId}
+                AND r.role_name = 'ROLE_MANAGER'
             """)
     String getRoleNameByBoardIdAndUserId(UUID boardId, UUID userId);
 
@@ -39,7 +40,7 @@ public interface RoleRepository {
 
 
     @Select("""
-                SELECT r.role_name FROM members m
+                SELECT DISTINCT r.role_name FROM members m
                 INNER JOIN roles r ON r.role_id = m.role_id
                 WHERE m.user_id = #{userId}
             """)
@@ -56,7 +57,7 @@ public interface RoleRepository {
 
 
     @Select("""
-            SELECT  role_name FROM roles 
+            SELECT  role_name FROM roles
             WHERE role_id=#{roleId}
             """)
     String getRoleByRoleId(UUID roleId);

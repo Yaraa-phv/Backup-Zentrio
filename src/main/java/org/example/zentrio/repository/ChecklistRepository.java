@@ -6,6 +6,7 @@ import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Checklist;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -63,12 +64,13 @@ public interface ChecklistRepository {
     @Select("""
                 UPDATE checklists SET title = #{checklistRequest.title},
                                       started_at = #{checklistRequest.startedAt},
-                                      finished_at = #{checklistRequest.finishedAt}
+                                      finished_at = #{checklistRequest.finishedAt},
+                                      updated_at = #{updatedAt}
                 WHERE checklist_id = #{checklistId} AND task_id = #{taskId}
                 RETURNING *
             """)
     @ResultMap("checklistMapper")
-    Checklist updateChecklistByIdAndTaskId(@Param("checklistRequest") ChecklistRequest checklistRequest, UUID checklistId, UUID taskId);
+    Checklist updateChecklistByIdAndTaskId(@Param("checklistRequest") ChecklistRequest checklistRequest, UUID checklistId, UUID taskId, LocalDateTime updatedAt);
 
     @Select("""
                 DELETE FROM checklists WHERE checklist_id = #{checklistId} AND task_id = #{taskId}

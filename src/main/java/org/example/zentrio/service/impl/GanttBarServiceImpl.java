@@ -38,6 +38,11 @@ public class GanttBarServiceImpl implements GanttBarService {
             throw new ForbiddenException("You're not a manager of this board can't create Gantt bar");
         }
 
+        if(ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
+            throw new BadRequestException("Finished time should be after started time");
+        }
+
+
         return ganttBarRepository.createGanttBarByGanttChartId(ganttBarRequest, ganttBarRequest.getGanttChartId());
     }
 
@@ -70,6 +75,9 @@ public class GanttBarServiceImpl implements GanttBarService {
         UUID memberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId,ganttChart.getBoardId());
         if(memberId == null) {
             throw new ForbiddenException("You're not a manager of this board can't updated Gantt bar");
+        }
+        if(ganttBarRequest.getFinishedAt().isBefore(ganttBarRequest.getStartedAt())){
+            throw new BadRequestException("Finished time should be after started time");
         }
         return ganttBarRepository.updateGanttBarByGanttBarId(ganttBarRequest,ganttBarId,ganttBarRequest.getGanttChartId());
     }

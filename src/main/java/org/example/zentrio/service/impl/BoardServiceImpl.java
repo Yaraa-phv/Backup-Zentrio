@@ -11,6 +11,7 @@ import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ConflictException;
 import org.example.zentrio.exception.ForbiddenException;
@@ -184,10 +185,6 @@ public class BoardServiceImpl implements BoardService {
         }
 
         UUID roleId = roleRepository.getRoleIdByRoleName(assignedRoleRequest.getRoleName().toString());
-        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(assignedRoleRequest.getBoardId(), assignedRoleRequest.getAssigneeId());
-        if(roleName.equals(RoleName.ROLE_MANAGER.toString())) {
-            throw new BadRequestException("User is already has role manager cannot assign role to this board");
-        }
 
         // Get all existing roles of the user on this board
         List<String> existingRoles = roleRepository.getRolesNameByBoardIdAndUserId(
@@ -288,9 +285,9 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests) {
         getBoardByBoardId(boardId);
-        inviteRequests.forEach(inviteRequest -> {
-            emailService.sendInvitations(boardId,inviteRequest.getEmail());
-        });
+        for(InviteRequest inviteRequest : inviteRequests) {
+            emailService.sendInvitations(boardId, inviteRequest.getEmail(),inviteRequest.getRoleName());
+        }
     }
 
     @Override
@@ -315,7 +312,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public String acceptBoardInvitation(UUID boardId, String email) {
+    public String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest) {
 
         log.info("acceptBoardInvitation: boardId: {}, email: {}", boardId, email);
             getBoardByBoardId(boardId);
@@ -328,7 +325,7 @@ public class BoardServiceImpl implements BoardService {
             }
             UUID userId = appUser.getUserId();
         System.out.println("acceptBoardInvitation: userId: " + userId);
-            UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_MEMBER.toString());
+            UUID roleId = roleRepository.getRoleIdByRoleName(roleRequest.toString());
             if (roleId == null) {
                 // If the user is not found, redirect to the login/sign-in page.
                 // Note: This URL is just an example; the actual URL should be

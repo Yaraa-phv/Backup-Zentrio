@@ -19,5 +19,5 @@ public class InviteRequest {
     private String email;
 
     @NotNull
-    private String roleName;
+    private RoleRequest roleName;
 }

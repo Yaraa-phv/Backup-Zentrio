@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.model.Workspace;
 
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -58,12 +59,13 @@ public interface WorkspaceRepository {
     List<Workspace> getWorkspaceByTitle(String title);
 
     @Select("""
-        UPDATE workspaces SET title = #{request.title}, description = #{request.description}
+        UPDATE workspaces SET title = #{request.title}, description = #{request.description},
+                          updated_at = #{updatedAt}
         WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
         RETURNING *
     """)
     @ResultMap("workspaceMapper")
-    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest,UUID userId);
+    Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest, UUID userId, LocalDateTime updatedAt);
 
     @Select("""
         DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}

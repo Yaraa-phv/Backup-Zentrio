@@ -5,6 +5,7 @@ import org.example.zentrio.dto.request.GanttChartRequest;
 import org.example.zentrio.model.GanttChart;
 
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Mapper
@@ -32,13 +33,13 @@ public interface GanttChartRepository {
     GanttChart getAllGanttChartByBoardId(UUID boardId);
 
     @Select("""
-                UPDATE gantt_charts SET title = #{request.title}
+                UPDATE gantt_charts SET title = #{request.title}, updated_at = #{updatedAt}
                 WHERE gantt_chart_id = #{ganttChartId}
                 AND board_id = #{boardId}
                 RETURNING *
             """)
     @ResultMap("ganttChartMapper")
-    GanttChart updateGanttChartByGanttChartId(@Param("request") GanttChartRequest ganttChartRequest, UUID ganttChartId, UUID boardId);
+    GanttChart updateGanttChartByGanttChartId(@Param("request") GanttChartRequest ganttChartRequest, UUID ganttChartId, UUID boardId, LocalDateTime updatedAt);
 
     @Select("""
                 SELECT * FROM gantt_charts

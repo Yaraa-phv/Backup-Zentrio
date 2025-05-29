@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.service.EmailService;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -50,7 +51,7 @@ public class EmailServiceImpl implements EmailService {
 
 
     @Override
-    public void sendInvitations(UUID boardId,String email) {
+    public void sendInvitations(UUID boardId, String email, RoleRequest role) {
 
        log.info("send invitations to email {}", email);
 
@@ -67,6 +68,7 @@ public class EmailServiceImpl implements EmailService {
             String acceptInvitationUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                             .path("/api/boards/" + boardId + "/invitations/accept")
                             .queryParam("email",email)
+                            .queryParam("role",role.name())
                             .toUriString();
 
             log.info("accept invitation {}", acceptInvitationUrl);
