@@ -28,6 +28,6 @@ public class CalendarRequest {
     private LocalDateTime tillDate;
 
     @NotNull
-    private UUID checklistId;
+    private UUID taskId;
 
 }

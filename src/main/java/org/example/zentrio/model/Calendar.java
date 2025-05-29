@@ -17,8 +17,8 @@ public class Calendar {
     private String noted;
     private LocalDateTime notedAt;
     private LocalDateTime tillDate;
-    private UUID checkListId;
+    private UUID taskId;
     private UUID userId;
-    private UUID commentId;
+
 
 }
