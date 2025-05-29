@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitation</title>
+  <style>
+    /* Improved styles for a better visual experience */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #333333;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .email-header {
+      background: linear-gradient(135deg, #4361ee 0%, #3a56dd 50%, #2a46cd 100%);
+      padding: 30px 0;
+      text-align: center;
+      position: relative;
+    }
+
+    .email-header:after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.05), transparent);
+    }
+
+    .email-header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .email-body {
+      padding: 45px 35px;
+    }
+
+    .greeting {
+      font-size: 20px;
+      margin-bottom: 24px;
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .message {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      color: #475569;
+    }
+
+    .invitation-container {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .button {
+      display: inline-block;
+      background: linear-gradient(145deg, #4361ee 0%, #3a56dd 100%);
+      color: #ffffff !important;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 16px 38px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .button:hover {
+      box-shadow: 0 6px 16px rgba(67, 97, 238, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .button:hover:before {
+      opacity: 1;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #64748b;
+      text-align: center;
+      margin: 32px 0;
+      padding: 0 10px;
+      line-height: 1.7;
+    }
+
+    .note strong {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .help-text {
+      background-color: #f1f5f9;
+      border-radius: 12px;
+      padding: 22px;
+      margin: 30px 0;
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.7;
+      border: 1px solid #e2e8f0;
+    }
+
+    .help-text a {
+      color: #4361ee;
+      text-decoration: none;
+      font-weight: 600;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .help-text a:after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      bottom: -1px;
+      left: 0;
+      background-color: #4361ee;
+      transform: scaleX(0);
+      transform-origin: bottom right;
+      transition: transform 0.3s;
+    }
+
+    .help-text a:hover {
+      color: #2a46cd;
+    }
+
+    .help-text a:hover:after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+      margin: 30px 0;
+    }
+
+    .email-footer {
+      background-color: #f8fafc;
+      padding: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .email-footer p {
+      margin: 5px 0;
+      line-height: 1.6;
+    }
+
+    .email-footer a {
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .email-footer a:hover {
+      color: #4361ee;
+    }
+
+    @media only screen and (max-width: 480px) {
+      .email-container {
+        margin: 20px 16px;
+        border-radius: 12px;
+      }
+
+      .email-body {
+        padding: 30px 24px;
+      }
+
+      .email-header {
+        padding: 24px 0;
+      }
+
+      .email-header h1 {
+        font-size: 22px;
+      }
+
+      .button {
+        padding: 14px 28px;
+        font-size: 15px;
+        width: 80%;
+      }
+
+      .greeting {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+  <div class="email-header">
+    <h1 th:text="${title}">You're Invited!</h1>
+  </div>
+
+  <div class="email-body">
+    <p class="greeting">Hello there,</p>
+
+    <p class="message" th:text="${message}">We would like to invite you to join our platform. Please click the button below to accept the invitation.</p>
+
+    <div class="invitation-container">
+      <a class="button " th:href="${inviteLink} " style="color: #ffffff">Accept Invitation</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="note">
+      This invitation will expire in <strong>7 days</strong> for security purposes.<br>
+      If you did not expect this invitation, please ignore this email.
+    </p>
+
+    <div class="help-text">
+      If you're having trouble, please contact our support team at <a href="mailto:zentriokshrd@company.com">zentriokshrd@company.com</a> or visit our <a href="https://zentriokshrd.com/help">Help Center</a>.
+    </div>
+  </div>
+
+  <div class="email-footer">
+    <p>&copy; 2025 Zentrio. All rights reserved.</p>
+    <p>
+      <a href="https://zentriokshrd.com/privacy">Privacy Policy</a> &bull;
+      <a href="https://zentriokshrd.com/terms">Terms of Service</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>
