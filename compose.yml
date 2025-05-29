@@ -1,15 +1,15 @@
 services:
-  zentrio-db:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_DB: zentrio_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    volumes:
-      - zentrio-db-data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
+#  zentrio-db:
+#    image: postgres:latest
+#    restart: always
+#    environment:
+#      POSTGRES_DB: zentrio_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: password
+#    volumes:
+#      - zentrio-db-data:/var/lib/postgresql/data
+#    ports:
+#      - "5433:5432"
 
   zentrio-redis:
     image: redis:latest
@@ -32,30 +32,30 @@ services:
     volumes:
       - zentrio-storage:/var/lib/minio/data
 
-#  zentrio-api:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    restart: always
-#    ports:
-#      - "9085:8080"
-#    environment:
-#      MINIO_URL: http://zentrio-minio:9000
-#      MINIO_ACCESS_KEY: miniprojectkey
-#      MINIO_ACCESS_SECRET: miniprojectgamifiedhabittrackersecret
-#      MINIO_BUCKET_NAME: zentrio-bucket
-#      SPRING_DATA_REDIS_HOST: zentrio-redis
-#      SPRING_DATA_REDIS_PORT: 6379
-#      SPRING_DATA_REDIS_PASSWORD: password
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://zentrio-db:5432/zentrio_db
-#      SPRING_DATASOURCE_USERNAME: postgres
-#      SPRING_DATASOURCE_PASSWORD: password
-#    depends_on:
+  zentrio-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9085:8080"
+    environment:
+      MINIO_URL: http://zentrio-minio:9000
+      MINIO_ACCESS_KEY: miniprojectkey
+      MINIO_ACCESS_SECRET: miniprojectgamifiedhabittrackersecret
+      MINIO_BUCKET_NAME: zentrio-bucket
+      SPRING_DATA_REDIS_HOST: zentrio-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://zentrio-db:5432/zentrio_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
 #      - zentrio-db
-#      - zentrio-redis
-#      - zentrio-minio
+      - zentrio-redis
+      - zentrio-minio
 
 volumes:
   zentrio-storage:
-  zentrio-db-data:
+#  zentrio-db-data:
   zentrio-redis-data:

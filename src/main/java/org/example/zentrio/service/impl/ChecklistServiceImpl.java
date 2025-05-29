@@ -89,9 +89,12 @@ public class ChecklistServiceImpl implements ChecklistService {
             return;
         }
 
+        System.out.println("userId" + userId);
+
 //      Leader — limited access (only to their own tasks)
         if (roles.contains(RoleName.ROLE_LEADER.toString())) {
             UUID leaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, boardId);
+            System.out.println("roleLeader" + leaderMemberId);
             // Fetch the task
             Task task = taskService.getTaskById(taskId);
             if (task == null) {

@@ -101,7 +101,7 @@ public class BoardServiceImpl implements BoardService {
         if(!board.getWorkspaceId().equals(boardRequest.getWorkspaceId())) {
             throw new NotFoundException("workspace id " + boardRequest.getWorkspaceId() + " not found");
         }
-        Workspace workspace = workspaceRepository.getWorkspaceById(boardRequest.getWorkspaceId(),userId);
+        Workspace workspace = workspaceRepository.getWorkspaceByWorkspaceId(boardRequest.getWorkspaceId());
         if (workspace == null) {
             throw new NotFoundException("Workspace id " + boardRequest.getWorkspaceId() + " not found");
         }
@@ -278,7 +278,18 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void updateIsFavourite(UUID boardId, boolean isFavourite) {
-        getBoardByBoardId(boardId);
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Board board = boardRepository.getBoardByBoardId(boardId);
+        if(board == null) {
+            throw new NotFoundException("Board ID " + boardId + " not found");
+        }
+        List<String> roleName = roleRepository.getRolesNameByBoardIdAndUserId(boardId, userId);
+        if(roleName == null) {
+            throw new NotFoundException("You doesn't have the role to update the favourite status of this board");
+        }
+        if(!roleName.contains(RoleName.ROLE_MANAGER.toString())) {
+            throw new ForbiddenException("You do not have the role to update the favourite status only manager can update the favourite status");
+        }
         boardRepository.updateIsFavourite(boardId, isFavourite);
     }
 
