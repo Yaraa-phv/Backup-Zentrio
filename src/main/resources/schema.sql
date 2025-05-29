@@ -166,7 +166,7 @@ CREATE TABLE documents (
                            is_public BOOLEAN DEFAULT false,
                            doc_type VARCHAR(100),
                            user_id UUID REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                           board_id UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
+                           task_id UUID REFERENCES  tasks(task_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create the attachments table
