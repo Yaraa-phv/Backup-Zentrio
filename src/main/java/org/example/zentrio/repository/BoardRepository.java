@@ -61,7 +61,7 @@ public interface BoardRepository {
                 WHERE board_id = #{boardId}
                 AND workspace_id = #{workspaceId}
             """)
-    @ResultMap("boardMapper")
+
     void deleteBoardByBoardId(UUID boardId, UUID workspaceId);
 
 

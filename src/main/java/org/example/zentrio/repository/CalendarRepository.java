@@ -101,10 +101,11 @@ public interface CalendarRepository {
 
 
     @Select("""
-        DELETE  FROM  calendars WHERE calendar_id= #{noteId} AND task_id= #{taskId} AND user_id= #{userId}
-    
+        DELETE  FROM  calendars WHERE
+                                      calendar_id= #{noteId} 
+                                  AND task_id= #{taskId} 
+                                  AND user_id= #{userId}
         """)
-
-     Void deleteCalendarByNoteId(UUID noteId, UUID taskId, UUID userId);
+     void deleteCalendarByNoteId(UUID noteId, UUID taskId, UUID userId);
 
 }
