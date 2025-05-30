@@ -32,6 +32,7 @@ public class TaskServiceImpl implements TaskService {
     private final GanttBarRepository ganttBarRepository;
     private final ChecklistRepository checklistRepository;
     private final MemberRepository memberRepository;
+    private final GanttChartService ganttChartService;
 
 
     private void validateTaskTimeWithGanttBar(TaskRequest taskRequest, GanttBar ganttBar) {
@@ -77,7 +78,7 @@ public class TaskServiceImpl implements TaskService {
         if (ganttBar == null) {
             throw new NotFoundException("Gantt bar with ID " + ganttBarId + " not found");
         }
-
+        ganttChartService.getGanttChartById(ganttBar.getGanttChartId(),boardId);
         //  Validate task timing against GanttBar timing
         validateTaskTimeWithGanttBar(taskRequest, ganttBar);
     }

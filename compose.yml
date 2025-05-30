@@ -1,15 +1,15 @@
 services:
-  #  zentrio-db:
-  #    image: postgres:latest
-  #    restart: always
-  #    environment:
-  #      POSTGRES_DB: zentrio_db
-  #      POSTGRES_USER: postgres
-  #      POSTGRES_PASSWORD: password
-  #    volumes:
-  #      - zentrio-db-data:/var/lib/postgresql/data
-  #    ports:
-  #      - "5433:5432"
+#  zentrio-db:
+#    image: postgres:latest
+#    restart: always
+#    environment:
+#      POSTGRES_DB: zentrio_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: password
+#    volumes:
+#      - zentrio-db-data:/var/lib/postgresql/data
+#    ports:
+#      - "5433:5432"
 
   zentrio-redis:
     image: redis:latest
