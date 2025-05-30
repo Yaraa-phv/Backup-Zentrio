@@ -277,7 +277,7 @@ public class TaskServiceImpl implements TaskService {
             System.out.println("leaderId: " + leaderId);
              if (leaderId == null) {
 //                 throw new ForbiddenException("This assignee with " + assigneeId + " not a leader of this board");
-                 UUID roleId = roleRepository.getRoleIdByRoleName("ROLE_LEADER");
+                 UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_LEADER.name());
                  boardRepository.insertMember(assigneeId,task.getBoardId(),roleId);
                  leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
                  System.out.println("leaderId after assign: " + leaderId);
