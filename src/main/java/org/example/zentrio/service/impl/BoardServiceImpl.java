@@ -198,6 +198,7 @@ public class BoardServiceImpl implements BoardService {
                 assignedRoleRequest.getBoardId(),
                 assignedRoleRequest.getAssigneeId()
         );
+        System.out.println(existingRoles);
 
         final String MANAGER_ROLE = RoleName.ROLE_MANAGER.toString();
         String newRoleName = assignedRoleRequest.getRoleName().toString();

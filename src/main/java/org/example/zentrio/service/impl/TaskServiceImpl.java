@@ -196,27 +196,22 @@ public class TaskServiceImpl implements TaskService {
         // Step 3: Validate user has permission role (Manager or Team Leader)
         validateRoleManageTask(taskRequest.getBoardId(), userId);
 
-        // Step 4: Get all roles of the user in this board
-        List<String> roles = roleRepository.getRolesNameByBoardIdAndUserId(taskRequest.getBoardId(), userId);
-
-        // Step 5: Determine permissions
-        if (roles.contains(RoleName.ROLE_MANAGER.toString())) {
-            // Manager can update any task — allow
-        } else if (roles.contains(RoleName.ROLE_LEADER.toString())) {
-            // Team Leader can only update tasks they created
-            UUID leaderMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, taskRequest.getBoardId());
-            if (!leaderMemberId.equals(task.getCreatedBy())) {
-                throw new ForbiddenException("Team Leader can only update tasks they created");
-            }
-        } else {
-            throw new ForbiddenException("You do not have permission to update this task");
-        }
+        Task taskAfterUpdate = new Task();
 
         // Step 6: Validate timing and references
         validateBoardAndGanttBarAndTaskTime(taskRequest.getBoardId(), taskRequest.getGanttBarId(), taskRequest);
+        String role = memberRepository.getRoleInTask(task.getBoardId(),userId,task.getTaskId());
+        System.out.println("role: " + role);
+        if (role == null) {
+            throw  new  ForbiddenException ("Only manager or team leader can update in "+task.getTitle()+ " can update it" );
+        }
+        if (role.contains(RoleName.ROLE_MANAGER.toString()) || role.contains(RoleName.ROLE_LEADER.toString())) {
+            taskAfterUpdate =  taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, taskRequest.getBoardId(), taskRequest.getGanttBarId(),LocalDateTime.now());
+        }
 
         // Step 7: Update the task in the DB
-        return taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, taskRequest.getBoardId(), taskRequest.getGanttBarId(),LocalDateTime.now());
+      //  return taskRepository.updateTaskByIdWithBoardIdAndGanttBarId(taskRequest, taskId, taskRequest.getBoardId(), taskRequest.getGanttBarId(),LocalDateTime.now());
+        return taskAfterUpdate;
     }
 
 
@@ -275,11 +270,22 @@ public class TaskServiceImpl implements TaskService {
         UUID currentUserId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         UUID assignerMemberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(currentUserId, task.getBoardId());
         System.out.println("assignerId: " + assignerMemberId);
-
-        UUID leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
-        if (leaderId == null) {
-            throw new ForbiddenException("This assignee with " + assigneeId + " not a leader of this board");
+        Boolean userExistInBoard= boardRepository.getExistUserInBoard(assigneeId,task.getBoardId());
+        UUID leaderId = null;
+        if (userExistInBoard){
+              leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
+            System.out.println("leaderId: " + leaderId);
+             if (leaderId == null) {
+//                 throw new ForbiddenException("This assignee with " + assigneeId + " not a leader of this board");
+                 UUID roleId = roleRepository.getRoleIdByRoleName("ROLE_LEADER");
+                 boardRepository.insertMember(assigneeId,task.getBoardId(),roleId);
+                 leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
+                 System.out.println("leaderId after assign: " + leaderId);
+             }
+         }else {
+            throw new ForbiddenException("This user is not member in this board");
         }
+
 
         taskRepository.insertTaskAssignment(taskId, assignerMemberId, leaderId);
     }

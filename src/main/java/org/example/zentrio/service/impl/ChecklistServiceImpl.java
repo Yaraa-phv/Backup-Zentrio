@@ -202,12 +202,13 @@ public class ChecklistServiceImpl implements ChecklistService {
         System.out.println("assignBy " + assignedBy);
 
         // can replace taskRepository to memberRepository
+
         UUID assignerId = taskRepository.getMemberIdByUserIdAndTaskId(assignedBy, taskId);
         System.out.println("assignerId: " + assignerId);
 
         String roleName = roleRepository.getRoleLeaderNameByBoardIdAndUserId(task.getBoardId(), assignedBy);
         if (roleName == null || !roleName.equals(RoleName.ROLE_LEADER.toString())) {
-            throw new ForbiddenException("User with id " + assignedTo + " are not the leader of this task can't be assigned to this checklist");
+            throw new ForbiddenException("User with id " + assignedBy + " are not the leader of this task can't be assigned to this checklist");
         }
 
         // can replace checklistRepository to memberRepository
