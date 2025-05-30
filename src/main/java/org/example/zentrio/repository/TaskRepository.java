@@ -202,12 +202,13 @@ public interface TaskRepository {
     UUID getBoardIdByTaskId(UUID taskId);
 
 
+
     @Select("""
-            SELECT EXISTS (
-            SELECT 1
-             FROM task_assignments tk
-            WHERE tk.task_id = #{taskId}
-              )
-            """)
-    boolean isTaskAssigned(UUID taskId);
+        SELECT t.* FROM task_assignments
+        INNER JOIN tasks t ON task_assignments.task_id = t.task_id
+        WHERE task_assign_id = #{taskAssignId}
+    """)
+    @ResultMap("taskMapper")
+    Task getTaskByAssignId(UUID taskAssignId);
+
 }

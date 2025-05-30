@@ -30,7 +30,7 @@ public interface NotificationRepository {
 
     @Select("""
                 INSERT INTO notifications(notification_id, content, type, is_read, created_at, task_assign_id, sender_id, receiver_id)
-                VALUES(#{notificationId}, #{content}, #{type}, #{isRead}, #{createdAt}, #{taskId}, #{userId}, #{senderId},#{receiverId})
+                VALUES(#{notificationId}, #{content}, #{type}, #{isRead}, #{createdAt}, #{taskId}, #{senderId},#{receiverId})
             """)
     @ResultMap("notificationMapper")
     void insertNotification(Notification notification);
