@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.CalendarRequest;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/calendars")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Calendar Controller")
 public class CalendarController {
 
     private final CalendarService calendarService;

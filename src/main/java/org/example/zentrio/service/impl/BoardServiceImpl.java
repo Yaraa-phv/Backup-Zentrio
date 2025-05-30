@@ -184,8 +184,15 @@ public class BoardServiceImpl implements BoardService {
             throw new NotFoundException("Assignee ID not found");
         }
 
+        if(assignedRoleRequest.getRoleName() == null){
+            throw new NotFoundException("Role name cannot be null or empty");
+        }
+
         UUID roleId = roleRepository.getRoleIdByRoleName(assignedRoleRequest.getRoleName().toString());
 
+        if (roleId == null) {
+            throw new NotFoundException("Invalid role name " + assignedRoleRequest.getRoleName());
+        }
         // Get all existing roles of the user on this board
         List<String> existingRoles = roleRepository.getRolesNameByBoardIdAndUserId(
                 assignedRoleRequest.getBoardId(),
@@ -336,7 +343,6 @@ public class BoardServiceImpl implements BoardService {
                 return "https://www.youtube.com/watch?v=Pzi-VuPjcII";
             }
             UUID userId = appUser.getUserId();
-        System.out.println("acceptBoardInvitation: userId: " + userId);
             UUID roleId = roleRepository.getRoleIdByRoleName(roleRequest.toString());
             if (roleId == null) {
                 // If the user is not found, redirect to the login/sign-in page.
@@ -351,7 +357,11 @@ public class BoardServiceImpl implements BoardService {
                 // obtained dynamically from the frontend.
                 return "http://localhost:8080/swagger-ui/index.html";
             }
-            boardRepository.insertMember(userId, boardId, roleId);
+
+        log.info("Returning redirect URL: {}", "http://localhost:8080/swagger-ui/index.html");
+
+
+        boardRepository.insertMember(userId, boardId, roleId);
             // If a user is found and is not yet assigned to a board,
             // upon acceptance, they should be redirected to the board page.
             // Note: The URL shown here is just an example; the real URL

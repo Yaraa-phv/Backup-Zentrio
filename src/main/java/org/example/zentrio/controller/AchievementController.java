@@ -2,6 +2,7 @@ package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.AchievementRequest;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/v1/achievements")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Achievement Controller")
 @RequiredArgsConstructor
 public class AchievementController {
 

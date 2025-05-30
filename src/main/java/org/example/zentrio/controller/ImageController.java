@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("api/v1/files")
 @RequiredArgsConstructor
-@Tag(name = "Image Controller")
+@Tag(name = "Images Controller")
 public class ImageController {
     private final FileService fileService;
 

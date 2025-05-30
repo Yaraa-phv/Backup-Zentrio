@@ -85,7 +85,7 @@ public interface BoardRepository {
 
 
     @Select("""
-               SELECT DISTINCT u.user_id, u.username, u.email FROM users u
+               SELECT DISTINCT u.user_id, u.username, u.email, u.profile_image FROM users u
                 INNER JOIN members m ON u.user_id = m.user_id
                 WHERE board_id = #{boardId}
             """)
@@ -175,4 +175,13 @@ public interface BoardRepository {
     @ResultMap("boardMapper")
     HashSet<Board> getAllBoards();
 
+    @Select("""
+        
+            SELECT EXISTS(
+            SELECT  1 FROM  members m
+                      where m.user_id= #{assigneeId}
+                      AND m.board_id= #{boardId}
+        )
+        """)
+    Boolean getExistUserInBoard(UUID assigneeId, UUID boardId);
 }
