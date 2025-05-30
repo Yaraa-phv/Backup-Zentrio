@@ -140,6 +140,20 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+//    @Operation(summary = "Assigned role with task ID", description = "Assigned role leader tasks with specific users")
+//    @PostMapping("/{task-id}/members/{assigned-id}")
+//    public ResponseEntity<?> assignLeaderRoleToTask(
+//            @PathVariable("task-id") UUID taskId,
+//            @PathVariable("assigned-id") UUID assignedId) {
+//        taskService.assignLeaderRoleToTask(taskId, assignedId);
+//        ApiResponse<?> apiResponse = ApiResponse.builder()
+//                .success(true)
+//                .message("Assigned role with task ID successfully")
+//                .status(HttpStatus.OK)
+//                .timestamp(LocalDateTime.now())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
 
     @Operation(summary = "Move task with task ID", description = "Moved task to another stage with specific tasks ID")
     @PutMapping("/{task-id}/move")
