@@ -292,6 +292,7 @@ public class TaskServiceImpl implements TaskService {
          }else {
             throw new ForbiddenException("This user is not member in this board");
         }
+        leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
         System.out.println("Leader : "+leaderId);
         taskRepository.insertTaskAssignment(taskId, assignerMemberId, leaderId);
     }
