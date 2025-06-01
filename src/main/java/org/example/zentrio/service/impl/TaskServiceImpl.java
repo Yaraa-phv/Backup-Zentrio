@@ -269,7 +269,6 @@ public class TaskServiceImpl implements TaskService {
 
         UUID currentUserId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         UUID assignerMemberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(currentUserId, task.getBoardId());
-        System.out.println("assignerId: " + assignerMemberId);
         Boolean userExistInBoard= boardRepository.getExistUserInBoard(assigneeId,task.getBoardId());
         UUID leaderId = null;
         if (userExistInBoard){
@@ -280,7 +279,6 @@ public class TaskServiceImpl implements TaskService {
 
             if (roleManager == null) {
                 leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
-                System.out.println("leaderId: " + leaderId);
 
                 if (leaderId == null) {
                     UUID roleId = roleRepository.getRoleIdByRoleName(RoleName.ROLE_LEADER.name());
@@ -293,7 +291,6 @@ public class TaskServiceImpl implements TaskService {
             throw new ForbiddenException("This user is not member in this board");
         }
         leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
-        System.out.println("Leader : "+leaderId);
         taskRepository.insertTaskAssignment(taskId, assignerMemberId, leaderId);
     }
 
@@ -402,23 +399,6 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.getAllTasks();
     }
 
-//    @Override
-//    public void assignLeaderRoleToTask(UUID taskId, UUID assignedId) {
-//        Task task = getTaskById(taskId);
-//        if (task == null){
-//            throw new NotFoundException("Task not found!");
-//        }
-//
-//        validateCurrentUserRoles(task.getBoardId());
-//        if (taskRepository.isAlreadyAssigned(taskId)) {
-//            throw new ConflictException("The task is already assigned Leader");
-//        }
-//        Boolean userExistInBoard= boardRepository.getExistUserInBoard(assignedId,task.getBoardId());
-//        if (userExistInBoard){
-//
-//        }
-//
-//    }
 
     private boolean canUserMoveToStage(List<String> roles, String stage) {
         return switch (stage) {
