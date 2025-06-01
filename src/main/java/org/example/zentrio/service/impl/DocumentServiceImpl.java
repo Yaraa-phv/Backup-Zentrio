@@ -306,9 +306,9 @@ public class DocumentServiceImpl implements DocumentService {
             throw e; // rethrow other unexpected Google exceptions
         }
 
-        if (!"application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
-            throw new NotFoundException("The provided ID does not refer to a folder.");
-        }
+//        if (!"application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
+//            throw new NotFoundException("The provided ID does not refer to a folder.");
+//        }
 
         drive.files().delete(folderId).execute();
         documentRepository.deleteDocumentById(documentId);
