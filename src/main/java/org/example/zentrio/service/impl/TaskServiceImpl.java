@@ -261,6 +261,7 @@ public class TaskServiceImpl implements TaskService {
     public void assignLeaderToTask(UUID taskId, UUID assigneeId) {
 
         Task task = getTaskById(taskId);
+        updateProgressOfTaskById(taskId);
 
         validateCurrentUserRoles(task.getBoardId());
         if (taskRepository.isAlreadyAssigned(taskId)) {
@@ -287,7 +288,6 @@ public class TaskServiceImpl implements TaskService {
                     boardRepository.insertMember(assigneeId, task.getBoardId(), roleId);
                 }
             }
-
 
          }else {
             throw new ForbiddenException("This user is not member in this board");
@@ -334,6 +334,9 @@ public class TaskServiceImpl implements TaskService {
                 break;
 
             case "COMPLETED":
+                if(!"UNDER_REVIEW".equals(taskRepository.getTaskStage(taskId))) {
+                    throw new BadRequestException("Task must be in the UNDER_REVIEW before moving to COMPLETED.");
+                }
                 long incompleteChecklistCount = checklistRepository.countIncompleteByTaskId(taskId);
                 if (incompleteChecklistCount > 0) {
                     throw new BadRequestException("Cannot move to COMPLETED until all checklist items are done.");
@@ -370,14 +373,12 @@ public class TaskServiceImpl implements TaskService {
     public void updateProgressOfTaskById(UUID taskId) {
         Task task = getTaskById(taskId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        System.out.println("task" + task.getBoardId());
+//        System.out.println("task" + task.getBoardId());
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(task.getBoardId(),userId);
-        System.out.println("roleName: " + roleName);
+//        System.out.println("roleName: " + roleName);
         if(roleName == null) {
             throw new ForbiddenException("You do not have permission to update this task");
         }
-
-
         taskRepository.updateProgressOfTaskById(taskId,Stage.IN_PROGRESS.toString());
     }
 
@@ -402,23 +403,6 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.getAllTasks();
     }
 
-//    @Override
-//    public void assignLeaderRoleToTask(UUID taskId, UUID assignedId) {
-//        Task task = getTaskById(taskId);
-//        if (task == null){
-//            throw new NotFoundException("Task not found!");
-//        }
-//
-//        validateCurrentUserRoles(task.getBoardId());
-//        if (taskRepository.isAlreadyAssigned(taskId)) {
-//            throw new ConflictException("The task is already assigned Leader");
-//        }
-//        Boolean userExistInBoard= boardRepository.getExistUserInBoard(assignedId,task.getBoardId());
-//        if (userExistInBoard){
-//
-//        }
-//
-//    }
 
     private boolean canUserMoveToStage(List<String> roles, String stage) {
         return switch (stage) {
