@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.TaskRequest;
+import org.example.zentrio.dto.response.GanttBarResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.enums.Stage;
@@ -29,6 +30,8 @@ public interface TaskRepository {
             @Result(property = "stage", column = "stage"),
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
+            @Result(property = "ganttBar", column = "gantt_bar_id",
+            one = @One(select = "getGanttBarById")),
             @Result(property = "createdBy", column = "created_by"),
             @Result(property = "creator", column = "created_by",
                     one = @One(select = "getDataOfUserCreator")),
@@ -223,5 +226,16 @@ public interface TaskRepository {
         
         """)
     UUID getManagerOrLeader(UUID boardId, UUID userId, UUID taskId);
+
+
+    @Select("""
+        SELECT gb.title, gb.face FROM gantt_bars gb
+        WHERE gantt_bar_id = #{ganttBarId}
+    """)
+    @Results(id = "ganttBarMapper", value = {
+            @Result(property = "title",column = "title"),
+            @Result(property = "face",column = "face")
+    })
+    GanttBarResponse getGanttBarById(UUID ganttBarId);
 
 }
