@@ -124,4 +124,21 @@ public interface ReportRepository {
         VALUES (#{time}, #{pmID}, #{boardId})
         """)
     void createReport(LocalDateTime time, UUID boardId, UUID pmID);
+
+
+    @Select("""
+        
+            SELECT  EXISTS(
+            SELECT  1 FROM  reports rp WHERE
+            rp.board_id= #{boardId}
+            AND rp.created_by= #{pmID})
+        """)
+    Boolean getExistReport(UUID boardId, UUID pmID);
+
+    @Select("""
+        
+            UPDATE  reports rp SET version= #{version}
+        WHERE  report_id= #{reportId}     
+        """)
+    void updateVersion(UUID reportId, int version);
 }

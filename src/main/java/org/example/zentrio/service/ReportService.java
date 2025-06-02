@@ -17,4 +17,6 @@ public interface ReportService {
     Map<String, Object> getAttachment(UUID checklistId);
 
     Set<ChecklistResponse> getChecklistById(UUID checklistId);
+
+    void updateVersionReport(Report report);
 }

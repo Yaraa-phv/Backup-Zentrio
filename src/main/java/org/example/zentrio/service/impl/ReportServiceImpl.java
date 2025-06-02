@@ -49,8 +49,12 @@ public class ReportServiceImpl implements ReportService {
         if (!role.equals(RoleName.ROLE_MANAGER.name())){
             throw new BadRequestException("Only manager can view report by this board");
         }
+        Boolean existReport= reportRepository.getExistReport(boardId, pmID);
+        if(!existReport){
+            reportRepository.createReport(LocalDateTime.now(),boardId,pmID);
+        }
 
-        reportRepository.createReport(LocalDateTime.now(),boardId,pmID);
+
         Report report = reportRepository.getReportByBoardId(boardId);
         if (report == null) {
             throw new NotFoundException("Report not found");
@@ -115,5 +119,12 @@ public class ReportServiceImpl implements ReportService {
 
         Set<ChecklistResponse>  response=new  HashSet<>(reportRepository.getChecklistById(takId));
         return response;
+    }
+
+    @Override
+    public void updateVersionReport(Report report) {
+        int version = report.getVersion() +1;
+        reportRepository.updateVersion(report.getReportId(), version);
+
     }
 }

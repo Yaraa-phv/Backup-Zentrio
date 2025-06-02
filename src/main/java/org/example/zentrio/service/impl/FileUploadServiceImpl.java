@@ -12,6 +12,9 @@ import org.example.zentrio.dto.response.Res;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
+import org.example.zentrio.model.Document;
+import org.example.zentrio.repository.DocumentRepository;
+import org.example.zentrio.service.FileService;
 import org.example.zentrio.service.FileUploadService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,17 +23,29 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
 
     private final DocumentServiceImpl documentService;
+    private final DocumentRepository documentRepository;
+
+
+    public Document validateFolder(String folderId ){
+        Document document= documentRepository.getDocumentByFolderId(folderId,documentService.userId());
+        if (document==null){
+            throw new NotFoundException("Document not found");
+        }
+        return document;
+    }
 
     @Override
     public List<File> getAllFilesByFolderId(String accessToken, String folderId) throws IOException, GeneralSecurityException {
 
         Drive drive = documentService.createDriveService(accessToken);
+        validateFolder(folderId);
 
         String query= String.format("'%s' in parents and trashed = false", folderId);
 
@@ -50,7 +65,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Override
     public void deleteFileById(String accessToken, String fileId) throws GeneralSecurityException, IOException {
         Drive drive = documentService.createDriveService(accessToken);
-
+        validateFolder(fileId);
 
         File fileMetadata;
         try {
@@ -98,6 +113,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     public File createDriveFile(String accessToken, String name, FileTypes userInputType, String folderId) throws GeneralSecurityException, IOException {
         // Convert user input to official Google MIME type
         String mimeType = getGoogleMimeType(userInputType.toString());
+        validateFolder(folderId);
 
         Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
@@ -169,7 +185,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     public List<File> getFilesByMimeTypeInFolder(String accessToken, String mimeType, String folderId)
             throws GeneralSecurityException, IOException {
         String type = getGoogleMimeType(mimeType);
-
+        validateFolder(folderId);
         Drive drive = documentService.createDriveService(accessToken);
         File fileMetadata;
         try {
@@ -271,7 +287,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Override
     public Res uploadFileToFolderDrive(String accessToken, String folderId, MultipartFile file)
             throws GeneralSecurityException, IOException {
-
+        validateFolder(folderId);
         // Validate file name
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || !originalFilename.contains(".")) {

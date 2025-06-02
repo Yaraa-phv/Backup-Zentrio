@@ -66,7 +66,7 @@ public class FileUploadDriveController {
     }
 
     @GetMapping("/file")
-    @Operation(summary= "Get all files by file id")
+    @Operation(summary= "Get  files by file id")
     public ResponseEntity<ApiResponse<File>> getFileById(@RequestParam String accessToken,
                                          @RequestParam String fileId) throws GeneralSecurityException, IOException {
 

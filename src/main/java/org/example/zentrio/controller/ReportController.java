@@ -117,7 +117,7 @@ public ResponseEntity<byte[]> generateProjectReport(@PathVariable("board-id") UU
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_PDF);
     headers.setContentDispositionFormData("attachment", report.getBoardName() + "-report.pdf");
-
+    reportService.updateVersionReport(report);
     return ResponseEntity.ok()
             .headers(headers)
             .body(pdf);

@@ -65,6 +65,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
 
         Feedback feedback = feedbackRepository.createFeedback(LocalDateTime.now(),memberId,taskId,feedbackRequest);
+        taskRepository.updateTaskStage(taskId, Stage.IN_PROGRESS.name());
         return feedback;
     }
 

@@ -119,7 +119,7 @@ public class DocumentServiceImpl implements DocumentService {
     public Document getDocumentById(UUID documentId){
 
 
-        Document document= documentRepository.getDocumentById(documentId);
+        Document document=documentRepository.getDocumentById(documentId, userId());
         if (document == null) {
             throw new NotFoundException("Document not found");
         }
@@ -176,7 +176,7 @@ public class DocumentServiceImpl implements DocumentService {
 @Override
     public String publicDocument(UUID documentId, String accessToken) throws GeneralSecurityException, IOException {
 
-        Document document= documentRepository.getDocumentById(documentId);
+        Document document= getDocumentById(documentId);
         if (document == null) {
             throw new NotFoundException("Document not found");
         }
@@ -249,7 +249,7 @@ public class DocumentServiceImpl implements DocumentService {
     public Document updateDocumentName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException {
         Drive drive = createDriveService(accessToken);
 
-        Document document= documentRepository.getDocumentById(documentId);
+        Document document= getDocumentById(documentId);
         if (document == null) {
             throw new NotFoundException("Document not found with ID: " + documentId);
         }
@@ -286,7 +286,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void deleteDocumentById(String accessToken, UUID documentId)
             throws GeneralSecurityException, IOException {
-        Document document= documentRepository.getDocumentById(documentId);
+        Document document= getDocumentById(documentId);
         if (document == null) {
             throw new NotFoundException("Document not found with ID: " + documentId);
         }
@@ -306,12 +306,9 @@ public class DocumentServiceImpl implements DocumentService {
             throw e; // rethrow other unexpected Google exceptions
         }
 
-//        if (!"application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
-//            throw new NotFoundException("The provided ID does not refer to a folder.");
-//        }
 
         drive.files().delete(folderId).execute();
-        documentRepository.deleteDocumentById(documentId);
+        documentRepository.deleteDocumentById(documentId, userId());
 
     }
 
@@ -382,7 +379,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
     @Override
     public String privateDocument(UUID documentId, String accessToken) throws GeneralSecurityException, IOException {
-        Document document = documentRepository.getDocumentById(documentId);
+        Document document = getDocumentById(documentId);
         if (document == null) {
             throw new NotFoundException("Document not found");
         }

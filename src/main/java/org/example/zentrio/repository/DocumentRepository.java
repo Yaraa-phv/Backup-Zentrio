@@ -40,26 +40,26 @@ public interface DocumentRepository {
 
     @Select("""
         SELECT  * FROM  documents 
-        WHERE document_id=#{documentId}
+        WHERE document_id=#{documentId} AND user_id= #{userId}
         """)
     @ResultMap("folderMapper")
-    Document getDocumentById(UUID documentId);
+    Document getDocumentById(UUID documentId, UUID userId);
 
     @Select("""
         
         SELECT * FROM  documents
-        WHERE folder_id=#{folderId}
+        WHERE folder_id=#{folderId} AND user_id= #{userId}
         """)
     @ResultMap("folderMapper")
-    Document getDocumentByFolderId(String folderId);
+    Document getDocumentByFolderId(String folderId, UUID userId);
 
 
 
     @Select("""
         DELETE  FROM documents
-        WHERE document_id=#{documentId}
+        WHERE document_id=#{documentId} AND  user_id=#{userId}
         """)
-    void deleteDocumentById(UUID documentId);
+    void deleteDocumentById(UUID documentId, UUID userId);
 
 
     @Select("""
