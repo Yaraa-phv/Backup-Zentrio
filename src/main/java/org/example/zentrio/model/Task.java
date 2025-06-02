@@ -3,6 +3,7 @@ package org.example.zentrio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.GanttBarResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.dto.response.MemberResponseData;
 
@@ -26,6 +27,8 @@ public class Task {
     private String stage;
     private UUID boardId;
     private UUID ganttBarId;
+    private GanttBarResponse ganttBar;
     private UUID createdBy;
     private MemberResponseData creator;
+
 }
