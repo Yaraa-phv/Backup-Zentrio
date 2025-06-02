@@ -205,11 +205,12 @@ public class ChecklistServiceImpl implements ChecklistService {
         // can replace taskRepository to memberRepository
 
         UUID assignerId = taskRepository.getManagerOrLeader(task.getBoardId(),assignedBy,task.getTaskId());
+        System.out.println("assignTo " + assignerId);
         UUID assignTo=null;
         String role= memberRepository.getRoleInTask(task.getBoardId(),assignedBy,task.getTaskId());
         System.out.println("role: " + role);
         if (role == null) {
-            throw new ForbiddenException("You do not have permission to create checklist.");
+            throw new ForbiddenException("You don't have permission to assign member to checklist.");
         }
         if (role.equals(RoleName.ROLE_MANAGER.toString()) ||  role.equals(RoleName.ROLE_LEADER.toString())) {
             Boolean userExistInBoard = boardRepository.getExistUserInBoard(assignedTo, task.getBoardId());
