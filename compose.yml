@@ -11,45 +11,45 @@ services:
 #    ports:
 #      - "5433:5432"
 
-  zentrio-redis:
+  zentrio-redis-develop:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - "6390:6379"
     volumes:
       - zentrio-redis-data:/data
     restart: always
     command: [ "redis-server", "--requirepass", "password" ]
 
-  zentrio-minio:
+  zentrio-minio-develop:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1
     command: server /var/lib/minio/data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=password
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9002:9000"
+      - "9003:9001"
     volumes:
       - zentrio-storage:/var/lib/minio/data
 
-  zentrio-api:
+  zentrio-api-develop:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "9090:8080"
+      - "9100:8080"
     environment:
-      SPRING_DATA_REDIS_HOST: localhost
-      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_HOST: zentrio-redis-develop
+      SPRING_DATA_REDIS_PORT: 6390
       SPRING_DATA_REDIS_PASSWORD: password
       SPRING_DATASOURCE_URL: jdbc:postgresql://96.9.81.189:6434/zentrio_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: Penholder7
     depends_on:
       #      - zentrio-db
-      - zentrio-redis
-      - zentrio-minio
+      - zentrio-redis-develop
+      - zentrio-minio-develop
 
 volumes:
   zentrio-storage:

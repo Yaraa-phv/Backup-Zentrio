@@ -8,7 +8,7 @@ import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
-import org.example.zentrio.dto.response.BoardRespone;
+import org.example.zentrio.dto.response.BoardResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
@@ -372,7 +372,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardRespone getAllDataInBoard(UUID boardId) {
+    public BoardResponse getAllDataInBoard(UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         Boolean memberId= memberRepository.existMemberId(userId, boardId);
         if (!memberId) {

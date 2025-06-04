@@ -4,7 +4,7 @@ import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
-import org.example.zentrio.dto.response.BoardRespone;
+import org.example.zentrio.dto.response.BoardResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.model.Board;
@@ -50,5 +50,5 @@ public interface BoardService {
 
     String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest);
 
-    BoardRespone getAllDataInBoard(UUID boardId);
+    BoardResponse getAllDataInBoard(UUID boardId);
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.zentrio.model.AllTasks;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BoardRespone {
+public class BoardResponse {
     private UUID boardId;
     private String title;
     private String description;

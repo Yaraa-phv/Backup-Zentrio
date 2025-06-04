@@ -2,7 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
-import org.example.zentrio.dto.response.BoardRespone;
+import org.example.zentrio.dto.response.BoardResponse;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
 
@@ -86,7 +86,7 @@ public interface BoardRepository {
 
 
     @Select("""
-               SELECT DISTINCT u.user_id, u.username, u.email, u.profile_image FROM users u
+               SELECT DISTINCT u.user_id, u.username, u.email, u.profile_image, u.gender, m.board_id AS board_id FROM users u
                 INNER JOIN members m ON u.user_id = m.user_id
                 WHERE board_id = #{boardId}
             """)
@@ -95,10 +95,41 @@ public interface BoardRepository {
             @Result(property = "username", column = "username"),
             @Result(property = "profileImage",column = "profile_image"),
             @Result(property = "email", column = "email"),
+            @Result(property = "tasks", column = "{userId=user_id, boardId=board_id}",
+            many = @Many(select = "getAllTaskNames")),
             @Result(property = "roles", column = "user_id",
-                    many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId"))
+                    many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId")),
     })
     HashSet<MemberResponse> getBoardByBoardIdWithMember(UUID boardId);
+
+
+    @Select("""
+        
+        SELECT DISTINCT ta.title
+        
+        FROM tasks ta
+                 JOIN boards b ON b.board_id = ta.board_id
+                 JOIN members m ON m.board_id = ta.board_id AND m.user_id = #{userId}
+            JOIN roles r ON m.role_id = r.role_id
+        
+            -- Left joins for filtering based on role
+            LEFT JOIN task_assignments tsa ON ta.task_id = tsa.task_id
+            LEFT JOIN checklists ch ON ch.task_id = ta.task_id
+            LEFT JOIN checklist_assignments ca ON ch.checklist_id = ca.checklist_id
+        
+        WHERE ta.board_id = #{boardId}
+          AND (
+        -- PM gets all tasks
+            r.role_name = 'ROLE_MANAGER'
+        
+        -- Team Lead gets tasks where he is the leader (assigned_by)
+           OR (r.role_name = 'ROLE_LEADER' AND tsa.assigned_to = m.member_id)
+        
+        -- Member gets tasks via checklist assignment
+           OR (r.role_name = 'ROLE_MEMBER' AND ca.member_id = m.member_id)
+            )
+    """)
+    HashSet<String> getAllTaskNames(UUID userId, UUID boardId);
 
 
     @Select("""
@@ -201,5 +232,5 @@ public interface BoardRepository {
             @Result(property = "allTasks", column = "board_id",
             many = @Many(select = "org.example.zentrio.repository.TaskRepository.getAllDataInTaskByBoardId"))
     })
-    BoardRespone getAllDataInBoard(UUID boardId);
+    BoardResponse getAllDataInBoard(UUID boardId);
 }

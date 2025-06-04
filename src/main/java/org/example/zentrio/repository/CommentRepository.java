@@ -2,7 +2,6 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.CommentRequest;
-import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Comment;
 
