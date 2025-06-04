@@ -239,5 +239,20 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+    @Operation(summary = "Move task in bord",description = "Get all the tasks for all users")
+    @PutMapping("board/{board-id}")
+    public ResponseEntity<ApiResponse<Void>> moveOrder(@PathVariable("board-id") UUID boardId ,
+                                                      @RequestParam int newOrder,
+                                                      @RequestParam int oldOrder) {
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .success(true)
+                .message("Move tasks successfully")
+                .payload(taskService.moveOrder(boardId,newOrder,oldOrder))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
 
 }

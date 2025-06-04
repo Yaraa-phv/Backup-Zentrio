@@ -258,14 +258,42 @@ public interface TaskRepository {
                     many = @Many(select = "org.example.zentrio.repository.ChecklistRepository.getAllDataInChecklistByTaskId")),
     })
     @Select("""
-        SELECT  * FROM tasks WHERE board_id= #{boardId}
+        SELECT  * FROM tasks WHERE board_id= #{boardId} 
         """)
     List<TaskRespone> getAllDataInTaskByBoardId(UUID boardId);
 
     @Select("""
-                SELECT * FROM tasks WHERE board_id= #{boardId
-                }
+                SELECT * FROM tasks WHERE board_id= #{boardId}
             """)
     @ResultMap("taskMapper")
     HashSet<Task> getTasksByBoardId(UUID boardId);
+
+
+    @Select("""
+        
+            UPDATE tasks
+        SET task_order = CASE
+                             WHEN task_order = #{oldOrder}  THEN #{newOrder}                            
+                             WHEN task_order BETWEEN #{newOrder} AND #{till} THEN task_order + 1    
+                             ELSE task_order
+            END
+        WHERE board_id = #{boardId}
+          AND task_order BETWEEN #{newOrder} AND #{oldOrder};
+        """)
+    void moveTaskOrderDown(int oldOrder, int newOrder, int till, UUID boardId);
+
+    @Select("""
+        
+            UPDATE tasks
+            SET task_order = CASE
+                             WHEN task_order = #{oldOrder} THEN #{newOrder}                              
+                             WHEN task_order BETWEEN #{till} AND #{newOrder} THEN task_order - 1     
+                             ELSE task_order
+            END
+            WHERE board_id = #{boardId}
+            AND task_order BETWEEN #{oldOrder} AND #{newOrder};
+            
+                   
+        """)
+    void moveTaskOrderUp(int oldOrder, int newOrder, int till, UUID boardId);
 }
