@@ -39,6 +39,8 @@ public interface TaskService {
 
     HashSet<Task> getAllTasks();
 
+    HashSet<Task> getTasksByBoardId(UUID boardId);
+
 
 //    void assignLeaderRoleToTask(UUID taskId, UUID assignedId);
 }

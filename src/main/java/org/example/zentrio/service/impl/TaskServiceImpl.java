@@ -400,6 +400,13 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.getAllTasks();
     }
 
+    @Override
+    public HashSet<Task> getTasksByBoardId(UUID boardId) {
+        boardService.getBoardByBoardId(boardId);
+        return  taskRepository.getTasksByBoardId(boardId);
+
+    }
+
 
     private boolean canUserMoveToStage(List<String> roles, String stage) {
         return switch (stage) {

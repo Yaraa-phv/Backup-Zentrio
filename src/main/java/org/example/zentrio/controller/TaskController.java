@@ -67,8 +67,22 @@ public class TaskController {
             @PathVariable("gantt-bar-id") UUID ganttBarId) {
         ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
                 .success(true)
-                .message("Updated task by ID successfully")
+                .message("Get all task by ID successfully")
                 .payload(taskService.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @Operation(summary = "Get all task by board ID", description = "Get all task by specific board ID ")
+    @GetMapping("/boards/{board-id}")
+    public ResponseEntity<ApiResponse<HashSet<Task>>> getTasksByBoardId(
+            @PathVariable("board-id") UUID boardId) {
+        ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
+                .success(true)
+                .message("Get all task by ID successfully")
+                .payload(taskService.getTasksByBoardId(boardId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();

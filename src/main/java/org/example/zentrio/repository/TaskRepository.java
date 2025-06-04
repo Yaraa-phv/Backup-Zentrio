@@ -3,7 +3,6 @@ package org.example.zentrio.repository;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.*;
-import org.example.zentrio.enums.Stage;
 import org.example.zentrio.model.Task;
 
 import java.time.LocalDateTime;
@@ -263,5 +262,10 @@ public interface TaskRepository {
         """)
     List<TaskRespone> getAllDataInTaskByBoardId(UUID boardId);
 
-
+    @Select("""
+                SELECT * FROM tasks WHERE board_id= #{boardId
+                }
+            """)
+    @ResultMap("taskMapper")
+    HashSet<Task> getTasksByBoardId(UUID boardId);
 }
