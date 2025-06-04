@@ -407,6 +407,53 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    @Override
+    public Void moveOrder( UUID boardId,int newOrder, int oldOrder) {
+        HashSet<Task> tasks= taskRepository.getTasksByBoardId(boardId);
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Boolean isMember= memberRepository.existMemberId(userId,boardId);
+        if (!isMember){
+            throw new ForbiddenException("You do not have permission to move this order");
+        }
+        if (newOrder == oldOrder){
+            return null ;
+        }
+      if (tasks.isEmpty()){
+          throw new NotFoundException("Tasks not found");
+      }
+        boolean oldExists = false;
+        boolean newExists = false;
+
+        for (Task task : tasks) {
+            if (task.getTaskOrder() == oldOrder) {
+                oldExists = true;
+            }
+            if (task.getTaskOrder() == newOrder) {
+                newExists = true;
+            }
+        }
+
+        if (!oldExists) {
+            throw new NotFoundException("No task with order: " + oldOrder);
+        }
+
+        if (!newExists) {
+            throw new NotFoundException("No task with order: " + newOrder);
+        }
+
+      // move down
+      if (oldOrder > newOrder){
+          int till= oldOrder -1;
+        taskRepository.moveTaskOrderDown(oldOrder,newOrder, till,boardId);
+          System.out.println("move down"+till);
+      }else {
+          int till= oldOrder +1;
+          taskRepository.moveTaskOrderUp(oldOrder,newOrder, till,boardId);
+          System.out.println("move up"+till);
+      }
+        return  null;
+    }
+
 
     private boolean canUserMoveToStage(List<String> roles, String stage) {
         return switch (stage) {

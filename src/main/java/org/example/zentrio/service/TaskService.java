@@ -41,6 +41,8 @@ public interface TaskService {
 
     HashSet<Task> getTasksByBoardId(UUID boardId);
 
+    Void moveOrder( UUID boardId,int newOrder, int oldOrder);
+
 
 //    void assignLeaderRoleToTask(UUID taskId, UUID assignedId);
 }
