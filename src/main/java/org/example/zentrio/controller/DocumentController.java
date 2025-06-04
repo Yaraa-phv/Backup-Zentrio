@@ -1,5 +1,8 @@
 package org.example.zentrio.controller;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +14,8 @@ import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
 import org.example.zentrio.service.DocumentService;
+import org.example.zentrio.service.impl.DocumentServiceImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +39,7 @@ import java.util.UUID;
 public class DocumentController {
 
     private final DocumentService documentService;
+
 
 
 
@@ -241,6 +249,20 @@ public class DocumentController {
         return ResponseEntity.ok(response);
     }
 
+
+        @GetMapping("/download/{document-id}")
+        @Operation(summary = "Download document from Google Drive by id")
+        public ResponseEntity<?> downloadDocument(@PathVariable("document-id") UUID documentId, @RequestParam String accessToken) {
+            return documentService.downloadDocument(documentId, accessToken);
+        }
+
+    @GetMapping("/download-folder/{document-id}")
+    @Operation(summary = "Download all files from a Google Drive folder as ZIP")
+    public ResponseEntity<?> downloadFolder(
+            @PathVariable("document-id") UUID documentId,
+            @RequestParam String accessToken) {
+        return documentService.downloadFolderAsZip(documentId, accessToken);
+    }
 
 
 

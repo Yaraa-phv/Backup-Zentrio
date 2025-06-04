@@ -8,6 +8,7 @@ import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.BoardRespone;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
@@ -49,6 +50,7 @@ public class BoardServiceImpl implements BoardService {
     private final WorkspaceService workspaceService;
     private final EmailService emailService;
     private final JwtService jwtService;
+    private final MemberRepository memberRepository;
 
     @Value("${minio.bucket.name}")
     private String bucketName;
@@ -367,6 +369,16 @@ public class BoardServiceImpl implements BoardService {
             // Note: The URL shown here is just an example; the real URL
             // should be dynamically obtained from the frontend.
             return "http://localhost:8080/swagger-ui/index.html";
+    }
+
+    @Override
+    public BoardRespone getAllDataInBoard(UUID boardId) {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        Boolean memberId= memberRepository.existMemberId(userId, boardId);
+        if (!memberId) {
+            throw new ForbiddenException("You are not member of this board");
+        }
+        return boardRepository.getAllDataInBoard(boardId);
     }
 
     public void validateCurrentUserRoles(UUID boardId) {

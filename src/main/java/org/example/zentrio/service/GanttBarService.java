@@ -6,10 +6,11 @@ import org.example.zentrio.dto.request.GanttBarRequest;
 import org.example.zentrio.model.GanttBar;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public interface GanttBarService {
-    GanttBar createGanttBarByGanttChartId(GanttBarRequest ganttBarRequest);
+    List<GanttBar> createGanttBarByGanttChartId(List<GanttBarRequest> ganttBarRequest);
 
     GanttBar getGanttBarById(UUID ganttBarId, UUID ganttChartId);
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,9 +30,9 @@ public class GanttBarController {
 
     @Operation(summary = "Create gantt bars with gantt chart ID", description = "Created gantt bars with specific gantt charts ID")
     @PostMapping("/gantt-charts")
-    public ResponseEntity<ApiResponse<GanttBar>> createGanttBarByGanttChartId(
-            @Valid @RequestBody GanttBarRequest ganttBarRequest) {
-        ApiResponse<GanttBar> apiResponse = ApiResponse.<GanttBar>builder()
+    public ResponseEntity<ApiResponse<List<GanttBar>>> createGanttBarByGanttChartId(
+            @Valid @RequestBody List<GanttBarRequest> ganttBarRequest) {
+        ApiResponse<List<GanttBar>> apiResponse = ApiResponse.<List<GanttBar>>builder()
                 .success(true)
                 .message("Created gantt bar successfully")
                 .payload(ganttBarService.createGanttBarByGanttChartId(ganttBarRequest))

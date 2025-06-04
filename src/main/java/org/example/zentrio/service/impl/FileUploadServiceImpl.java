@@ -79,9 +79,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             throw e; // rethrow other unexpected Google exceptions
         }
 
-        if ("application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
-            throw new BadRequestException("This ID is not file id");
-        }
+
         drive.files().delete(fileId).execute();
     }
 
@@ -101,10 +99,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             throw e; // rethrow other unexpected Google exceptions
         }
 
-        if ("application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
-            throw new BadRequestException("Cannot get  File that id refer to folder");
 
-        }
         return fileMetadata;
     }
 
@@ -128,9 +123,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             throw e; // rethrow other unexpected Google exceptions
         }
 
-        if (!"application/vnd.google-apps.folder".equals(fileMetadata.getMimeType())) {
-            throw new NotFoundException("The provided ID does not refer to a folder.");
-        }
 
         File file = new File();
         file.setName(name);

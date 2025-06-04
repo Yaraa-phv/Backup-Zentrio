@@ -62,13 +62,13 @@ public interface DocumentRepository {
     void deleteDocumentById(UUID documentId, UUID userId);
 
 
-    @Select("""
-        UPDATE  documents SET decriptction=#{newFolderName}
-        WHERE user_id=#{userId} AND  board_id=#{boardId}
-        RETURNING *
-        """)
-    @ResultMap("folderMapper")
-    Document updateFolderName(UUID userId, UUID boardId, String newFolderName);
+        @Select("""
+            UPDATE  documents SET description=#{newFolderName}
+            WHERE user_id=#{userId} AND  board_id=#{boardId} AND document_id= #{documentId}
+            RETURNING *
+            """)
+        @ResultMap("folderMapper")
+        Document updateFolderName(UUID userId, UUID boardId, String newFolderName , UUID documentId);
 
 
     @Select(""" 
@@ -101,4 +101,11 @@ public interface DocumentRepository {
         """)
     @ResultMap("folderMapper")
     List<Document> getDocumentByType(UUID uuid, UUID boardId, String type);
+
+    @Select("""
+          SELECT * FROM documents 
+                 where document_id=#{documentId}
+        """)
+    @ResultMap("folderMapper")
+    Document getDocumentByDocumentId(UUID documentId);
 }

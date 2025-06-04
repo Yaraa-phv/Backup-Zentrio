@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
+import org.example.zentrio.dto.response.BoardRespone;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.model.Board;
 
@@ -184,4 +185,21 @@ public interface BoardRepository {
         )
         """)
     Boolean getExistUserInBoard(UUID assigneeId, UUID boardId);
+
+    @Select("""
+        SELECT * FROM boards WHERE board_id= #{boardId}
+        """)
+    @Results(id = "boarAllDataMapper", value = {
+            @Result(property = "boardId", column = "board_id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "description", column = "description"),
+            @Result(property = "cover", column = "cover"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "isFavourite", column = "is_favourite"),
+            @Result(property = "workspaceId", column = "workspace_id"),
+            @Result(property = "allTasks", column = "board_id",
+            many = @Many(select = "org.example.zentrio.repository.TaskRepository.getAllDataInTaskByBoardId"))
+    })
+    BoardRespone getAllDataInBoard(UUID boardId);
 }

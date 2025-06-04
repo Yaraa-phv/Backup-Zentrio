@@ -3,6 +3,7 @@ package org.example.zentrio.service;
 import org.example.zentrio.dto.request.DocumentRequest;
 import org.example.zentrio.enums.FileTypes;
 import org.example.zentrio.model.Document;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -38,4 +39,9 @@ public interface DocumentService {
                                    UUID boardId) throws GeneralSecurityException, IOException;
 
     String privateDocument(UUID documentId, String accessToken)throws GeneralSecurityException, IOException;
+
+  ResponseEntity<?> downloadDocument(UUID documentID, String accessToken);
+
+    ResponseEntity<?> downloadFolderAsZip(UUID documentId, String accessToken);
+
 }

@@ -344,15 +344,16 @@
                                         <span class="detail-value" th:text="${cl.finishedAt}">Mar 15, 2024</span>
                                     </div>
 
-                                    <div th:if="${cl.attachments != null}" class="checklist-detail">
+                                    <div th:if="${cl.attachments != null and cl.attachments['details'] != null}" class="checklist-detail">
                                         <span class="detail-label">File:</span>
                                         <span class="detail-value">
                                             <span class="attachment-info"
-                                                  th:text="${cl.attachments.details.filename} + ' (' + ${cl.attachments.details.size} + ')'">
-                                                document.pdf (2.5MB)
+                                             th:text="${cl.attachments['details']['filename'] + ' (' + cl.attachments['details']['size'] + ')'}">
+                                                   document.pdf (2.5MB)
+                                                </span>
                                             </span>
-                                        </span>
                                     </div>
+
                                 </div>
                             </div>
                         </td>

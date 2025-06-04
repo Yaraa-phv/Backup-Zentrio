@@ -123,4 +123,13 @@ public interface MemberRepository {
             """)
     UUID getUserId(UUID assignedTo, UUID boardId);
 
+
+    @Select("""
+       
+            SELECT count(m.member_id) >0
+       FROM members m
+       WHERE m.user_id = #{userId} AND m.board_id= #{boardId}
+        """)
+    Boolean existMemberId(UUID userId, UUID boardId);
+
 }

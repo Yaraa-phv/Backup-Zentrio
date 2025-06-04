@@ -3,6 +3,7 @@ package org.example.zentrio.repository;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.ChecklistRequest;
+import org.example.zentrio.dto.response.ChecklistRespone;
 import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Checklist;
 
@@ -161,5 +162,29 @@ public interface ChecklistRepository {
 
 
 
+    @Results(id = "checklistResponeMapper", value = {
+            @Result(property = "checklistId", column = "checklist_id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "description", column = "description"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "cover", column = "cover"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "checklistOrder", column = "checklist_order"),
+            @Result(property = "startedAt", column = "started_at"),
+            @Result(property = "finishedAt", column = "finished_at"),
+            @Result(property = "members", column = "checklist_id",
+                    many = @Many(select = "getMembersByChecklistId")),
+            @Result(property = "taskId", column = "task_id"),
+            @Result(property = "createdBy", column = "created_by"),
+            @Result(property = "attachment", column = "checklist_id",
+            one = @One(select = "org.example.zentrio.repository.AttachmentRepository.getAttachmentByChecklistId")),
+            @Result(property = "allComments", column = "checklist_id",
+            many = @Many(select = "org.example.zentrio.repository.CommentRepository.getAllComments"))
+    })
+    @Select("""
+               SELECT * FROM checklists WHERE task_id= #{taskId}
+               """)
+    List<ChecklistRespone> getAllDataInChecklistByTaskId(UUID taskId);
 
 }

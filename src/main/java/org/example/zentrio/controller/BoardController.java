@@ -10,6 +10,7 @@ import org.example.zentrio.dto.request.AssignedRoleRequest;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.request.InviteRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.BoardRespone;
 import org.example.zentrio.dto.response.MemberResponse;
 import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.model.Board;
@@ -259,6 +260,20 @@ public class BoardController {
                 .success(true)
                 .message("Get all boards successfully")
                 .payload(boardService.getAllBoards())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Get all data in board by board id for current user")
+    @GetMapping("/all-data/{board-id}")
+    public ResponseEntity<ApiResponse<BoardRespone>> getAllDataInBoard(@PathVariable("board-id") UUID boardId) {
+        ApiResponse<BoardRespone> apiResponse = ApiResponse.<BoardRespone>builder()
+                .success(true)
+                .message("Get all data from  board successfully")
+                .payload(boardService.getAllDataInBoard(boardId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
