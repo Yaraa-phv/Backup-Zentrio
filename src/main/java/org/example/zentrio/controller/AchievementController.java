@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.AchievementRequest;
+import org.example.zentrio.dto.response.AchievementResponse;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Achievement;
 import org.example.zentrio.service.AchievementService;
@@ -29,8 +30,8 @@ public class AchievementController {
 
     @Operation(summary = "Get achievement", description = "Get achievement for a user")
     @GetMapping("/current")
-    ResponseEntity<ApiResponse<Achievement>> getAllAchievementsByCurrentUser() {
-        ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
+    ResponseEntity<ApiResponse<AchievementResponse>> getAllAchievementsByCurrentUser() {
+        ApiResponse<AchievementResponse> apiResponse = ApiResponse.<AchievementResponse>builder()
                 .success(true)
                 .message("Get achievement successfully")
                 .payload(achievementService.getAllAchievementByCurrentUser())
@@ -67,20 +68,6 @@ public class AchievementController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Get all achievement ",description = "Get all achievement")
-    @GetMapping
-    public ResponseEntity<ApiResponse<Achievement>> getAllAchievements() {
-        ApiResponse<Achievement> apiResponse = ApiResponse.<Achievement>builder()
-                .success(true)
-                .message("Get all achievement successfully")
-                .payload(achievementService.getAllAchievements())
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-
     @Operation(summary = "Deleted achievement for current users",description = "Deleted achievement for current users")
     @DeleteMapping("/achievement-id")
     public ResponseEntity<?> deleteAchievement(@RequestParam("achievement-id") UUID achievementId) {
@@ -88,6 +75,20 @@ public class AchievementController {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Deleted all achievement successfully")
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Get achievement by user ID",description = "Get ahievement by user ID when visited")
+    @GetMapping("/users/{user-id}")
+    public ResponseEntity<?> getAchievementByUserId(@PathVariable("user-id") UUID userId) {
+        ApiResponse<AchievementResponse> apiResponse = ApiResponse.<AchievementResponse>builder()
+                .success(true)
+                .message("Get achievement by user ID successfully")
+                .payload(achievementService.getAchievementByUserId(userId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();

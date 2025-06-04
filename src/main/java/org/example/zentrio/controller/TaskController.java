@@ -67,7 +67,7 @@ public class TaskController {
             @PathVariable("gantt-bar-id") UUID ganttBarId) {
         ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
                 .success(true)
-                .message("Get all task by ID successfully")
+                .message("Updated task by ID successfully")
                 .payload(taskService.getAllTasksByBoardIdAndGanttBarId(boardId, ganttBarId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
