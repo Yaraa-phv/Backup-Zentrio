@@ -174,13 +174,6 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public AppUserResponse registerThirdParty(ThirdPartyRequest request) {
-        String password = passwordEncoder.encode(UUID.randomUUID().toString());
-        AppUser appUser = authRepository.registerThirdParty(request, password);
-        return modelMapper.map(appUser, AppUserResponse.class);
-    }
-
-    @Override
     public TokenResponse loginThirdParty(AuthThirdPartyRequest request) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
 //                .setAudience(Collections.singletonList("67453975102-v5k4olq9qom0dop0400ika07ntf9lils.apps.googleusercontent.com")) own google id ("Fanau")

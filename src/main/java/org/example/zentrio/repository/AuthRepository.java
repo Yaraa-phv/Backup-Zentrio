@@ -35,15 +35,6 @@ public interface AuthRepository {
             """)
     AppUser register(@Param("request") AppUserRequest appUserRequest);
 
-
-    @ResultMap("UserMapper")
-    @Select("""
-        INSERT INTO users
-        VALUES (default, #{request.fullName}, #{password},  #{request.email}, #{request.profilePicture})
-        RETURNING *;
-    """)
-    AppUser registerThirdParty(@Param("request") ThirdPartyRequest request, String password);
-
     @ResultMap("UserMapper")
     @Select("""
         INSERT INTO users(email,username,password,profile_image,is_verified)

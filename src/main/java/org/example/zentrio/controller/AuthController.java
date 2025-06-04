@@ -81,20 +81,6 @@ public class AuthController {
     }
 
 
-
-    @Operation(summary = "Register with third party", description = "Register new user with third party provide for information")
-    @PostMapping("/register/third-party")
-    public ResponseEntity<ApiResponse<AppUserResponse>> registerThirdParty(@RequestBody @Valid ThirdPartyRequest request) {
-        ApiResponse<AppUserResponse> apiResponse = ApiResponse.<AppUserResponse>builder()
-                .success(true)
-                .message("User registered successfully! Please verify your email to complete the registration.")
-                .status(HttpStatus.CREATED)
-                .payload(authService.registerThirdParty(request))
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-    }
-
     @Operation(summary = "Login with third party", description = "Login user with third party with credential from third party are provided")
     @PostMapping("/login/third-party")
     public ResponseEntity<ApiResponse<TokenResponse>> loginThirdParty(@RequestBody @Valid AuthThirdPartyRequest request) throws GeneralSecurityException, IOException {

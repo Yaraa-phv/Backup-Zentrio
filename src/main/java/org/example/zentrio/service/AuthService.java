@@ -22,7 +22,6 @@ public interface AuthService {
 
     UUID getCurrentAppUserId();
 
-    AppUserResponse registerThirdParty(ThirdPartyRequest request);
 
     TokenResponse loginThirdParty(AuthThirdPartyRequest request) throws GeneralSecurityException, IOException;
 
