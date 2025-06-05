@@ -3,8 +3,10 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ProfileRequest;
 import org.example.zentrio.dto.response.AppUserResponse;
+import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.repository.AppUserRepository;
+import org.example.zentrio.repository.AuthRepository;
 import org.example.zentrio.repository.ProfileRepository;
 import org.example.zentrio.service.AuthService;
 import org.example.zentrio.service.ProfileService;
@@ -21,6 +23,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final AuthService authService;
     private final ProfileRepository profileRepository;
     private final AppUserRepository appUserRepository;
+    private final AuthRepository authRepository;
 
 
     @Override
@@ -38,6 +41,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public AppUserResponse updateProfile(ProfileRequest profileRequest) {
         UUID appUserId = authService.getCurrentAppUserId();
+
         AppUser appUser = profileRepository.updateProfile(profileRequest,appUserId);
         return appUser != null ? modelMapper.map(appUser, AppUserResponse.class) : null;
     }
@@ -47,6 +51,18 @@ public class ProfileServiceImpl implements ProfileService {
         UUID appUserId = authService.getCurrentAppUserId();
         profileRepository.deleteProfile(appUserId);
     }
+
+    @Override
+    public AppUserResponse getProfileByUserId(UUID userId) {
+        AppUser user = appUserRepository.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("User with id " + userId + " not found");
+        }
+
+        AppUser appUser = profileRepository.getProfileByUserId(userId);
+        return appUser != null ? modelMapper.map(appUser, AppUserResponse.class) : null;
+    }
+
 
 
 }

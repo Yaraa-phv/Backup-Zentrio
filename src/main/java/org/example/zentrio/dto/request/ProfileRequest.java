@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.enums.Gender;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +16,21 @@ public class ProfileRequest {
     @NotNull
     @NotBlank
     private String username;
+
+    @NotNull
+    private Gender gender;
+
+    @NotNull
+    @NotBlank
+    private String position;
+
+    @NotNull
+    @NotBlank
+    private String location;
+
+    @NotNull
+    @NotBlank
+    private String contact;
 
     private String profileImageUrl;
 

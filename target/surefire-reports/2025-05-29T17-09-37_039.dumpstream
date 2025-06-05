@@ -1,5 +1,0 @@
-# Created at 2025-05-29T17:09:37.262
-Boot Manifest-JAR contains absolute paths in classpath 'D:\Spring\Final Project\zentrio-api\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-'other' has different root
-

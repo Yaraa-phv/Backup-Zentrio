@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/profiles")
@@ -49,7 +50,7 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Delete user profile", description = "Deletes the currently authenticated user's profile. This action cannot be undone.")
+    @Operation(summary = "Delete user profile", description = "Deleted the currently authenticated user's profile. This action cannot be undone.")
     @DeleteMapping("/delete-profile")
     public ResponseEntity<ApiResponse<?>> deleteProfile() {
         ApiResponse<AppUserResponse> apiResponse = ApiResponse.<AppUserResponse>builder()
@@ -59,6 +60,21 @@ public class ProfileController {
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Get user profile by user ID",description = "Get user profile by user ID")
+    @GetMapping("/users/{user-id}/profiles")
+    public ResponseEntity<ApiResponse<AppUserResponse>> getProfileByUserId(@PathVariable("user-id") UUID userId) {
+        ApiResponse<AppUserResponse> apiResponse = ApiResponse.<AppUserResponse>builder()
+                .success(true)
+                .message("Get user profile by ID successfully")
+                .status(HttpStatus.OK)
+                .payload(profileService.getProfileByUserId(userId))
+                .timestamp(LocalDateTime.now())
+                .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }

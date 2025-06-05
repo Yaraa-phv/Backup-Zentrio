@@ -17,6 +17,5 @@ import java.util.Map;
 public class AchievementRequest {
 
     @NotNull
-    @Size(min = 1, max = 100)
     private Map<String, Object> details;
 }
