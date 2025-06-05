@@ -64,10 +64,12 @@ public interface AchievementRepository {
 
 
     @Select("""
-                SELECT u.username, u.profile_image FROM users u
+                SELECT u.username, u.profile_image, u.user_id FROM users u
                 WHERE u.user_id = #{userId}
             """)
     @Results(id = "userMapper", value = {
+
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "username", column = "username"),
             @Result(property = "imageUrl", column = "profile_image")
     })

@@ -35,4 +35,6 @@ public interface ChecklistService {
     HashSet<Checklist> getAllChecklists();
 
     HashSet<Checklist> getAllChecklistsByCurrentUser();
+
+    Void moveChecklistOrder(UUID taskId, int newOrder, int oldOrder);
 }

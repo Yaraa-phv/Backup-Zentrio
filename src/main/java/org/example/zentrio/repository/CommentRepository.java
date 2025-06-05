@@ -60,11 +60,12 @@ public interface CommentRepository {
 
     @Select("""
         
-         SELECT u.profile_image AS image , u.username AS name FROM users u
+         SELECT u.profile_image AS image , u.username AS name, u.user_id FROM users u
         INNER JOIN  members m ON u.user_id = m.user_id
         WHERE member_id= #{memberId}
         """)
     @Results(id = "memberResponseMapper", value = {
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "imageUrl", column = "image"),
             @Result(property = "username", column = "name"),
     })
