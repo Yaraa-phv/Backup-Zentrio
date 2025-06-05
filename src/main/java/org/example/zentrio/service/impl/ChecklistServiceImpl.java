@@ -324,9 +324,10 @@ ChecklistServiceImpl implements ChecklistService {
     public Void moveChecklistOrder(UUID taskId, int newOrder, int oldOrder) {
         Task task= taskService.getTaskById(taskId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        Boolean isMember= memberRepository.existMemberId(userId,task.getBoardId());
-        if (!isMember){
-            throw new ForbiddenException("You do not have permission to move this order");
+        String teamLead= memberRepository.getRoleInTask(task.getBoardId(), userId , task.getTaskId());
+        System.out.println(teamLead);
+        if (teamLead == null || !teamLead.equals(RoleName.ROLE_LEADER.toString())) {
+            throw new ForbiddenException("You do not have the leader of this task");
         }
         if (newOrder == oldOrder){
             return null ;
