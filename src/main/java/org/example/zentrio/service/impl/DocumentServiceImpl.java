@@ -174,9 +174,10 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     @Override
-    public void shareFolder(String folderId, String emailAddress, String accessToken) throws IOException, GeneralSecurityException {
+    public void shareFolder(UUID documentId, String emailAddress, String accessToken) throws IOException, GeneralSecurityException {
+        Document document = getDocumentById(documentId);
         Drive drive = createDriveService(accessToken);
-
+        String   folderId =  document.getFolderId();
         File folder = drive.files().get(folderId)
                 .setFields("id, name, webViewLink, iconLink")
                 .setSupportsAllDrives(true)

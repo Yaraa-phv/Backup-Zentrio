@@ -239,7 +239,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Move task in bord",description = "Get all the tasks for all users")
+    @Operation(summary = "Move task in bord")
     @PutMapping("board/{board-id}")
     public ResponseEntity<ApiResponse<Void>> moveOrder(@PathVariable("board-id") UUID boardId ,
                                                       @RequestParam int newOrder,

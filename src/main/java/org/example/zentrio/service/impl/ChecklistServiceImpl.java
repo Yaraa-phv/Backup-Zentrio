@@ -5,7 +5,6 @@ import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.zentrio.dto.request.ChecklistRequest;
-import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.enums.ChecklistStatus;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
@@ -17,7 +16,6 @@ import org.example.zentrio.repository.*;
 import org.example.zentrio.service.ChecklistService;
 import org.example.zentrio.service.TaskService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -31,7 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChecklistServiceImpl implements ChecklistService {
+public class
+ChecklistServiceImpl implements ChecklistService {
 
     private final ChecklistRepository checklistRepository;
     private final TaskService taskService;
@@ -320,5 +319,55 @@ public class ChecklistServiceImpl implements ChecklistService {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         return checklistRepository.getAllChecklistsByCurrentUser(userId);
     }
+
+    @Override
+    public Void moveChecklistOrder(UUID taskId, int newOrder, int oldOrder) {
+        Task task= taskService.getTaskById(taskId);
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String teamLead= memberRepository.getRoleInTask(task.getBoardId(), userId , task.getTaskId());
+        System.out.println(teamLead);
+        if (teamLead == null || !teamLead.equals(RoleName.ROLE_LEADER.toString())) {
+            throw new ForbiddenException("You do not have the leader of this task");
+        }
+        if (newOrder == oldOrder){
+            return null ;
+        }
+        HashSet<Checklist> checklists = checklistRepository.getAllChecklistsByTaskId(task.getTaskId());
+        if (checklists.isEmpty()){
+            throw new NotFoundException("No checklists found for task " + task.getTaskId());
+        }
+        boolean oldExists = false;
+        boolean newExists = false;
+
+        for (Checklist checklist : checklists) {
+            if (checklist.getChecklistOrder() == oldOrder) {
+                oldExists = true;
+            }
+            if (checklist.getChecklistOrder() == newOrder) {
+                newExists = true;
+            }
+        }
+
+        if (!oldExists) {
+            throw new NotFoundException("No task with order: " + oldOrder);
+        }
+
+        if (!newExists) {
+            throw new NotFoundException("No task with order: " + newOrder);
+        }
+
+        // move down
+        if (oldOrder > newOrder){
+            int till= oldOrder -1;
+            checklistRepository.moveChecklistOrderDown(oldOrder,newOrder, till,task.getTaskId());
+            System.out.println("move down"+till);
+        }else {
+            int till= oldOrder +1;
+            checklistRepository.moveChecklistOrderUp(oldOrder,newOrder, till,task.getTaskId());
+            System.out.println("move up"+till);
+        }
+        return  null;
+    }
+
 
 }

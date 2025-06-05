@@ -148,13 +148,16 @@ public interface ChecklistRepository {
     @Select("""
             SELECT
                 u.username AS userName,
-                u.profile_image AS image
+                u.profile_image AS image,
+                u.user_id
             FROM users u
                      INNER JOIN members m ON u.user_id = m.user_id
                   inner join checklist_assignments ch on m.member_id = ch.member_id
             WHERE ch.checklist_id = #{checklistId};
             """)
     @Results(id = "memberChecklistMapper", value = {
+
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "imageUrl", column = "image"),
             @Result(property = "userName", column = "name"),
     })
@@ -186,5 +189,34 @@ public interface ChecklistRepository {
                SELECT * FROM checklists WHERE task_id= #{taskId}
                """)
     List<ChecklistRespone> getAllDataInChecklistByTaskId(UUID taskId);
+
+    @Select("""
+        
+            UPDATE checklists
+        SET checklist_order = CASE
+                             WHEN
+                                 checklist_order= #{oldOrder} THEN #{newOrder}
+                             WHEN checklist_order BETWEEN #{newOrder} AND #{till} THEN checklist_order  + 1 -- move down
+            ELSE checklist_order
+        END
+            WHERE task_id = #{taskId}
+                  AND checklist_order  BETWEEN #{newOrder} AND #{oldOrder};
+        
+        """)
+    void moveChecklistOrderDown(int oldOrder, int newOrder, int till, UUID taskId);
+
+
+    @Select("""
+        
+            UPDATE checklists
+        SET checklist_order = CASE
+                             WHEN checklist_order = #{oldOrder} THEN #{newOrder}
+                             WHEN checklist_order BETWEEN #{till} AND #{newOrder} THEN checklist_order - 1  -- move up
+            ELSE checklist_order
+        END
+            WHERE task_id = #{taskId}
+                    AND checklist_order BETWEEN #{oldOrder} AND #{newOrder};
+        """)
+    void moveChecklistOrderUp(int oldOrder, int newOrder, int till, UUID taskId);
 
 }

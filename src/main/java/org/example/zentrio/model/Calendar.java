@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponseData;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class Calendar {
     private LocalDateTime tillDate;
     private UUID taskId;
     private UUID userId;
+    private MemberResponseData useData;
 
 
 }

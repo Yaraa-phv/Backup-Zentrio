@@ -89,7 +89,7 @@ public interface GanttBarRepository {
 
     @Select("""
         
-            SELECT us.username AS name,us.profile_image AS image
+            SELECT us.username AS name,us.profile_image AS image, us.user_id
         FROM gantt_bars g
                  JOIN tasks ts ON ts.gantt_bar_id = g.gantt_bar_id
                  JOIN task_assignments ta ON ta.task_id = ts.task_id
@@ -99,6 +99,7 @@ public interface GanttBarRepository {
         WHERE g.gantt_bar_id = #{ganttBarId};
         """)
     @Results(id = "teamLeadGanttBarMapper", value = {
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "imageUrl", column = "image"),
             @Result(property = "username", column = "name"),
     })

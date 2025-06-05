@@ -185,11 +185,13 @@ public interface TaskRepository {
     HashSet<Task> getAllTasks();
 
     @Select("""
-                SELECT u.username, u.profile_image FROM users u
+                SELECT u.username, u.profile_image , u.user_id FROM users u
                 INNER JOIN members m ON u.user_id = m.user_id
                 WHERE m.member_id = #{userId}
             """)
     @Results(id = "memberMapper", value = {
+
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "username", column = "username"),
             @Result(property = "imageUrl", column = "profile_image")
     })

@@ -199,5 +199,19 @@ public class ChecklistController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+    @Operation(summary = "Move checklist in task")
+    @PutMapping("tasks/{task-id}")
+    public ResponseEntity<ApiResponse<Void>> moveChecklistOrder(@PathVariable("task-id") UUID taskId ,
+                                                                @RequestParam int newOrder,
+                                                                @RequestParam int oldOrder) {
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .success(true)
+                .message("Move checklist in task successfully")
+                .payload(checklistService.moveChecklistOrder(taskId,newOrder,oldOrder))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 
 }

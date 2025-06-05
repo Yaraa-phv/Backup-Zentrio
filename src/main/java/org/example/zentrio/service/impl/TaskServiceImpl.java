@@ -411,15 +411,15 @@ public class TaskServiceImpl implements TaskService {
     public Void moveOrder( UUID boardId,int newOrder, int oldOrder) {
         HashSet<Task> tasks= taskRepository.getTasksByBoardId(boardId);
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        Boolean isMember= memberRepository.existMemberId(userId,boardId);
-        if (!isMember){
-            throw new ForbiddenException("You do not have permission to move this order");
-        }
         if (newOrder == oldOrder){
             return null ;
         }
       if (tasks.isEmpty()){
           throw new NotFoundException("Tasks not found");
+      }
+        String memberRole= memberRepository.getRolePMByBoardIdAndUserId(boardId,userId);
+      if ( memberRole == null || !memberRole.equals(RoleName.ROLE_MANAGER.toString()) ){
+          throw new ForbiddenException("You don't have permission to move tasks");
       }
         boolean oldExists = false;
         boolean newExists = false;

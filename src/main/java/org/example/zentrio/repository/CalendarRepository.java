@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.CalendarRequest;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Calendar;
 import org.example.zentrio.model.Task;
 
@@ -68,6 +69,8 @@ public interface CalendarRepository {
            @Result(property = "tillDate", column = "till_date"),
            @Result(property = "userId", column = "user_id"),
            @Result(property = "taskId", column = "task_id"),
+           @Result(property = "useData", column = "user_id",
+           one = @One(select = "getMemberByUserId"))
    })
     Calendar createCalendar(@Param("request") CalendarRequest calendarRequest, LocalDateTime now, UUID userId);
 
@@ -108,4 +111,17 @@ public interface CalendarRepository {
         """)
      void deleteCalendarByNoteId(UUID noteId, UUID taskId, UUID userId);
 
+
+    @Select("""
+        
+         SELECT u.profile_image AS image , u.username AS name, u.user_id FROM users u
+       
+        WHERE u.user_id= #{memberId}
+        """)
+    @Results(id = "memberResponseMapper", value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "username", column = "name"),
+    })
+    MemberResponseData getMemberByUserId(UUID memberId);
 }
