@@ -149,10 +149,10 @@ public class DocumentController {
     @PostMapping("/share-document")
     @Operation(summary = "Share Document with Specific   User")
     public ResponseEntity<ApiResponse<String>> shareFolder(
-                                @RequestParam String folderId,
+                                @RequestParam UUID documentId,
                               @RequestParam String emailAddress,
                               @RequestParam String accessToken) throws GeneralSecurityException, IOException {
-        documentService.shareFolder(folderId, emailAddress, accessToken);
+        documentService.shareFolder(documentId, emailAddress, accessToken);
         ApiResponse<String> response =  ApiResponse.<String>builder()
                 .success(true)
                 .message("Folder Share  Successfully ")

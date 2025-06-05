@@ -16,7 +16,7 @@ public interface DocumentService {
 
     Document updateDocumentName(String accessToken, UUID documentId, String newFolderName) throws GeneralSecurityException, IOException;
 
-    void shareFolder(String folderId, String emailAddress, String accessToken) throws IOException, GeneralSecurityException;
+    void shareFolder(UUID documentId, String emailAddress, String accessToken) throws IOException, GeneralSecurityException;
 
     String publicDocument(UUID documentId, String accessToken) throws GeneralSecurityException, IOException;
 
