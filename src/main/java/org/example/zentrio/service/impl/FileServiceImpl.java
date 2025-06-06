@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.FileMetadata;
+import org.example.zentrio.repository.ProfileRepository;
 import org.example.zentrio.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
 
     private final MinioClient minioClient;
+    private final ProfileRepository profileRepository;
 
 
     @Value("${minio.bucket.name}")
@@ -50,7 +54,6 @@ public class FileServiceImpl implements FileService {
         }
 
         String fileName = file.getOriginalFilename();
-
         fileName = UUID.randomUUID() + "." + StringUtils.getFilenameExtension(fileName);
 
         minioClient.putObject(
@@ -62,6 +65,7 @@ public class FileServiceImpl implements FileService {
                         .build()
         );
 
+
         String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/v1/files/preview-file/" + fileName)
                 .toUriString();
@@ -72,6 +76,7 @@ public class FileServiceImpl implements FileService {
                 .fileType(file.getContentType())
                 .fileSize(file.getSize())
                 .build();
+
     }
 
     @SneakyThrows

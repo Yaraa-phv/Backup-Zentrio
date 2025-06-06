@@ -94,4 +94,17 @@ public class AchievementController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+    @Operation(summary = "Get achievement for current user only achievement",description = "Get only achievement of user")
+    @GetMapping("/my-achievement")
+    public ResponseEntity<?> getMyAchievement() {
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Get achievement successfully")
+                .payload(achievementService.getMyAchievement())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 }

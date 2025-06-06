@@ -72,4 +72,10 @@ public class AchievementServiceImpl implements AchievementService {
         return new AchievementResponse(user, ownedBoards, joinedBoards);
     }
 
+    @Override
+    public Achievement getMyAchievement() {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        return achievementRepository.getMyAchievement(userId);
+    }
+
 }

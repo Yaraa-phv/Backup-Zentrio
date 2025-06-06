@@ -1,6 +1,6 @@
 -- DATABASE SCRIPT
 -- Create database
-CREATE DATABASE zentrio_db;
+-- CREATE DATABASE zentrio_db;
 
 --Create extension for uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

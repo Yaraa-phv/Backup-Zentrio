@@ -115,4 +115,17 @@ public interface AchievementRepository {
               AND w.created_by != #{userId}
             """)
     List<BoardSummary> getJoinBoard(UUID userId);
+
+    @Select("""
+        SELECT * FROM achievements WHERE user_id = #{userId}
+        LIMIT 1
+    """)
+    @Results(id = "myAchievementMapper", value = {
+            @Result(property = "achievementId", column = "achievement_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "details", column = "details", typeHandler = JsonbTypeHandler.class),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at")
+    })
+    Achievement getMyAchievement(UUID userId);
 }
