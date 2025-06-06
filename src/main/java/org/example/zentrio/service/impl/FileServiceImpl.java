@@ -26,7 +26,6 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
 
     private final MinioClient minioClient;
-    private final ProfileRepository profileRepository;
 
 
     @Value("${minio.bucket.name}")
