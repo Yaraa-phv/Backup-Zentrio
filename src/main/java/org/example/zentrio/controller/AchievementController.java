@@ -82,7 +82,7 @@ public class AchievementController {
     }
 
 
-    @Operation(summary = "Get achievement by user ID",description = "Get ahievement by user ID when visited")
+    @Operation(summary = "Get achievement by user ID",description = "Get achievement by user ID when visited")
     @GetMapping("/users/{user-id}")
     public ResponseEntity<?> getAchievementByUserId(@PathVariable("user-id") UUID userId) {
         ApiResponse<AchievementResponse> apiResponse = ApiResponse.<AchievementResponse>builder()

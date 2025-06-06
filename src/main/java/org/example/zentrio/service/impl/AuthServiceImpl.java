@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
             } else if (request.getGender().equals(Gender.MALE)) {
                 request.setProfileImage("https://i.pinimg.com/736x/3e/9f/08/3e9f085ce52735854f9f2d4742f86659.jpg");
             } else {
-                request.setGender(Gender.RATHER_NOT_TO_SAY);
+                request.setGender(Gender.OTHER);
                 request.setProfileImage("https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg");
             }
         }

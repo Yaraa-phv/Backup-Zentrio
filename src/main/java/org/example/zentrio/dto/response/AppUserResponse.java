@@ -20,5 +20,8 @@ public class AppUserResponse {
     private String profileImage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String position;
+    private String location;
+    private String contact;
 
 }

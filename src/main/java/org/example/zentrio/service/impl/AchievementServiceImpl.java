@@ -30,10 +30,6 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     public Achievement createAchievement(AchievementRequest achievementRequest) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-        boolean isAlreadySetup = achievementRepository.isAchievementExist(userId);
-        if (isAlreadySetup) {
-            throw new BadRequestException("You're already set up this achievement can't set up it again thank.");
-        }
         return achievementRepository.createAchievement(achievementRequest, userId);
     }
 

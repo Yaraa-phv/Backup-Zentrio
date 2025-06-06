@@ -22,7 +22,10 @@ public interface AppUserRepository {
             @Result(property = "isVerified", column = "is_verified"),
             @Result(property = "isReset", column = "is_reset"),
             @Result(property = "createdAt", column = "created_at"),
-            @Result(property = "updatedAt", column = "updated_at")
+            @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "position", column = "position"),
+            @Result(property = "location", column = "location"),
+            @Result(property = "contact", column = "contact"),
     }
     )
     AppUser getUserByEmail(String email);
@@ -51,14 +54,17 @@ public interface AppUserRepository {
     UUID getCurrentUserId(String email);
 
     @Select("""
-        SELECT user_id, username,email,gender,profile_image,created_at,updated_at
+        SELECT user_id, username,email,gender,profile_image,position,location,contact,created_at,updated_at
         FROM users WHERE user_id =  #{userId}
     """)
    @Results(id = "userResponse", value = {
            @Result(property = "userId",column = "user_id"),
            @Result(property = "profileImage", column = "profile_image"),
            @Result(property = "createdAt", column = "created_at"),
-           @Result(property = "updatedAt", column = "updated_at")
+           @Result(property = "updatedAt", column = "updated_at"),
+           @Result(property = "position", column = "position"),
+           @Result(property = "location", column = "location"),
+           @Result(property = "contact", column = "contact"),
    })
     AppUserResponse getUserByUserId(UUID userId);
 
