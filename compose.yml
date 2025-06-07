@@ -43,9 +43,9 @@ services:
       SPRING_DATA_REDIS_HOST: zentrio-redis-develop
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: password
-      SPRING_DATASOURCE_URL: jdbc:postgresql://zentrio-db-develop:5432/zentrio_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://96.9.81.189:6434/zentrio_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: Penholder7
     depends_on:
       - zentrio-db-develop
       - zentrio-redis-develop
