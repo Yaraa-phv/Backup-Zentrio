@@ -132,4 +132,7 @@ public interface MemberRepository {
         """)
     Boolean existMemberId(UUID userId, UUID boardId);
 
+
+
+
 }

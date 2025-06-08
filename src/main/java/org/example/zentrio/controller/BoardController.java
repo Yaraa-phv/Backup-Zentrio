@@ -281,4 +281,20 @@ public class BoardController {
     }
 
 
+
+    @Operation(summary = "Delete member in the board by user ID",description = "Deleted member in board by user ID")
+    @DeleteMapping("/{board-id}/users/{user-id}")
+    public ResponseEntity<?> deleteMember(@PathVariable("board-id") UUID boardId, @PathVariable("user-id") UUID userId) {
+        boardService.deletedMember(boardId,userId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Deleted member by board ID and user ID successfully")
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
 }

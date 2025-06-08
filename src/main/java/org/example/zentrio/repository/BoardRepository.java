@@ -233,4 +233,11 @@ public interface BoardRepository {
             many = @Many(select = "org.example.zentrio.repository.TaskRepository.getAllDataInTaskByBoardId"))
     })
     BoardResponse getAllDataInBoard(UUID boardId);
+
+    @Select("""
+        DELETE members FROM members
+        WHERE board_id = #{boardId}
+        AND m.user_id = #{userId}
+    """)
+    void deletedMember(UUID boardId, UUID userId);
 }

@@ -381,6 +381,20 @@ public class BoardServiceImpl implements BoardService {
         return boardRepository.getAllDataInBoard(boardId);
     }
 
+    @Override
+    public void deletedMember(UUID boardId, UUID userId) {
+        Board board = boardRepository.getBoardByBoardId(boardId);
+        if (board == null) {
+            throw new NotFoundException("Board ID " + boardId + " not found");
+        }
+        UUID mangerId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, mangerId);
+        if(!roleName.contains(RoleName.ROLE_MANAGER.toString())) {
+            throw new ForbiddenException("You're not a manager of this board can't delete member");
+        }
+        boardRepository.deletedMember(boardId,userId);
+    }
+
     public void validateCurrentUserRoles(UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
