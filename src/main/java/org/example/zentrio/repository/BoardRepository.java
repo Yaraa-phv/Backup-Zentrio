@@ -235,8 +235,8 @@ public interface BoardRepository {
     BoardResponse getAllDataInBoard(UUID boardId);
 
     @Select("""
-        DELETE members FROM members
-        WHERE board_id = #{boardId}
+        DELETE FROM members m
+        WHERE m.board_id = #{boardId}
         AND m.user_id = #{userId}
     """)
     void deletedMember(UUID boardId, UUID userId);
