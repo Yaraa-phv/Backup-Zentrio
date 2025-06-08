@@ -1,6 +1,7 @@
 package org.example.zentrio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.response.ApiResponse;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @RequestMapping("api/v1/files")
 @RequiredArgsConstructor
 @Tag(name = "Images Controller")
+@SecurityRequirement(name = "bearerAuth")
 public class ImageController {
     private final FileService fileService;
 

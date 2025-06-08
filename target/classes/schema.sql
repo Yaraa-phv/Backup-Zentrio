@@ -1,6 +1,6 @@
 -- DATABASE SCRIPT
 -- Create database
--- CREATE DATABASE zentrio_db;
+CREATE DATABASE zentrio_db;
 
 --Create extension for uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -14,6 +14,9 @@ CREATE TABLE users
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR      NOT NULL,
     profile_image VARCHAR          DEFAULT 'https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg',
+    position      VARCHAR(100),
+    location      VARCHAR(255),
+    contact       VARCHAR(100),
     created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     is_verified   BOOLEAN          DEFAULT false,
