@@ -39,11 +39,11 @@ public interface AnnouncementRepository {
     @Select("""
         UPDATE announcements SET text_content= #{content},
                                  update_at= #{now}
-        WHERE announcement_id =#{announcementId}
+        WHERE announcement_id =#{announcementId} AND bord_id= #{bordId}
        RETURNING * 
        """)
     @ResultMap("announcementMapper")
-    Announcement updateAnnouncementById(UUID announcementId, String content, LocalDateTime now);
+    Announcement updateAnnouncementById(UUID announcementId, String content, LocalDateTime now, UUID bordId);
 
     @Select("""
         UPDATE announcements SET is_pinned= #{b}

@@ -13,7 +13,7 @@ public interface AnnouncementService {
     Announcement getAnnouncementById(UUID announcementId);
 
 
-    Announcement updateAnnouncementById(UUID announcementId, String content);
+    Announcement updateAnnouncementById( UUID announcementId,AnnouncementRequest announcementRequest);
 
     Announcement updateAnnouncementPinnedById(UUID announcementId);
 

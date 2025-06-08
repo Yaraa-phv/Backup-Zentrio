@@ -3,6 +3,7 @@ package org.example.zentrio.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
 import org.example.zentrio.dto.request.AnnouncementRequest;
@@ -27,7 +28,7 @@ public class AnnouncementController {
 
         @Operation(summary = "Create announcement by board id")
         @PostMapping
-        public ResponseEntity<ApiResponse<Announcement>>  createAnnouncement(@RequestBody AnnouncementRequest announcementRequest) {
+        public ResponseEntity<ApiResponse<Announcement>>  createAnnouncement(@Valid @RequestBody AnnouncementRequest announcementRequest) {
 
             ApiResponse<Announcement> apiResponse= ApiResponse.<Announcement>builder()
                     .success(true)
@@ -55,15 +56,16 @@ public class AnnouncementController {
     }
 
     @Operation(summary = "Update announcement by announcement id")
-    @PutMapping("/{announcement-id}")
+    @PutMapping("{announcement-id}")
     public ResponseEntity<ApiResponse<Announcement>>  updateAnnouncementById(
             @PathVariable("announcement-id") UUID announcementId,
-            @RequestParam String content) {
+            @Valid @RequestBody AnnouncementRequest announcementRequest
+            ) {
 
         ApiResponse<Announcement> apiResponse= ApiResponse.<Announcement>builder()
                 .success(true)
                 .message("Update announcement by id successfully")
-                .payload(announcementService.updateAnnouncementById(announcementId, content))
+                .payload(announcementService.updateAnnouncementById(announcementId,announcementRequest))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();

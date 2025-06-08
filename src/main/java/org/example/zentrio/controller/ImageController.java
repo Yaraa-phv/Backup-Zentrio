@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/files")
@@ -49,4 +51,25 @@ public class ImageController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(fileContent);
     }
+
+    @Operation(summary = "Upload multiple files  ", description = "Uploads multiple files and returns metadata for each uploaded file.")
+    @PostMapping(value = "/boards/{board-id}/upload-multiple-files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<List<FileMetadata>>> uploadMultipleFiles(
+            @PathVariable("board-id") UUID boardId,
+            @RequestParam("files") List<MultipartFile> files) {
+
+        System.out.println("Uploading " + files.size() + " files");
+        List<FileMetadata> metadataList = fileService.uploadFiles(boardId,files);
+
+        ApiResponse<List<FileMetadata>> apiResponse = ApiResponse.<List<FileMetadata>>builder()
+                .success(true)
+                .message("Uploaded " + metadataList.size() + " file(s) successfully.")
+                .payload(metadataList)
+                .status(HttpStatus.CREATED)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
 }
