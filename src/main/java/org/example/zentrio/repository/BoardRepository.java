@@ -240,4 +240,15 @@ public interface BoardRepository {
         AND m.user_id = #{userId}
     """)
     void deletedMember(UUID boardId, UUID userId);
+
+
+    @Select("""
+        SELECT b.*
+        FROM boards b
+        INNER JOIN workspaces w ON b.workspace_id = w.workspace_id
+        WHERE b.is_favourite = TRUE
+        AND w.created_by = #{userId}
+    """)
+    @ResultMap("boardMapper")
+    HashSet<Board> getFavouriteBoardsByUserId(UUID userId);
 }

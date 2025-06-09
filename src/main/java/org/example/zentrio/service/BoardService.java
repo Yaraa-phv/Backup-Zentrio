@@ -53,4 +53,6 @@ public interface BoardService {
     BoardResponse getAllDataInBoard(UUID boardId);
 
     void deletedMember(UUID boardId, UUID userId);
+
+    HashSet<Board> getFavouriteBoardsByUserId(UUID userId);
 }

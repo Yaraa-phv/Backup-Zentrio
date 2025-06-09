@@ -399,6 +399,15 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.deletedMember(boardId,userId);
     }
 
+    @Override
+    public HashSet<Board> getFavouriteBoardsByUserId(UUID userId) {
+        AppUser user = appUserRepository.getUserById(userId);
+        if(user == null) {
+            throw new NotFoundException("User with ID " + userId + " not found in this board");
+        }
+        return boardRepository.getFavouriteBoardsByUserId(userId);
+    }
+
     public void validateCurrentUserRoles(UUID boardId) {
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         String roleName = roleRepository.getRoleNameByBoardIdAndUserId(boardId, userId);
