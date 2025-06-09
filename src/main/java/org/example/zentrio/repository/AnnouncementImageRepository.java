@@ -1,6 +1,7 @@
 package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
+import org.example.zentrio.model.Announcement;
 import org.example.zentrio.model.AnnouncementImage;
 
 import java.time.LocalDateTime;
@@ -36,4 +37,6 @@ public interface AnnouncementImageRepository {
             @Result(property = "announcementId", column = "announcement_id"),
     })
     List<AnnouncementImage> getALLAnnouncementImagesByAnnouncementId( UUID announcementId);
+
+
 }

@@ -3,6 +3,7 @@ package org.example.zentrio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.enums.ReactTypes;
 
 
@@ -18,5 +19,6 @@ public class React {
     private ReactTypes reactType ;
     private LocalDateTime reactDate ;
     private UUID authorId ;
+    private MemberResponseData commentBy;
     private UUID announcementId ;
 }

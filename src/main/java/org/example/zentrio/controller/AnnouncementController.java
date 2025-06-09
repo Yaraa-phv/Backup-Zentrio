@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.example.zentrio.dto.request.AnnouncementRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.model.Announcement;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -87,20 +87,37 @@ public class AnnouncementController {
         return  ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @Operation(summary = "Delete announcement pin by announcement id")
+    @Operation(summary = "Delete announcement  by announcement id")
     @DeleteMapping("/{announcement-id}")
-    public ResponseEntity<ApiResponse<Void>>  deletedAnnouncementPinnedById(
+    public ResponseEntity<ApiResponse<Void>>  deletedAnnouncementById(
             @PathVariable("announcement-id") UUID announcementId) {
 
         ApiResponse<Void> apiResponse= ApiResponse.<Void>builder()
                 .success(true)
-                .message("Delete announcement pin by id successfully")
-                .payload(announcementService.deletedAnnouncementPinnedById(announcementId))
+                .message("Delete announcement  by id successfully")
+                .payload(announcementService.deletedAnnouncementById(announcementId))
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
         return  ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
+    @Operation(summary = "Get all announcement  by board id")
+    @GetMapping("boards/{board-id}")
+    public ResponseEntity<ApiResponse<List<Announcement>>>  getAnnouncementsByBoardId  (
+            @PathVariable("board-id") UUID boardId) {
+
+        ApiResponse<List<Announcement>> apiResponse= ApiResponse.<List<Announcement>>builder()
+                .success(true)
+                .message("Get all announcement  by board id successfully")
+                .payload(announcementService.getAnnouncementsByBoardId(boardId))
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return  ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
 
 
 

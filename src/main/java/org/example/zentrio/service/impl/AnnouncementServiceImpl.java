@@ -96,7 +96,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     }
 
     @Override
-    public Void deletedAnnouncementPinnedById(UUID announcementId) {
+    public Void deletedAnnouncementById(UUID announcementId) {
         Announcement  announcement= getAnnouncementById(announcementId);
         UUID pmId= getPmId(announcement.getBoardId());
         if (!announcement.getAuthorId().equals(pmId)) {
@@ -109,5 +109,15 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         }
         announcementRepository.deletedAnnouncementPinnedById(announcement.getAnnouncementId(), pmId);
         return null;
+    }
+
+    @Override
+    public List<Announcement> getAnnouncementsByBoardId(UUID boardId) {
+        boardService.getBoardByBoardId(boardId);
+        List<Announcement> announcements= announcementRepository.getAnnouncementsByBoardId(boardId);
+        if (announcements.isEmpty()) {
+            throw new NotFoundException("No announcements found");
+        }
+        return announcements;
     }
 }

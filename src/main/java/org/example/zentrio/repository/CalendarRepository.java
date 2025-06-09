@@ -28,6 +28,8 @@ public interface CalendarRepository {
             @Result(property = "boardId", column = "board_id"),
             @Result(property = "ganttBarId", column = "gantt_bar_id"),
             @Result(property = "createdBy", column = "created_by"),
+            @Result(property = "creator", column = "created_by",
+                    one = @One(select = "org.example.zentrio.repository.TaskRepository.getDataOfUserCreator")),
     })
     @Select("""
          

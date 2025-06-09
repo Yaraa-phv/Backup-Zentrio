@@ -3,6 +3,7 @@ package org.example.zentrio.service;
 import org.example.zentrio.dto.request.AnnouncementRequest;
 import org.example.zentrio.model.Announcement;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AnnouncementService {
@@ -18,5 +19,7 @@ public interface AnnouncementService {
     Announcement updateAnnouncementPinnedById(UUID announcementId);
 
 
-    Void deletedAnnouncementPinnedById(UUID announcementId);
+    Void deletedAnnouncementById(UUID announcementId);
+
+    List<Announcement> getAnnouncementsByBoardId(UUID boardId);
 }

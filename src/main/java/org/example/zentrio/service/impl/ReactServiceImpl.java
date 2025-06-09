@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.ReactRequest;
 import org.example.zentrio.exception.ConflictException;
 import org.example.zentrio.exception.ForbiddenException;
+import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Announcement;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.React;
@@ -48,8 +49,40 @@ public class ReactServiceImpl implements ReactService {
         UUID authorId = memberId(announcement.getBoardId());
         Boolean existingReact= reactRepository.getExistingReact(announcement.getAnnouncementId(), authorId);
         if (existingReact) {
-            throw new ConflictException("You are already member of this board");
+            throw new ConflictException("You are already reacted in this announcement");
         }
         return reactRepository.createReact(reactRequest, LocalDateTime.now(),authorId);
     }
+
+    @Override
+    public React UpdateReact(UUID reactId, ReactRequest reactRequest) {
+        Announcement announcement= announcementService.getAnnouncementById(reactRequest.getAnnouncementId());
+        GetReactById(reactId);
+        UUID authorId = memberId(announcement.getBoardId());
+       React react= reactRepository.UpdateReact(reactId,reactRequest,authorId);
+       return react;
+    }
+
+    @Override
+    public React GetReactById(UUID reactId) {
+        React react= reactRepository.GetReactById(reactId);
+        if (react == null) {
+            throw new NotFoundException("React not found");
+        }
+        return react;
+    }
+
+    @Override
+    public Void DeleteReactById(UUID reactId) {
+     React react=   GetReactById(reactId);
+        Announcement announcement= announcementService.getAnnouncementById(react.getAnnouncementId());
+        UUID authorId = memberId(announcement.getBoardId());
+        if (!authorId.equals(react.getAuthorId())) {
+            throw new ForbiddenException("This react is not belong to you");
+        }
+        return reactRepository.DeleteReactById(react.getReactId(), authorId);
+
+    }
+
+
 }

@@ -3,8 +3,10 @@ package org.example.zentrio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponseData;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,5 +19,8 @@ public class Announcement  {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID authorId;
+    private MemberResponseData createdBy;
+    private List<String>  imageUrl;
     private UUID boardId;
+    private List<React> reacts;
 }

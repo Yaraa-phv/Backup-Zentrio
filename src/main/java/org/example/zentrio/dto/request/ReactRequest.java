@@ -1,5 +1,6 @@
 package org.example.zentrio.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ReactRequest {
+
+    @NotNull
     private ReactTypes reactType ;
+
+    @NotNull
     private UUID announcementId ;
 }
