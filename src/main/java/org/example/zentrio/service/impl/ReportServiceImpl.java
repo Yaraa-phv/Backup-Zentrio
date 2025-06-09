@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.response.ChecklistResponse;
+import org.example.zentrio.dto.response.StageTaskGroup;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
@@ -59,32 +60,24 @@ public class ReportServiceImpl implements ReportService {
         if (report == null) {
             throw new NotFoundException("Report not found");
         }
+        List<AllTasks> rawTasks = Optional.ofNullable(reportRepository.getTasks(boardId))
+                .orElse(Collections.emptyList());
 
-        Map<String, List<AllTasks>> tasksByStage = report.getAllTasks().stream()
+
+        // ✅ Group tasks by stage
+        Map<String, List<AllTasks>> tasksByStage = rawTasks.stream()
                 .collect(Collectors.groupingBy(AllTasks::getTask));
 
-        List<AllTasks> mergedTasks = new ArrayList<>();
+        // ✅ Create StageTaskGroup list
+        List<StageTaskGroup> groupedTasks = tasksByStage.entrySet().stream()
+                .map(entry -> new StageTaskGroup(
+                        entry.getKey(),            // stage name
+                        entry.getValue().size(),   // count
+                        entry.getValue()           // list of tasks
+                ))
+                .collect(Collectors.toList());
 
-        for (String stage : tasksByStage.keySet()) {
-            List<AllTasks> stageTasks = tasksByStage.get(stage);
-
-            List<ChecklistResponse> allChecklists = new ArrayList<>();
-            for (AllTasks task : stageTasks) {
-                if (task.getTaskId() != null) {
-                    allChecklists.addAll(reportRepository.getChecklistById(task.getTaskId()));
-                }
-            }
-
-            AllTasks merged = new AllTasks();
-            merged.setTask(stage);
-            merged.setTaskId(null); // Optional
-            merged.setTotal(stageTasks.size());
-            merged.setChecklist(allChecklists);
-
-            mergedTasks.add(merged);
-        }
-
-        report.setAllTasks(mergedTasks);
+        report.setGroupedTasks(groupedTasks);
         return report;
     }
 
@@ -126,5 +119,10 @@ public class ReportServiceImpl implements ReportService {
         int version = report.getVersion() +1;
         reportRepository.updateVersion(report.getReportId(), version);
 
+    }
+
+    @Override
+    public List<AllTasks> getTasks(UUID checklistId) {
+        return reportRepository.getTasks(checklistId);
     }
 }

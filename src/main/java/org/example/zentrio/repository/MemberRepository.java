@@ -132,7 +132,8 @@ public interface MemberRepository {
         """)
     Boolean existMemberId(UUID userId, UUID boardId);
 
-
-
-
+    @Select("""
+    SELECT  member_id FROM members WHERE user_id= #{userId} AND board_id=#{boardId} LIMIT 1;
+    """)
+    UUID getMemberIdInboard(UUID userId, UUID boardId);
 }

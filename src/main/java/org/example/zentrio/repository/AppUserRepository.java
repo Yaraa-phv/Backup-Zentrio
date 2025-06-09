@@ -79,4 +79,10 @@ public interface AppUserRepository {
         WHERE user_id = #{userId}
     """)
     void updatedIsResetToFalse(UUID userId);
+
+    @Select("""
+            UPDATE users SET profile_image = #{fileUrl} 
+            WHERE user_id= #{userId}
+            """)
+    void profileImage(String fileUrl, UUID userId);
 }
