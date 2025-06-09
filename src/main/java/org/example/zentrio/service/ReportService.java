@@ -2,6 +2,7 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.response.ChecklistResponse;
 import org.example.zentrio.model.AllMember;
+import org.example.zentrio.model.AllTasks;
 import org.example.zentrio.model.Report;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface ReportService {
     Set<ChecklistResponse> getChecklistById(UUID checklistId);
 
     void updateVersionReport(Report report);
+
+    List<AllTasks> getTasks(UUID checklistId);
 }

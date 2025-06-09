@@ -8,6 +8,7 @@ import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.AppUserResponse;
 import org.example.zentrio.dto.response.ChecklistResponse;
 import org.example.zentrio.model.AllMember;
+import org.example.zentrio.model.AllTasks;
 import org.example.zentrio.model.Report;
 import org.example.zentrio.service.ReportService;
 import org.example.zentrio.service.impl.PdfService;

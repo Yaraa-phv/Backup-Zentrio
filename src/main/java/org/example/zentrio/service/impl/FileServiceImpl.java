@@ -112,8 +112,6 @@ public class FileServiceImpl implements FileService {
     @Override
     public InputStream getFileByFileName(String fileName) {
         try {
-
-
         return minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucketName)

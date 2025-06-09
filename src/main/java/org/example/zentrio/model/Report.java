@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
+import org.example.zentrio.dto.response.StageTaskGroup;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,4 +22,5 @@ public class Report {
     private List<AllMember> allMembers;
     private String boardName;
     private List<AllTasks> allTasks;
+    private List<StageTaskGroup> groupedTasks;
 }

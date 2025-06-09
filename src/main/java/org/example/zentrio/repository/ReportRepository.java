@@ -32,13 +32,15 @@ public interface ReportRepository {
 
 
     @Select("""
-    SELECT task_id, stage AS tasks
-    FROM tasks
-    WHERE board_id = #{boardId}
+     SELECT task_id, stage, started_at, finished_at
+                                   FROM tasks
+                                   WHERE board_id = #{boardId}
 """)
     @Results(id = "tasksCountMapper", value = {
-            @Result(property = "task", column = "tasks"),
+            @Result(property = "task", column = "stage"),
             @Result(property = "taskId", column = "task_id"),
+            @Result(property = "startAt", column = "started_at"),
+            @Result(property = "finishAt", column = "finished_at"),
             @Result(property = "checklist", column = "task_id",
                     many = @Many(select = "getChecklistById"))
     })
