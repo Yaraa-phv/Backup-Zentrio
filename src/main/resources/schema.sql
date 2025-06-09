@@ -1,6 +1,6 @@
 -- DATABASE SCRIPT
 -- Create database
-CREATE DATABASE zentrio_db;
+-- CREATE DATABASE zentrio_db;
 
 --Create extension for uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -391,3 +391,14 @@ CREATE TABLE reacts (
                         created_by  UUID UNIQUE  REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                         announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- favorite boards table
+CREATE TABLE favorite_boards (
+                                 favorite_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                                 user_id     UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                                 board_id    UUID REFERENCES boards (board_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                                 marked_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 UNIQUE (user_id, board_id)
+);
+

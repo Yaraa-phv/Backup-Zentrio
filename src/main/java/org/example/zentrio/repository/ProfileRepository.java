@@ -28,7 +28,7 @@ public interface ProfileRepository {
     )
     @Select("""
                 UPDATE users set username = #{req.username},
-                                profile_image = #{req.profileImageUrl},
+                                profile_image = #{req.profileImage},
                                 gender = #{req.gender},
                                 position = #{req.position},
                                 location = #{req.location},

@@ -51,6 +51,7 @@ public class BoardServiceImpl implements BoardService {
     private final EmailService emailService;
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
+    private final FavouriteBoardRepository favouriteBoardRepository;
 
     @Value("${minio.bucket.name}")
     private String bucketName;
@@ -293,14 +294,15 @@ public class BoardServiceImpl implements BoardService {
         if(board == null) {
             throw new NotFoundException("Board ID " + boardId + " not found");
         }
-        List<String> roleName = roleRepository.getRolesNameByBoardIdAndUserId(boardId, userId);
-        if(roleName == null) {
-            throw new NotFoundException("You doesn't have the role to update the favourite status of this board");
-        }
-        if(!roleName.contains(RoleName.ROLE_MANAGER.toString())) {
-            throw new ForbiddenException("You do not have the role to update the favourite status only manager can update the favourite status");
-        }
         boardRepository.updateIsFavourite(boardId, isFavourite);
+        if(isFavourite) {
+            if(!favouriteBoardRepository.existsByUserIdAndBoardId(userId,boardId)){
+                favouriteBoardRepository.insertFavoriteBoard(LocalDateTime.now(),boardId,userId);
+            }
+        }
+        if(!isFavourite) {
+            favouriteBoardRepository.deleteFavoriteBoard(boardId,userId);
+        }
     }
 
     @Override
