@@ -392,6 +392,10 @@ public class BoardServiceImpl implements BoardService {
         if(!roleName.contains(RoleName.ROLE_MANAGER.toString())) {
             throw new ForbiddenException("You're not a manager of this board can't delete member");
         }
+        AppUser user = appUserRepository.getUserById(userId);
+        if(user == null) {
+            throw new NotFoundException("User with ID " +userId + " not found in this board");
+        }
         boardRepository.deletedMember(boardId,userId);
     }
 
