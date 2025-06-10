@@ -3,6 +3,7 @@ package org.example.zentrio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.zentrio.dto.response.MemberResponseData;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,5 +20,6 @@ public class Board {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isFavourite;
+    private MemberResponseData createdBy;
     private UUID workspaceId;
 }
