@@ -21,6 +21,7 @@ public interface ProfileRepository {
             @Result(property = "isReset", column = "is_reset"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "googleEmail", column = "google_email"),
             @Result(property = "location", column = "location"),
             @Result(property = "position", column = "position"),
             @Result(property = "contact", column = "contact"),

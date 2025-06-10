@@ -215,7 +215,7 @@ CREATE TABLE notifications
     type            VARCHAR(50),
     is_read         BOOLEAN          DEFAULT FALSE,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    task_id  UUID REFERENCES tasks (task_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    task_assign_id  UUID REFERENCES task_assignments (task_assign_id) ON DELETE CASCADE ON UPDATE CASCADE,
     sender_id       UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     receiver_id     UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

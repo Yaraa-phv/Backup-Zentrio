@@ -70,13 +70,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     public Announcement updateAnnouncementById( UUID announcementId,AnnouncementRequest announcementRequest) {
 
-        String content= announcementRequest.getDescription();
         Announcement  announcement= getAnnouncementById(announcementId);
         UUID pmId= getPmId(announcement.getBoardId());
         if (!announcement.getAuthorId().equals(pmId)) {
             throw new ForbiddenException("Only Pm that created announcement it  allow to update announcement");
         }
-        return announcementRepository.updateAnnouncementById(announcementId, content, LocalDateTime.now(),announcement.getBoardId());
+        return announcementRepository.updateAnnouncementById(announcementId,announcementRequest, LocalDateTime.now(),announcement.getBoardId());
     }
 
     @Override
