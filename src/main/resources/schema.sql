@@ -388,3 +388,5 @@ CREATE TABLE reacts (
                         created_by  UUID UNIQUE  REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                         announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+alter table announcements add column  title varchar(250);
+ALTER TABLE users ADD  COLUMN  google_email varchar(50) ;
