@@ -88,6 +88,7 @@ public class BoardController {
         ApiResponse<Board> apiResponse = ApiResponse.<Board>builder()
                 .success(true)
                 .message("Deleted board successfully")
+                .payload(null)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -176,6 +177,7 @@ public class BoardController {
                 .success(true)
                 .message("Assigned role to board successfully")
                 .status(HttpStatus.OK)
+                .payload(null)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
@@ -191,6 +193,7 @@ public class BoardController {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Updated favourite of board successfully")
+                .payload(null)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -207,6 +210,7 @@ public class BoardController {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Invited users to board successfully")
+                .payload(null)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -280,5 +284,36 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+
+
+    @Operation(summary = "Delete member in the board by user ID",description = "Deleted member in board by user ID")
+    @DeleteMapping("/{board-id}/users/{user-id}")
+    public ResponseEntity<?> deleteMember(@PathVariable("board-id") UUID boardId, @PathVariable("user-id") UUID userId) {
+        boardService.deletedMember(boardId,userId);
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Deleted member by board ID and user ID successfully")
+                .status(HttpStatus.OK)
+                .payload(null)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
+    @Operation(summary = "Get favourite board by user ID",description = "Get all favourite board by user ID")
+    @GetMapping("/favourite/users/{user-id}")
+    public ResponseEntity<ApiResponse<HashSet<Board>>> getFavouriteBoardsByUserId(@PathVariable("user-id") UUID userId) {
+        ApiResponse<HashSet<Board>> apiResponse = ApiResponse.<HashSet<Board>>builder()
+                .success(true)
+                .message("Get all favourite boards by user ID successfully")
+                .status(HttpStatus.OK)
+                .payload(boardService.getFavouriteBoardsByUserId(userId))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+
+    }
 
 }

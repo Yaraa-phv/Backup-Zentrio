@@ -25,4 +25,5 @@ public interface WorkspaceService {
 
     Workspace getWorkspaceByIdForAllUsers(UUID workspaceId);
 
+    HashSet<Workspace> getOtherWorkspaceForUser();
 }

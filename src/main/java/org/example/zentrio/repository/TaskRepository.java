@@ -204,15 +204,6 @@ public interface TaskRepository {
     UUID getBoardIdByTaskId(UUID taskId);
 
 
-
-    @Select("""
-        SELECT t.* FROM task_assignments
-        INNER JOIN tasks t ON task_assignments.task_id = t.task_id
-        WHERE task_assign_id = #{taskAssignId}
-    """)
-    @ResultMap("taskMapper")
-    Task getTaskByAssignId(UUID taskAssignId);
-
     @Select("""
             SELECT m.member_id
         FROM members m

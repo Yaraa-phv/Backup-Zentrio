@@ -34,8 +34,6 @@ public interface BoardRepository {
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "isFavourite", column = "is_favourite"),
-            @Result(property = "createdBy", column = "workspace_id",
-            one = @One(select = "getMemberByUserId")),
             @Result(property = "workspaceId", column = "workspace_id")
     })
     Board createBoard(@Param("req") BoardRequest boardRequest, UUID workspaceId);
@@ -100,8 +98,9 @@ public interface BoardRepository {
             @Result(property = "email", column = "email"),
             @Result(property = "tasks", column = "{userId=user_id, boardId=board_id}",
             many = @Many(select = "getAllTaskNames")),
-            @Result(property = "roles", column = "user_id",
+            @Result(property = "roles", column = "{userId=user_id, boardId=board_id}",
                     many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId")),
+
     })
     HashSet<MemberResponse> getBoardByBoardIdWithMember(UUID boardId);
 
@@ -236,6 +235,24 @@ public interface BoardRepository {
             many = @Many(select = "org.example.zentrio.repository.TaskRepository.getAllDataInTaskByBoardId"))
     })
     BoardResponse getAllDataInBoard(UUID boardId);
+
+    @Select("""
+        DELETE FROM members m
+        WHERE m.board_id = #{boardId}
+        AND m.user_id = #{userId}
+    """)
+    void deletedMember(UUID boardId, UUID userId);
+
+
+    @Select("""
+        SELECT b.*
+        FROM boards b
+        INNER JOIN workspaces w ON b.workspace_id = w.workspace_id
+        WHERE b.is_favourite = TRUE
+        AND w.created_by = #{userId}
+    """)
+    @ResultMap("boardMapper")
+    HashSet<Board> getFavouriteBoardsByUserId(UUID userId);
 
 
     @Select("""

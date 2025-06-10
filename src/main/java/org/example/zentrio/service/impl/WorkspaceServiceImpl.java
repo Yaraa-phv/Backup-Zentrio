@@ -106,4 +106,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         getWorkspaceById(workspaceId);
         return  workspaceRepository.getWorkspaceByWorkspaceIdForAllUsers(workspaceId);
     }
+
+    @Override
+    public HashSet<Workspace> getOtherWorkspaceForUser() {
+        UUID userId = currentUserId();
+        return workspaceRepository.getOtherWorkspaceForUser(userId);
+    }
 }

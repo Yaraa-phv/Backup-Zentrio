@@ -51,4 +51,8 @@ public interface BoardService {
     String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest);
 
     BoardResponse getAllDataInBoard(UUID boardId);
+
+    void deletedMember(UUID boardId, UUID userId);
+
+    HashSet<Board> getFavouriteBoardsByUserId(UUID userId);
 }

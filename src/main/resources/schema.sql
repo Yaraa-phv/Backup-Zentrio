@@ -1,6 +1,6 @@
 -- DATABASE SCRIPT
 -- Create database
-CREATE DATABASE zentrio_db;
+-- CREATE DATABASE zentrio_db;
 
 --Create extension for uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -215,7 +215,7 @@ CREATE TABLE notifications
     type            VARCHAR(50),
     is_read         BOOLEAN          DEFAULT FALSE,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    task_assign_id  UUID REFERENCES task_assignments (task_assign_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    task_id  UUID REFERENCES tasks (task_id) ON DELETE CASCADE ON UPDATE CASCADE,
     sender_id       UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     receiver_id     UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -359,14 +359,6 @@ CREATE TRIGGER trigger_reorder_checklist_after_delete
     FOR EACH ROW
 EXECUTE FUNCTION reorder_checklist_order_after_delete();
 
---announcement_images
-CREATE TABLE announcement_images (
-                                     announcement_images_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                                     image_url VARCHAR(255) NOT NULL,
-                                     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                     announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE,
-                                     created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE
-                                 );
 
 --announcements
 CREATE TABLE announcements (
@@ -378,6 +370,17 @@ CREATE TABLE announcements (
                                created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                                bord_id    UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+--announcement_images
+CREATE TABLE announcement_images (
+                                     announcement_images_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                                     image_url VARCHAR(255) NOT NULL,
+                                     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                                     created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE
+                                 );
+
+
 --reacts
 CREATE TABLE reacts (
                         react_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -388,3 +391,14 @@ CREATE TABLE reacts (
                         created_by  UUID UNIQUE  REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                         announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- favorite boards table
+CREATE TABLE favorite_boards (
+                                 favorite_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                                 user_id     UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                                 board_id    UUID REFERENCES boards (board_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                                 marked_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 UNIQUE (user_id, board_id)
+);
+

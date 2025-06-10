@@ -13,6 +13,7 @@ import org.example.zentrio.enums.Gender;
 @NoArgsConstructor
 @Builder
 public class ProfileRequest {
+
     @NotNull
     @NotBlank
     private String username;
@@ -32,6 +33,6 @@ public class ProfileRequest {
     @NotBlank
     private String contact;
 
-    private String profileImageUrl;
+    private String profileImage;
 
 }

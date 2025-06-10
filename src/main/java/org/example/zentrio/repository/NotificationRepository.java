@@ -16,8 +16,10 @@ public interface NotificationRepository {
             @Result(property = "type", column = "type"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "isRead", column = "is_read"),
-            @Result(property = "taskId", column = "task_assign_id"),
+            @Result(property = "taskId", column = "task_id"),
             @Result(property = "senderId", column = "sender_id"),
+            @Result(property = "sender", column = "sender_id",
+                    one = @One(select = "org.example.zentrio.repository.AppUserRepository.getUserByUserId")),
             @Result(property = "receiverId", column = "receiver_id")
     })
 
@@ -29,7 +31,7 @@ public interface NotificationRepository {
     HashSet<Notification> getNotificationsByUserId(UUID userId);
 
     @Select("""
-                INSERT INTO notifications(notification_id, content, type, is_read, created_at, task_assign_id, sender_id, receiver_id)
+                INSERT INTO notifications(notification_id, content, type, is_read, created_at, task_id, sender_id, receiver_id)
                 VALUES(#{notificationId}, #{content}, #{type}, #{isRead}, #{createdAt}, #{taskId}, #{senderId},#{receiverId})
             """)
     @ResultMap("notificationMapper")
