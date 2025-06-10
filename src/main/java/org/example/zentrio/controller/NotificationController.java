@@ -27,12 +27,12 @@ public class NotificationController {
         notificationService.sendMessageToAllUsers(message);
     }
 
-    @PostMapping("/sendMessageToUser/{sender-id}/users/{receiver-id}/tasks/{task-id}")
-    public void sendMessageToUser(@PathVariable("sender-id") String senderId,
-                                  @PathVariable("receiver-id") String receiverId,
-                                  @PathVariable("task-id") UUID taskId,
-                                  @RequestBody String message) throws JsonProcessingException {
-        notificationService.sendMessageToUser(senderId,receiverId,taskId,message);
+    @PostMapping("/sendMessageToUser/users/{receiver-id}/tasks/{task-id}")
+    public void sendMessageToUser(
+            @PathVariable("receiver-id") String receiverId,
+            @PathVariable("task-id") UUID taskId,
+            @RequestBody String message) throws JsonProcessingException {
+        notificationService.sendPushNotificationToUser(receiverId,taskId,message);
     }
 
 

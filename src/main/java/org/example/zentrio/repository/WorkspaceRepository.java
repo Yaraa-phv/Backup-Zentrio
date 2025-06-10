@@ -85,6 +85,16 @@ public interface WorkspaceRepository {
     @ResultMap("workspaceMapper")
     HashSet<Workspace> getAllWorkspacesForAllUsers();
 
+
+    @Select("""
+        SELECT w.* FROM boards b
+                     INNER JOIN members m ON b.board_id = m.board_id
+                     INNER JOIN roles r ON m.role_id = r.role_id
+                     INNER JOIN workspaces w ON b.workspace_id = w.workspace_id
+            WHERE m.user_id = #{userId}
+            AND w.created_by != #{userId}
+    """)
+    HashSet<Workspace> getOtherWorkspaceForUser(UUID userId);
 }
 
 

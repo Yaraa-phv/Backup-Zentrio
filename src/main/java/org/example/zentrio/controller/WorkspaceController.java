@@ -140,4 +140,17 @@ public class WorkspaceController {
 
         return  ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+    @Operation(summary = "Get other workspaces for joining users by users ID",description = "Get other workspaces that users has joined")
+    @GetMapping("/other")
+    public ResponseEntity<ApiResponse<HashSet<Workspace>>> getOtherWorkspaceForUser() {
+        ApiResponse<HashSet<Workspace>> apiResponse = ApiResponse.<HashSet<Workspace>>builder()
+                .success(true)
+                .message("Get other workspace by users ID successfully")
+                .payload(workspaceService.getOtherWorkspaceForUser())
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 }

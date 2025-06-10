@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
@@ -24,10 +25,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
     private final AppUserRepository appUserRepository;
-    private final TaskService taskService;
     private final TaskRepository taskRepository;
     @Value("${onesignal.app-id}")
     private String APP_ID;
@@ -40,12 +41,6 @@ public class NotificationServiceImpl implements NotificationService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final NotificationRepository notificationRepository;
 
-    public NotificationServiceImpl(NotificationRepository notificationRepository, AppUserRepository appUserRepository, TaskService taskService, TaskRepository taskRepository) {
-        this.notificationRepository = notificationRepository;
-        this.appUserRepository = appUserRepository;
-        this.taskService = taskService;
-        this.taskRepository = taskRepository;
-    }
 
     public void sendMessageToAllUsers(String message) throws JsonProcessingException {
         String url = "https://onesignal.com/api/v1/notifications";
@@ -73,31 +68,22 @@ public class NotificationServiceImpl implements NotificationService {
 //        notificationRepository.insertNotification(notification);
     }
 
-    public void sendMessageToUser(String senderStr,String receiverId,UUID taskId, String message) throws JsonProcessingException {
+    public void sendPushNotificationToUser(String receiverId,UUID taskId, String message) throws JsonProcessingException {
 
-        Task task = taskRepository.getTaskByAssignId(taskId);
+        Task task = taskRepository.getTaskByTaskId(taskId);
         if (task == null) {
             throw new NotFoundException("Task assign ID " +taskId+ "not found");
         }
 
-        AppUser user = appUserRepository.getUserById(UUID.fromString(senderStr));
-        System.out.println("user: " + user);
-        if(user == null) {
-            throw new BadRequestException("User with ID " +senderStr+ " not found");
-        }
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         UUID senderUUID;
         UUID receiverUUID;
 
         try {
-            senderUUID = UUID.fromString(senderStr);
+            senderUUID = (userId);
             receiverUUID = UUID.fromString(receiverId);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid UUID format for sender or receiver ID");
-        }
-
-        AppUser senderUser = appUserRepository.getUserById(senderUUID);
-        if (senderUser == null || senderUser.getUserId() == null) {
-            throw new NotFoundException("Sender user not found or has null ID: " + senderStr);
         }
 
         AppUser receiverUser = appUserRepository.getUserById(receiverUUID);
@@ -105,15 +91,15 @@ public class NotificationServiceImpl implements NotificationService {
             throw new BadRequestException("User with ID " + receiverId + " not found");
         }
 
-
-
         // 1. Send push notification via OneSignal
         String url = "https://onesignal.com/api/v1/notifications";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json; charset=UTF-8");
         headers.set("Authorization", "Basic " + REST_API_KEY);
 
-        String strJsonBody = buildJsonBodyForSingleUser(message, senderStr);
+        String userStrId = UUID.fromString(userId.toString()).toString();
+
+        String strJsonBody = buildJsonBodyForSingleUser(message,(userStrId));
         HttpEntity<String> request = new HttpEntity<>(strJsonBody, headers);
         restTemplate.postForEntity(url, request, String.class);
 
