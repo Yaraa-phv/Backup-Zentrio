@@ -40,7 +40,7 @@ public interface BoardService {
 
     void updateIsFavourite(UUID boardId, boolean isFavourite);
 
-    void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests);
+    void inviteMemberToBoard(UUID workspaceId,UUID boardId, List<InviteRequest> inviteRequests);
 
     Board getBoardByIdWithCurrentUserId(UUID boardId);
 
@@ -48,7 +48,7 @@ public interface BoardService {
 
     HashSet<Board> getAllBoards();
 
-    String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest);
+    String acceptBoardInvitation(UUID workspaceId, UUID boardId, String email, RoleRequest roleRequest);
 
     BoardResponse getAllDataInBoard(UUID boardId);
 

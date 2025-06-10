@@ -202,11 +202,12 @@ public class BoardController {
 
 
     @Operation(summary = "Invite users to board", description = "Invite any users to specific board")
-    @PostMapping("/{board-id}/users/invite")
+    @PostMapping("/{board-id}/workspaces/{workspace-id}/users/invite")
     public ResponseEntity<?> inviteMemberToBoard(
             @PathVariable("board-id") UUID boardId,
+            @PathVariable("workspace-id") UUID workspaceId,
             @RequestBody List<InviteRequest> inviteRequests) {
-        boardService.inviteMemberToBoard(boardId,inviteRequests);
+        boardService.inviteMemberToBoard(workspaceId,boardId,inviteRequests);
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .success(true)
                 .message("Invited users to board successfully")
@@ -219,12 +220,13 @@ public class BoardController {
 
 
     @Operation(summary = "Accept board invitation", description = "Accept invitation to join a board using email")
-    @GetMapping("/{board-id}/invitations/accept")
+    @GetMapping("/{board-id}/workspaces/{workspace-id}/invitations/accept")
     public ResponseEntity<?> acceptInvitation(
             @PathVariable("board-id") UUID boardId,
+            @PathVariable("workspace-id") UUID workspaceId,
             @RequestParam String email,
             @RequestParam RoleRequest roleRequest) {
-        String redirectUrl = boardService.acceptBoardInvitation(boardId, email,roleRequest);
+        String redirectUrl = boardService.acceptBoardInvitation(workspaceId,boardId, email,roleRequest);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
                 .build();
