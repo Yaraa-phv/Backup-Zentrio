@@ -19,6 +19,7 @@ public class Report {
     private LocalDate creationDate;
     private Integer version;
     private  UUID boardId;
+    private Board boardData;
     private List<AllMember> allMembers;
     private String boardName;
     private List<AllTasks> allTasks;

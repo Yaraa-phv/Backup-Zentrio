@@ -444,7 +444,9 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         String fileId = document.getFolderId(); // or getFileId() if that's more accurate
-
+        if ("application/vnd.google-apps.folder".equals(document.getDocumentType())) {
+            throw new NotFoundException("The provided ID refer to a folder.");
+        }
         try {
             Drive drive = createDriveService(accessToken);
 
