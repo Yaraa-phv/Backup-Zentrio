@@ -15,12 +15,14 @@ public interface AnnouncementRepository {
 
 
     @Select("""
-        INSERT INTO announcements(text_content,created_by,bord_id)
-        VALUES (#{request.description}, #{creator}, #{request.boardId})
+        INSERT INTO announcements(text_content,title,created_by,bord_id)
+        VALUES (#{request.description},#{request.title
+        }, #{creator}, #{request.boardId})
         RETURNING *
         """)
     @Results(id="announcementMapper", value = {
             @Result(property = "announcementId", column = "announcement_id"),
+            @Result(property = "title", column = "title"),
             @Result(property = "description", column = "text_content"),
             @Result(property = "isPinned", column = "is_pinned"),
             @Result(property = "createdAt", column = "created_at"),
@@ -44,13 +46,14 @@ public interface AnnouncementRepository {
     Announcement getAnnouncementById(UUID announcementId);
 
     @Select("""
-        UPDATE announcements SET text_content= #{content},
+        UPDATE announcements SET text_content= #{re.description},
+                                 title= #{re.title}  ,      
                                  update_at= #{now}
         WHERE announcement_id =#{announcementId} AND bord_id= #{bordId}
        RETURNING * 
        """)
     @ResultMap("announcementMapper")
-    Announcement updateAnnouncementById(UUID announcementId, String content, LocalDateTime now, UUID bordId);
+    Announcement updateAnnouncementById(UUID announcementId,@Param("re") AnnouncementRequest request, LocalDateTime now, UUID bordId);
 
     @Select("""
         UPDATE announcements SET is_pinned= #{b}
