@@ -32,6 +32,8 @@ public interface TaskRepository {
             @Result(property = "createdBy", column = "created_by"),
             @Result(property = "creator", column = "created_by",
                     one = @One(select = "getDataOfUserCreator")),
+            @Result(property = "teamLeader", column = "task_id",
+                    one = @One(select = "getTeamLeadData")),
 
     })
     @Select("""
@@ -247,6 +249,8 @@ public interface TaskRepository {
             @Result(property = "createdBy", column = "created_by"),
             @Result(property = "creator", column = "created_by",
                     one = @One(select = "getDataOfUserCreator")),
+
+
             @Result(property = "allChecklists", column = "task_id",
                     many = @Many(select = "org.example.zentrio.repository.ChecklistRepository.getAllDataInChecklistByTaskId")),
     })
@@ -289,4 +293,27 @@ public interface TaskRepository {
                    
         """)
     void moveTaskOrderUp(int oldOrder, int newOrder, int till, UUID boardId);
+
+
+    @Select("""
+        
+            SELECT
+            u.profile_image AS image,
+            u.username AS name,
+            u.user_id
+        FROM
+            task_assignments ta
+                INNER JOIN
+            members m ON ta.assigned_to = m.member_id
+                INNER JOIN
+            users u ON m.user_id = u.user_id
+        WHERE
+            ta.task_id = #{taskId};
+        """)
+    @Results(id = "teamLeadResponseMapper", value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "username", column = "name"),
+    })
+    MemberResponseData getTeamLeadData(UUID taskId);
 }
