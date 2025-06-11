@@ -36,24 +36,21 @@ public class CalendarServiceImpl implements CalendarService {
     private void validateNoteWithTask(CalendarRequest calendarRequest, Task task) {
         LocalDateTime now = LocalDateTime.now();
 
-        //  Checklist start time cannot be in the past
-        if (calendarRequest.getStartDate().isBefore(now)) {
-            throw new BadRequestException("Checklist start time cannot be in the past.");
-        }
+
 
             // Checklist finish time must be the same or after start time
             if (calendarRequest.getTillDate().isBefore(calendarRequest.getStartDate())) {
-                throw new BadRequestException("Checklist finish time cannot be before start time.");
+                throw new BadRequestException("Task finish time cannot be before start time.");
             }
 
             // Checklist finish time must not exceed Task's finish time
             if (calendarRequest.getTillDate().isAfter(task.getFinishedAt())) {
-                throw new BadRequestException("Checklist finish time cannot exceed Task's finish time.");
+                throw new BadRequestException("Task finish time cannot exceed Task's finish time.");
             }
 
 //        // Checklist start time must not be before Task's start time
             if (calendarRequest.getStartDate().isBefore(task.getStartedAt())) {
-                throw new BadRequestException("Checklist start time cannot be before Task's start time.");
+                throw new BadRequestException("Task start time cannot be before Task's start time.");
             }
         }
 

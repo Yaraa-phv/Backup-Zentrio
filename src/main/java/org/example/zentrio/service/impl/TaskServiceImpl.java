@@ -2,6 +2,7 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
+import org.example.zentrio.dto.response.TaskRespone;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.enums.Status;
@@ -135,6 +136,7 @@ public class TaskServiceImpl implements TaskService {
             creatorMemberId = boardRepository.getManagerMemberIdByUserIdAndBoardId(userId, board.getBoardId());
         } else if (roles.contains(RoleName.ROLE_LEADER.toString())) {
             creatorMemberId = boardRepository.getTeamLeaderMemberIdByUserIdAndBoardId(userId, board.getBoardId());
+
         } else {
             throw new ForbiddenException("You're not a Manager or Team Leader in this board, can't create task");
         }
@@ -150,6 +152,7 @@ public class TaskServiceImpl implements TaskService {
             UUID assignByMemberId = boardRepository.getManagerMemberIdByBoardId(board.getBoardId()); // Manager's member ID
 
             taskRepository.insertTaskAssignment(task.getTaskId(), assignByMemberId, creatorMemberId);
+            taskRepository.updateProgressOfTaskById(task.getTaskId(),Stage.IN_PROGRESS.toString());
         }
 
         return task;
@@ -261,7 +264,7 @@ public class TaskServiceImpl implements TaskService {
     public void assignLeaderToTask(UUID taskId, UUID assigneeId) {
 
         Task task = getTaskById(taskId);
-        updateProgressOfTaskById(taskId);
+
 
         validateCurrentUserRoles(task.getBoardId());
         if (taskRepository.isAlreadyAssigned(taskId)) {
@@ -292,6 +295,7 @@ public class TaskServiceImpl implements TaskService {
         }
         leaderId = taskRepository.getLeaderIdByUserIdAndBoardId(assigneeId, task.getBoardId());
         taskRepository.insertTaskAssignment(taskId, assignerMemberId, leaderId);
+        updateProgressOfTaskById(taskId);
     }
 
     @Override
@@ -401,9 +405,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public HashSet<Task> getTasksByBoardId(UUID boardId) {
+    public HashSet<TaskRespone> getTasksByBoardId(UUID boardId) {
         boardService.getBoardByBoardId(boardId);
-        return  taskRepository.getTasksByBoardId(boardId);
+        HashSet<TaskRespone>  taskRespones= new HashSet<>( taskRepository.getAllDataInTaskByBoardId(boardId));
+        return taskRespones;
 
     }
 
