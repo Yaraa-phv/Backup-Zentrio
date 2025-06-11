@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.ApiResponse;
 import org.example.zentrio.dto.response.DeleteApiResponse;
+import org.example.zentrio.dto.response.OtherWorkspaceResponse;
 import org.example.zentrio.model.Workspace;
 import org.example.zentrio.service.WorkspaceService;
 import org.springframework.http.HttpStatus;
@@ -143,8 +144,8 @@ public class WorkspaceController {
 
     @Operation(summary = "Get other workspaces for joining users by users ID",description = "Get other workspaces that users has joined")
     @GetMapping("/other")
-    public ResponseEntity<ApiResponse<HashSet<Workspace>>> getOtherWorkspaceForUser() {
-        ApiResponse<HashSet<Workspace>> apiResponse = ApiResponse.<HashSet<Workspace>>builder()
+    public ResponseEntity<ApiResponse<HashSet<OtherWorkspaceResponse>>> getOtherWorkspaceForUser() {
+        ApiResponse<HashSet<OtherWorkspaceResponse>> apiResponse = ApiResponse.<HashSet<OtherWorkspaceResponse>>builder()
                 .success(true)
                 .message("Get other workspace by users ID successfully")
                 .payload(workspaceService.getOtherWorkspaceForUser())

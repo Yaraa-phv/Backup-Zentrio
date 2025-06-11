@@ -3,6 +3,7 @@ package org.example.zentrio.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.OtherWorkspaceResponse;
 import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.Pagination;
 import org.example.zentrio.model.Workspace;
@@ -108,7 +109,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public HashSet<Workspace> getOtherWorkspaceForUser() {
+    public HashSet<OtherWorkspaceResponse> getOtherWorkspaceForUser() {
         UUID userId = currentUserId();
         return workspaceRepository.getOtherWorkspaceForUser(userId);
     }
