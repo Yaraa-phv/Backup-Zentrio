@@ -36,4 +36,12 @@ public interface NotificationRepository {
             """)
     @ResultMap("notificationMapper")
     void insertNotification(Notification notification);
+
+    @Select("""
+        SELECT task_assign_id
+        FROM task_assignments
+        WHERE task_id = #{taskId}
+        AND user_id = #{userId}
+    """)
+    UUID getTaskAssignId(UUID taskId,UUID userId);
 }
