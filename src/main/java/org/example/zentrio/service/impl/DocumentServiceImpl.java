@@ -21,6 +21,7 @@ import org.example.zentrio.exception.NotFoundException;
 import org.example.zentrio.model.AppUser;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.Document;
+import org.example.zentrio.repository.AppUserRepository;
 import org.example.zentrio.repository.BoardRepository;
 import org.example.zentrio.repository.DocumentRepository;
 import org.example.zentrio.service.DocumentService;
@@ -34,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +50,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final BoardRepository boardRepository;
+    private final AppUserRepository appUserRepository;
+
+
 
     public UUID userId() {
         AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -438,13 +444,16 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public ResponseEntity<?> downloadDocument(UUID documentId, String accessToken) {
 
+
         Document document = documentRepository.getDocumentByDocumentId(documentId);
         if (document == null) {
             throw new NotFoundException("Document not found with ID: " + documentId);
         }
 
         String fileId = document.getFolderId(); // or getFileId() if that's more accurate
-
+        if ("application/vnd.google-apps.folder".equals(document.getDocumentType())) {
+            throw new NotFoundException("The provided ID refer to a folder.");
+        }
         try {
             Drive drive = createDriveService(accessToken);
 
@@ -455,6 +464,10 @@ public class DocumentServiceImpl implements DocumentService {
             String mimeType = fileMetadata.getMimeType();
             String fileName = fileMetadata.getName();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
 
             if (mimeType.startsWith("application/vnd.google-apps.")) {
                 // It's a Google-native file (Docs, Sheets, Slides)
@@ -480,7 +493,7 @@ public class DocumentServiceImpl implements DocumentService {
             byte[] fileBytes = outputStream.toByteArray();
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .contentType(MediaType.parseMediaType(mimeType))
                     .body(fileBytes);
 
@@ -492,6 +505,8 @@ public class DocumentServiceImpl implements DocumentService {
                     .body("Download failed: " + e.getMessage());
         }
     }
+
+
     @Override
     public ResponseEntity<?> downloadFolderAsZip(UUID documentId, String accessToken) {
         Document document = documentRepository.getDocumentByDocumentId(documentId);
@@ -568,6 +583,21 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
+    @Override
+    public Void saveGoogleEmailDrive(String email) {
+        AppUser appUser= appUserRepository.getUserById(userId());
+        if ( appUser.getGoogleEmail()== null ) {
+
+         return  appUserRepository.saveGoogleEmailDrive(email, userId());
+        }else  {
+
+            if (!appUser.getGoogleEmail().equals(email)) {
+                throw new BadRequestException("The provided email address not right");
+            }
+
+            return null;
+        }
+    }
 
 
 }

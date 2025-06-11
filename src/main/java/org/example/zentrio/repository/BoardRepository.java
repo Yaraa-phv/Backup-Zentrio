@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.BoardRequest;
 import org.example.zentrio.dto.response.BoardResponse;
 import org.example.zentrio.dto.response.MemberResponse;
+import org.example.zentrio.dto.response.MemberResponseData;
 import org.example.zentrio.model.Board;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public interface BoardRepository {
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "isFavourite", column = "is_favourite"),
+            @Result(property = "createdBy", column = "workspace_id",
+            one = @One(select = "getMemberByUserId")),
             @Result(property = "workspaceId", column = "workspace_id")
     })
     Board createBoard(@Param("req") BoardRequest boardRequest, UUID workspaceId);
@@ -251,4 +254,18 @@ public interface BoardRepository {
     """)
     @ResultMap("boardMapper")
     HashSet<Board> getFavouriteBoardsByUserId(UUID userId);
+
+
+    @Select("""
+             
+                   SELECT u.profile_image AS image , u.username AS name, u.user_id FROM users u
+                        inner join workspaces wk on u.user_id = wk.created_by
+                WHERE wk.workspace_id= #{workspaceId}
+        """)
+    @Results(id = "userWorkspaceMapper", value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "imageUrl", column = "image"),
+            @Result(property = "username", column = "name"),
+    })
+    MemberResponseData getMemberByUserId(UUID workspaceId);
 }

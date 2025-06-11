@@ -18,6 +18,10 @@ public class AnnouncementRequest {
     @NotNull
     private String description;
 
+    @NotBlank
+    @NotNull
+    private String title;
+
     @NotNull
     private UUID boardId;
 }

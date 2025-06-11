@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Announcement  {
     private UUID announcementId;
+    private String title;
     private String description;
     private Boolean isPinned;
     private LocalDateTime createdAt;

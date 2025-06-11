@@ -59,6 +59,8 @@ public interface ReportRepository {
             @Result(property = "creationDate" , column = "created_at"),
             @Result(property = "boardId" , column = "board_id"),
             @Result(property = "version" , column = "version"),
+            @Result(property = "boardData" , column = "board_id",
+            one = @One(select = "org.example.zentrio.repository.BoardRepository.getBoardByBoardId")),
             @Result(property = "allMembers" , column = "board_id",
             many =@Many (select = "getMember") ),
             @Result(property = "boardName" , column = "board_id",

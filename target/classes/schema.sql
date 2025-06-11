@@ -368,7 +368,7 @@ CREATE TABLE announcements (
                                update_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                is_pinned BOOLEAN DEFAULT  FALSE,
                                created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
-                               bord_id    UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
+                               board_id   UUID REFERENCES boards(board_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 --announcement_images
