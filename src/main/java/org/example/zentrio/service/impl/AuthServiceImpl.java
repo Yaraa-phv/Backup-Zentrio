@@ -177,7 +177,8 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse loginThirdParty(AuthThirdPartyRequest request) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
 //                .setAudience(Collections.singletonList("67453975102-v5k4olq9qom0dop0400ika07ntf9lils.apps.googleusercontent.com")) own google id ("Fanau")
-                .setAudience(Collections.singleton("555065390048-dcgfpec66hk6e3oqs46nhuqlpg4a8c3f.apps.googleusercontent.com"))
+                .setAudience(Collections.singletonList("67453975102-v5k4olq9qom0dop0400ika07ntf9lils.apps.googleusercontent.com"))
+//                .setAudience(Collections.singleton("555065390048-dcgfpec66hk6e3oqs46nhuqlpg4a8c3f.apps.googleusercontent.com"))
                 .build();
 
         GoogleIdToken idToken = verifier.verify(request.getIdToken());
@@ -197,7 +198,9 @@ public class AuthServiceImpl implements AuthService {
         String name = (String) payload.get("name");
         String picture = (String) payload.get("picture");
         Boolean emailVerified = (Boolean) payload.get("email_verified");
-        authRepository.insertUser(email, name, googleId, picture, emailVerified);
+        String provider = request.getProvider();
+        System.out.println("provider = " + provider);
+        authRepository.insertUser(email, name, googleId, picture, emailVerified,provider);
         String token = jwtService.generateToken(email);
         return TokenResponse.builder()
                 .token(token)
@@ -228,7 +231,6 @@ public class AuthServiceImpl implements AuthService {
         ResetPasswordRequest resetPasswordRequest = authRepository.resetPassword(request, email);
 
         appUserRepository.updatedIsResetToFalse(appUser.getUserId());
-        System.out.println("is REset : " + appUser.getIsReset());
         return resetPasswordRequest;
     }
 
