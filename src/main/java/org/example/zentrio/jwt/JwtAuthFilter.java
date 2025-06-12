@@ -34,10 +34,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = authHeader.substring(7);
 //            email = jwtService.extractEmail(token);
             // new updated
-            if(token.chars().filter(ch -> ch == '=').count() != 2) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+//            if(token.chars().filter(ch -> ch == '=').count() != 2) {
+//                filterChain.doFilter(request, response);
+//                return;
+//            }
             try {
                 email = jwtService.extractEmail(token);
             } catch (Exception e) {
