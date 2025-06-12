@@ -289,8 +289,6 @@ public interface TaskRepository {
             END
             WHERE board_id = #{boardId}
             AND task_order BETWEEN #{oldOrder} AND #{newOrder};
-            
-                   
         """)
     void moveTaskOrderUp(int oldOrder, int newOrder, int till, UUID boardId);
 

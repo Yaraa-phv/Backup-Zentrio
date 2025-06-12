@@ -75,6 +75,8 @@ public class NotificationServiceImpl implements NotificationService {
             throw new NotFoundException("Task assign ID " +taskId+ "not found");
         }
 
+
+
         UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
         UUID senderUUID;
         UUID receiverUUID;
@@ -89,6 +91,11 @@ public class NotificationServiceImpl implements NotificationService {
         AppUser receiverUser = appUserRepository.getUserById(receiverUUID);
         if (receiverUser == null || receiverUser.getUserId() == null) {
             throw new BadRequestException("User with ID " + receiverId + " not found");
+        }
+
+        UUID taskAssignId = notificationRepository.getTaskAssignId(taskId, receiverUUID);
+        if (taskAssignId == null) {
+            throw new NotFoundException("Task assignment not found for task ID " + taskId + " and user ID " + receiverId);
         }
 
         // 1. Send push notification via OneSignal
@@ -110,8 +117,6 @@ public class NotificationServiceImpl implements NotificationService {
             content = content.substring(1, content.length() - 1);
         }
 
-
-
         System.out.println("content" + content);
         notification.setContent(content);
         notification.setType("IN APP");
@@ -119,7 +124,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setCreatedAt(LocalDateTime.now());
         notification.setSenderId(senderUUID);
         notification.setReceiverId(receiverUUID);
-        notification.setTaskId(taskId);
+        notification.setTaskId(taskAssignId);
         notificationRepository.insertNotification(notification);
         System.out.println("notification: " + notification);
 

@@ -2,6 +2,7 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.OtherWorkspaceResponse;
 import org.example.zentrio.model.Workspace;
 
 import java.util.HashSet;
@@ -25,5 +26,5 @@ public interface WorkspaceService {
 
     Workspace getWorkspaceByIdForAllUsers(UUID workspaceId);
 
-    HashSet<Workspace> getOtherWorkspaceForUser();
+    HashSet<OtherWorkspaceResponse> getOtherWorkspaceForUser();
 }

@@ -34,6 +34,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -306,10 +308,10 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void inviteMemberToBoard(UUID boardId, List<InviteRequest> inviteRequests) {
+    public void inviteMemberToBoard(UUID workspaceId,UUID boardId, List<InviteRequest> inviteRequests) {
         getBoardByBoardId(boardId);
         for(InviteRequest inviteRequest : inviteRequests) {
-            emailService.sendInvitations(boardId, inviteRequest.getEmail(),inviteRequest.getRoleName());
+            emailService.sendInvitations(workspaceId,boardId, inviteRequest.getEmail(),inviteRequest.getRoleName());
         }
     }
 
@@ -335,7 +337,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public String acceptBoardInvitation(UUID boardId, String email, RoleRequest roleRequest) {
+    public String acceptBoardInvitation(UUID workspaceId,UUID boardId, String email, RoleRequest roleRequest) {
 
         log.info("acceptBoardInvitation: boardId: {}, email: {}", boardId, email);
             getBoardByBoardId(boardId);
@@ -344,7 +346,7 @@ public class BoardServiceImpl implements BoardService {
                 // If the user is not found, redirect to the login/sign-in page.
                 // Note: This URL is just an example; the actual URL should be
                 // provided dynamically by the frontend.
-                return "https://www.youtube.com/watch?v=Pzi-VuPjcII";
+                return "http://localhost:3000/login";
             }
             UUID userId = appUser.getUserId();
             UUID roleId = roleRepository.getRoleIdByRoleName(roleRequest.toString());
@@ -352,15 +354,18 @@ public class BoardServiceImpl implements BoardService {
                 // If the user is not found, redirect to the login/sign-in page.
                 // Note: This URL is just an example; the actual URL should be
                 // provided dynamically by the frontend.
-                return "https://www.youtube.com/watch?v=Pzi-VuPjcII";
+                return "http://localhost:3000/login";
             }
-            UUID existingMemberId = boardRepository.getMemberIdByUserIdAndBoardId(userId, boardId);
-            if (existingMemberId != null) {
-                // If the user exists, redirect them to the board page.
-                // Note: This URL is just an example; the actual URL should be
-                // obtained dynamically from the frontend.
-                return "http://localhost:8080/swagger-ui/index.html";
-            }
+        UUID existingMemberId = boardRepository.getMemberIdByUserIdAndBoardId(userId, boardId);
+        if (existingMemberId != null) {
+            log.info("User {} is already a member of board {}, redirecting to board page", userId, boardId);
+            return String.format(
+                    "http://localhost:3000/dashboard/%s/%s/board?role=%s",
+                    workspaceId,
+                    boardId,
+                    URLEncoder.encode(roleRequest.name().toLowerCase(), StandardCharsets.UTF_8)
+            );
+        }
 
         log.info("Returning redirect URL: {}", "http://localhost:8080/swagger-ui/index.html");
 
@@ -370,7 +375,12 @@ public class BoardServiceImpl implements BoardService {
             // upon acceptance, they should be redirected to the board page.
             // Note: The URL shown here is just an example; the real URL
             // should be dynamically obtained from the frontend.
-            return "http://localhost:8080/swagger-ui/index.html";
+        return String.format(
+                "http://localhost:3000/dashboard/%s/%s/board?role=%s",
+                workspaceId,
+                boardId,
+                URLEncoder.encode(roleRequest.name().toLowerCase(), StandardCharsets.UTF_8)
+        );
     }
 
     @Override

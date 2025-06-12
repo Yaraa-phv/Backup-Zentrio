@@ -2,6 +2,7 @@ package org.example.zentrio.repository;
 
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.WorkspaceRequest;
+import org.example.zentrio.dto.response.OtherWorkspaceResponse;
 import org.example.zentrio.model.Workspace;
 
 
@@ -14,9 +15,9 @@ import java.util.UUID;
 public interface WorkspaceRepository {
 
     @Select("""
-        INSERT INTO workspaces(title, description, created_by) VALUES (#{request.title}, #{request.description}, #{userId})
-        RETURNING *
-    """)
+                INSERT INTO workspaces(title, description, created_by) VALUES (#{request.title}, #{request.description}, #{userId})
+                RETURNING *
+            """)
     @Results(id = "workspaceMapper", value = {
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "title", column = "title"),
@@ -28,73 +29,80 @@ public interface WorkspaceRepository {
     Workspace createWorkspace(@Param("request") WorkspaceRequest workspaceRequest, UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces
-        WHERE created_by = #{userId}
-        LIMIT #{limit} OFFSET #{offset}
-    """)
+                SELECT * FROM workspaces
+                WHERE created_by = #{userId}
+                LIMIT #{limit} OFFSET #{offset}
+            """)
     @ResultMap("workspaceMapper")
-    List<Workspace> getAllWorkspaces(UUID userId,Integer limit,Integer offset);
+    List<Workspace> getAllWorkspaces(UUID userId, Integer limit, Integer offset);
 
     @Select("""
-        SELECT * FROM workspaces
-        WHERE workspace_id = #{workspaceId}
-    """)
+                SELECT * FROM workspaces
+                WHERE workspace_id = #{workspaceId}
+            """)
     Workspace getWorkspaceByWorkspaceId(UUID workspaceId);
 
     @Select("""
-         SELECT COUNT(*) FROM workspaces WHERE created_by = #{userId}
-    """)
+                 SELECT COUNT(*) FROM workspaces WHERE created_by = #{userId}
+            """)
     Integer countWorkspacesByUserId(UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
-    """)
+                SELECT * FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
+            """)
     @ResultMap("workspaceMapper")
     Workspace getWorkspaceById(UUID workspaceId, UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces WHERE title ILIKE '%'|| #{title} ||'%'
-    """)
+                SELECT * FROM workspaces WHERE title ILIKE '%'|| #{title} ||'%'
+            """)
     @ResultMap("workspaceMapper")
     List<Workspace> getWorkspaceByTitle(String title);
 
     @Select("""
-        UPDATE workspaces SET title = #{request.title}, description = #{request.description},
-                          updated_at = #{updatedAt}
-        WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
-        RETURNING *
-    """)
+                UPDATE workspaces SET title = #{request.title}, description = #{request.description},
+                                  updated_at = #{updatedAt}
+                WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
+                RETURNING *
+            """)
     @ResultMap("workspaceMapper")
     Workspace updateWorkspaceById(UUID workspaceId, @Param("request") WorkspaceRequest workspaceRequest, UUID userId, LocalDateTime updatedAt);
 
     @Select("""
-        DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
-    """)
+                DELETE FROM workspaces WHERE workspace_id = #{workspaceId} AND created_by = #{userId}
+            """)
     @ResultMap("workspaceMapper")
     void deleteWorkspaceByWorkspaceId(UUID workspaceId, UUID userId);
 
     @Select("""
-        SELECT * FROM workspaces WHERE workspace_id = #{workspaceId}
-    """)
+                SELECT * FROM workspaces WHERE workspace_id = #{workspaceId}
+            """)
     @ResultMap("workspaceMapper")
     Workspace getWorkspaceByWorkspaceIdForAllUsers(UUID workspaceId);
 
     @Select("""
-        SELECT * FROM workspaces
-    """)
+                SELECT * FROM workspaces
+            """)
     @ResultMap("workspaceMapper")
     HashSet<Workspace> getAllWorkspacesForAllUsers();
 
-
     @Select("""
-        SELECT w.* FROM boards b
-                     INNER JOIN members m ON b.board_id = m.board_id
-                     INNER JOIN roles r ON m.role_id = r.role_id
-                     INNER JOIN workspaces w ON b.workspace_id = w.workspace_id
-            WHERE m.user_id = #{userId}
-            AND w.created_by != #{userId}
-    """)
-    HashSet<Workspace> getOtherWorkspaceForUser(UUID userId);
+                SELECT w.workspace_id,w.title,w.description,w.created_by,r.role_name, b.*, m.user_id
+                FROM boards b
+                INNER JOIN members m ON b.board_id = m.board_id
+                INNER JOIN roles r ON m.role_id = r.role_id
+                INNER JOIN workspaces w ON b.workspace_id = w.workspace_id
+                WHERE m.user_id = #{userId}
+                AND w.created_by != #{userId}
+            """)
+    @Results(id = "otherWorkspaceMapper", value = {
+            @Result(property = "workspaceId",column = "workspace_id"),
+            @Result(property = "createdByDetails",column = "user_id",
+                    one = @One(select = "org.example.zentrio.repository.AchievementRepository.getDetailsOfUserByUserId")),
+            @Result(property = "otherBoards", column = "user_id",
+                    many = @Many(select = "org.example.zentrio.repository.AchievementRepository.getJoinBoard"))
+    })
+    HashSet<OtherWorkspaceResponse> getOtherWorkspaceForUser(UUID userId);
 }
 
 

@@ -14,4 +14,8 @@ public class AuthThirdPartyRequest {
     @NotNull
     @NotBlank
     private String idToken;
+
+    @NotNull
+    @NotBlank
+    private String provider;
 }

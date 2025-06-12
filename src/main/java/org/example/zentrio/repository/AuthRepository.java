@@ -37,11 +37,11 @@ public interface AuthRepository {
 
     @ResultMap("UserMapper")
     @Select("""
-        INSERT INTO users(email,username,password,profile_image,is_verified)
-        VALUES(#{email},#{name},#{googleId},#{picture},#{isVerified})
+        INSERT INTO users(email,username,password,profile_image,is_verified,provider)
+        VALUES(#{email},#{name},#{googleId},#{picture},#{isVerified},#{provider})
         RETURNING *;
     """)
-    void insertUser(String email, String name, String googleId, String picture,Boolean isVerified);
+    void insertUser(String email, String name, String googleId, String picture,Boolean isVerified,String provider);
 
     @Select("""
         UPDATE users set password = #{req.password}, is_reset = true

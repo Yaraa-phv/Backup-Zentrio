@@ -6,15 +6,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.zentrio.enums.RoleRequest;
 import org.example.zentrio.exception.BadRequestException;
+import org.example.zentrio.model.AppUser;
+import org.example.zentrio.repository.AppUserRepository;
 import org.example.zentrio.service.EmailService;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +28,7 @@ import java.util.UUID;
 public class EmailServiceImpl implements EmailService {
     private final SpringTemplateEngine templateEngine;
     private final JavaMailSender javaMailSender;
+    private final AppUserRepository appUserRepository;
 
     @Override
     public void sendDynamicEmail(String toEmail, String templateName, String subject, Map<String, Object> variables) {
@@ -51,56 +56,64 @@ public class EmailServiceImpl implements EmailService {
 
 
     @Override
-    public void sendInvitations(UUID boardId, String email, RoleRequest role) {
+    public void sendInvitations(UUID workspaceId, UUID boardId, String email, RoleRequest role) {
+        log.info("Sending invitation to email: {} for workspace: {}, board: {}, role: {}", email, workspaceId, boardId, role);
 
-       log.info("send invitations to email {}", email);
-
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            throw new BadRequestException("Invalid email address");
+        if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new BadRequestException("Invalid email address: " + email);
         }
 
         if (role == null) {
-            throw new BadRequestException("Role required can't be null or empty");
+            throw new BadRequestException("Role cannot be null or empty");
         }
 
         try {
-            // Prepare the email template context with dynamic values
+            // Prepare the email template context
             Context context = new Context();
-            context.setVariable("title", "You're Invited!");  // Title for the email
+            context.setVariable("title", "You're Invited to Join a Project!");
             context.setVariable("message",
-                    "We would like to invite you to join our platform. Please click the button below to accept the invitation.");  // Message content
+                    "You’ve been invited to join a project board. Click the button below to accept the invitation.");
 
-            String acceptInvitationUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                            .path("/api/boards/" + boardId + "/invitations/accept")
-                            .queryParam("email",email)
-                            .queryParam("role",role.name())
-                            .toUriString();
+            // Generate the frontend invitation URL
+            String acceptInvitationUrl = String.format(
+                    "http://localhost:3000/dashboard/%s/%s/board?role=%s",
+                    workspaceId,
+                    boardId,
+                    URLEncoder.encode(role.name().toLowerCase(), StandardCharsets.UTF_8)
+            );
 
-            log.info("accept invitation {}", acceptInvitationUrl);
+            AppUser user = appUserRepository.getUserByEmail(email);
+            String loginInvitationUrl = "http://localhost:3000/login";
 
-            context.setVariable("inviteLink", "https://www.youtube.com/");  // Invitation link (replace with actual URL)
+            if(user == null) {
+                context.setVariable("inviteLink", loginInvitationUrl);
+            }else{
+            context.setVariable("inviteLink", acceptInvitationUrl);
+            }
 
-            // Process the Thymeleaf template 'invite-member.html' (replace with the correct template name)
-            String processedHtml = templateEngine.process("invite-member", context);  // Template name
+            log.info("Generated invitation URL: {}", acceptInvitationUrl);
 
-            // Create the MimeMessage for sending the email
+            // Process the Thymeleaf template
+            String processedHtml = templateEngine.process("invite-member", context);
+
+            // Create and send the email
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            mimeMessageHelper.setSubject("You're Invited to Join Zentrio!");
+            mimeMessageHelper.setText(processedHtml, true);
+            mimeMessageHelper.setTo(email);
 
-            mimeMessageHelper.setSubject("You're Invited to Join Zentrio!");  // Email subject
-            mimeMessageHelper.setText(processedHtml, true);  // true means it will be sent as HTML content
-            mimeMessageHelper.setTo(email);  // The recipient email
-
-            // Send the email using JavaMailSender
             javaMailSender.send(mimeMessage);
-
-            System.out.println("Invitation email sent to " + email);
+            log.info("Invitation email sent to {}", email);
 
         } catch (MessagingException e) {
+            log.error("Failed to send invitation email to {}: {}", email, e.getMessage());
             throw new RuntimeException("Failed to send invitation email to " + email, e);
+        } catch (Exception e) {
+            log.error("Unexpected error while sending invitation to {}: {}", email, e.getMessage());
+            throw new RuntimeException("Unexpected error while sending invitation to " + email, e);
         }
     }
-
 
 
     @SneakyThrows

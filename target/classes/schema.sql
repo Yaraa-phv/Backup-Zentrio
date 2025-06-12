@@ -13,6 +13,7 @@ CREATE TABLE users
     gender        VARCHAR(100),
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR      NOT NULL,
+    provider      VARCHAR(30),
     profile_image VARCHAR          DEFAULT 'https://i.pinimg.com/736x/d0/7b/a6/d07ba6dcf05fa86c0a61855bc722cb7a.jpg',
     position      VARCHAR(100),
     location      VARCHAR(255),
@@ -215,7 +216,7 @@ CREATE TABLE notifications
     type            VARCHAR(50),
     is_read         BOOLEAN          DEFAULT FALSE,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    task_id  UUID REFERENCES tasks (task_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    task_assign_id  UUID REFERENCES task_assignments (task_assign_id) ON DELETE CASCADE ON UPDATE CASCADE,
     sender_id       UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     receiver_id     UUID REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -376,6 +377,7 @@ CREATE TABLE announcement_images (
                                      announcement_images_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                                      image_url VARCHAR(255) NOT NULL,
                                      uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     title VARCHAR(255) NOT NULL ,
                                      announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE,
                                      created_by UUID REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE
                                  );
@@ -385,8 +387,7 @@ CREATE TABLE announcement_images (
 CREATE TABLE reacts (
                         react_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                         reaction_type VARCHAR(20) NOT NULL CHECK (
-                            reaction_type IN ('LIKE', 'LOVE', 'FUNNY', 'SAD', 'ANGRY', 'SURPRISED')
-                            ),
+                        reaction_type IN ('LIKE', 'LOVE', 'FUNNY', 'SAD', 'ANGRY', 'SURPRISED')),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         created_by  UUID UNIQUE  REFERENCES members(member_id) ON DELETE CASCADE ON UPDATE CASCADE ,
                         announcement_id UUID  REFERENCES announcements(announcement_id) ON DELETE CASCADE ON UPDATE CASCADE
