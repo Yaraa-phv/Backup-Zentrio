@@ -190,18 +190,21 @@ public class AuthServiceImpl implements AuthService {
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String email = payload.getEmail();
-        if(appUserRepository.getUserByEmail(email) != null) {
-            throw new BadRequestException("This email is already logged in.");
-        }
-//        String googleId = (passwordEncoder.encode(payload.getSubject()));
+
         String googleId = payload.getSubject();
+
         String name = (String) payload.get("name");
         String picture = (String) payload.get("picture");
         Boolean emailVerified = (Boolean) payload.get("email_verified");
         String provider = request.getProvider();
         System.out.println("provider = " + provider);
-        authRepository.insertUser(email, name, googleId, picture, emailVerified,provider);
+
+        AppUser user = appUserRepository.getUserByEmail(email);
+        if(user ==  null) {
+            authRepository.insertUser(email, name, googleId, picture, emailVerified,provider);
+        }
         String token = jwtService.generateToken(email);
+
         return TokenResponse.builder()
                 .token(token)
                 .build();
