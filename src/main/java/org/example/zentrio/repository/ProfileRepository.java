@@ -46,7 +46,7 @@ public interface ProfileRepository {
     void deleteProfile(UUID appUserId);
 
     @Select("""
-                SELECT u.username, u.gender, u.email, u.profile_image, u.position,u.contact, u.location, u.created_at, u.updated_at FROM users u
+                SELECT u.user_id,u.username, u.gender, u.email, u.profile_image, u.position,u.contact, u.location, u.created_at, u.updated_at FROM users u
                 WHERE user_id = #{userId}
             """)
     @ResultMap("profileMapper")
