@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.TaskRespone;
+import org.example.zentrio.dto.response.TaskResponse;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.enums.Status;
 import org.example.zentrio.model.Task;
@@ -77,9 +79,9 @@ public class TaskController {
 
     @Operation(summary = "Get all task by board ID", description = "Get all task by specific board ID ")
     @GetMapping("/boards/{board-id}")
-    public ResponseEntity<ApiResponse<HashSet<Task>>> getTasksByBoardId(
+    public ResponseEntity<ApiResponse<HashSet<TaskRespone>>> getTasksByBoardId(
             @PathVariable("board-id") UUID boardId) {
-        ApiResponse<HashSet<Task>> apiResponse = ApiResponse.<HashSet<Task>>builder()
+        ApiResponse<HashSet<TaskRespone>> apiResponse = ApiResponse.<HashSet<TaskRespone>>builder()
                 .success(true)
                 .message("Get all task by board ID successfully")
                 .payload(taskService.getTasksByBoardId(boardId))

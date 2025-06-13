@@ -4,6 +4,7 @@ package org.example.zentrio.service;
 
 import org.example.zentrio.dto.request.TaskRequest;
 import org.example.zentrio.dto.response.ApiResponse;
+import org.example.zentrio.dto.response.TaskRespone;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.enums.Status;
 import org.example.zentrio.model.Task;
@@ -39,7 +40,7 @@ public interface TaskService {
 
     HashSet<Task> getAllTasks();
 
-    HashSet<Task> getTasksByBoardId(UUID boardId);
+    HashSet<TaskRespone> getTasksByBoardId(UUID boardId);
 
     Void moveOrder( UUID boardId,int newOrder, int oldOrder);
 

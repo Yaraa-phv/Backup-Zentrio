@@ -21,7 +21,7 @@ public class CalendarRequest {
     @NotBlank
     private String noted;
 
-    @FutureOrPresent
+
     private LocalDateTime startDate;
 
     @FutureOrPresent

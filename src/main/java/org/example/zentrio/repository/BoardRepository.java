@@ -34,8 +34,6 @@ public interface BoardRepository {
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
             @Result(property = "isFavourite", column = "is_favourite"),
-            @Result(property = "createdBy", column = "workspace_id",
-            one = @One(select = "getMemberByUserId")),
             @Result(property = "workspaceId", column = "workspace_id")
     })
     Board createBoard(@Param("req") BoardRequest boardRequest, UUID workspaceId);
@@ -100,8 +98,9 @@ public interface BoardRepository {
             @Result(property = "email", column = "email"),
             @Result(property = "tasks", column = "{userId=user_id, boardId=board_id}",
             many = @Many(select = "getAllTaskNames")),
-            @Result(property = "roles", column = "user_id",
+            @Result(property = "roles", column = "{userId=user_id, boardId=board_id}",
                     many = @Many(select = "org.example.zentrio.repository.RoleRepository.getRolesNameByUserId")),
+
     })
     HashSet<MemberResponse> getBoardByBoardIdWithMember(UUID boardId);
 

@@ -30,5 +30,7 @@ public class Task {
     private GanttBarResponse ganttBar;
     private UUID createdBy;
     private MemberResponseData creator;
+    private MemberResponseData teamLeader;
+
 
 }

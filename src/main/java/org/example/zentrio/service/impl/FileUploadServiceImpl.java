@@ -134,7 +134,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         }
 
         File createdFile = drive.files().create(file)
-                .setFields("id, name, mimeType")
+                .setFields("id, name, mimeType, webViewLink")
                 .execute();
 
         return createdFile;
