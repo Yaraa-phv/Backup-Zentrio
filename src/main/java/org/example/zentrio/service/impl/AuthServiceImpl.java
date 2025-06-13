@@ -181,7 +181,10 @@ public class AuthServiceImpl implements AuthService {
 //                .setAudience(Collections.singleton("555065390048-dcgfpec66hk6e3oqs46nhuqlpg4a8c3f.apps.googleusercontent.com"))
                 .build();
 
+        System.out.println("token from fronted       " + request.getIdToken());
         GoogleIdToken idToken = verifier.verify(request.getIdToken());
+
+        System.out.println("idToken: " + idToken);
 
         if (idToken == null) {
             throw new BadRequestException("Invalid ID token");

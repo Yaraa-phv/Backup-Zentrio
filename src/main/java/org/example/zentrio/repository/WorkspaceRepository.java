@@ -3,6 +3,7 @@ package org.example.zentrio.repository;
 import org.apache.ibatis.annotations.*;
 import org.example.zentrio.dto.request.WorkspaceRequest;
 import org.example.zentrio.dto.response.AppUserResponse;
+import org.example.zentrio.dto.response.JoinBoardResponse;
 import org.example.zentrio.dto.response.OtherWorkspaceResponse;
 import org.example.zentrio.model.Board;
 import org.example.zentrio.model.Workspace;
@@ -88,12 +89,21 @@ public interface WorkspaceRepository {
     @ResultMap("workspaceMapper")
     HashSet<Workspace> getAllWorkspacesForAllUsers();
 
+
+    @Select("""
+                SELECT DISTINCT r.role_name FROM members m
+                INNER JOIN roles r ON r.role_id = m.role_id
+                WHERE m.board_id = #{boardId} AND m.user_id = #{userId}
+            """)
+    List<String> getRolesNameByBoardIdAndUserId(UUID boardId, UUID userId);
+
     // Get boards the user joined within the workspace
     @Select("""
-        SELECT b.board_id, b.title, b.description, b.is_favourite, b.cover,
+        SELECT b.board_id, b.title, b.description, b.is_favourite, b.cover,r.role_name,
                b.created_at, b.updated_at, b.workspace_id, m.user_id
         FROM boards b
         INNER JOIN members m ON b.board_id = m.board_id
+        INNER JOIN roles r ON m.role_id = r.role_id
         WHERE m.user_id = #{userId} AND b.workspace_id = #{workspaceId}
     """)
     @Results(id = "joinBoardMapper", value = {
@@ -101,14 +111,10 @@ public interface WorkspaceRepository {
             @Result(property = "title", column = "title"),
             @Result(property = "description", column = "description"),
             @Result(property = "isFavourite", column = "is_favourite"),
-            @Result(property = "cover", column = "cover"),
-            @Result(property = "createdBy", column = "user_id",
-            one = @One(select = "org.example.zentrio.repository.AchievementRepository.getDetailsOfUserByUserId")),
-            @Result(property = "createdAt", column = "created_at"),
-            @Result(property = "updatedAt", column = "updated_at"),
-            @Result(property = "workspaceId", column = "workspace_id")
+            @Result(property = "role", column = "{userId=user_id,boardId=board_id}",
+            many = @Many(select = "getRolesNameByBoardIdAndUserId")),
     })
-    List<Board> getJoinBoardByUserAndWorkspace(UUID userId, UUID workspaceId);
+    List<JoinBoardResponse> getJoinBoardByUserAndWorkspace(UUID userId, UUID workspaceId);
 
 
     // Main query to get all other workspaces the user joined
@@ -128,7 +134,7 @@ public interface WorkspaceRepository {
             @Result(property = "createdByDetails", column = "user_id",
                     one = @One(select = "org.example.zentrio.repository.AchievementRepository.getDetailsOfUserByUserId")),
             @Result(property = "otherBoards", column = "{userId=user_id,workspaceId=workspace_id}",
-                    many = @Many(select = "getJoinBoardByUserAndWorkspace"))
+                    many = @Many(select = "getJoinBoardByUserAndWorkspace")),
     })
     HashSet<OtherWorkspaceResponse> getOtherWorkspaceForUser(UUID userId);
 
