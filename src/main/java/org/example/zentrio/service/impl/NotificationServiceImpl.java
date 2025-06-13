@@ -91,10 +91,10 @@ public class NotificationServiceImpl implements NotificationService {
             throw new BadRequestException("User with ID " + receiverId + " not found");
         }
 
-        UUID taskAssignId = notificationRepository.getTaskAssignId(taskId);
-        if (taskAssignId == null) {
-            throw new NotFoundException("Task assignment not found for task ID " + taskId );
-        }
+//        UUID taskAssignId = notificationRepository.getTaskAssignId(taskId);
+//        if (taskAssignId == null) {
+//            throw new NotFoundException("Task assignment not found for task ID " + taskId );
+//        }
 
 
         // 1. Send push notification via OneSignal
@@ -123,7 +123,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setCreatedAt(LocalDateTime.now());
         notification.setSenderId(senderUUID);
         notification.setReceiverId(receiverUUID);
-        notification.setTaskAssignId(taskAssignId);
+//        notification.setTaskAssignId(taskAssignId);
         notificationRepository.insertNotification(notification);
         System.out.println("notification: " + notification);
 
