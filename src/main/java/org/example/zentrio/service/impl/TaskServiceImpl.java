@@ -2,7 +2,7 @@ package org.example.zentrio.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.zentrio.dto.request.TaskRequest;
-import org.example.zentrio.dto.response.TaskRespone;
+import org.example.zentrio.dto.response.TaskResponse;
 import org.example.zentrio.enums.RoleName;
 import org.example.zentrio.enums.Stage;
 import org.example.zentrio.enums.Status;
@@ -405,9 +405,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public HashSet<TaskRespone> getTasksByBoardId(UUID boardId) {
+    public HashSet<TaskResponse> getTasksByBoardId(UUID boardId) {
         boardService.getBoardByBoardId(boardId);
-        HashSet<TaskRespone>  taskRespones= new HashSet<>( taskRepository.getAllDataInTaskByBoardId(boardId));
+        HashSet<TaskResponse>  taskRespones= new HashSet<>( taskRepository.getAllDataInTaskByBoardId(boardId));
         return taskRespones;
 
     }
