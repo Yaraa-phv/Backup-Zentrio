@@ -41,8 +41,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/v1/boards/*/invitations/accept").permitAll()
-                        .requestMatchers("/api/v1/boards/invitations/accept").permitAll()
+                        .requestMatchers("/api/v1/boards/{board-id}/workspaces/{workspace-id}/invitations/accept").permitAll()
                         .requestMatchers("/api/v1/files/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -67,4 +67,19 @@ public class NotificationController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllNotifications() {
+        notificationService.deleteAllNotifications();
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .success(true)
+                .message("Delete all notification successfully")
+                .payload(null)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+
 }

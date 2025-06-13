@@ -148,6 +148,12 @@ public class NotificationServiceImpl implements NotificationService {
        notificationRepository.deleteNotificationByIdAndByUserId(notificationId,userId);
     }
 
+    @Override
+    public void deleteAllNotifications() {
+        UUID userId = ((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        notificationRepository.deleteAllNotifications(userId);
+    }
+
     private String buildJsonBodyForAllUsers(String message) throws JsonProcessingException {
         Map<String, Object> body = new HashMap<>();
         body.put("app_id", APP_ID);

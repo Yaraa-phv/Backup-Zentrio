@@ -57,4 +57,11 @@ public interface NotificationRepository {
     """)
     @ResultMap("notificationMapper")
     Notification getNotificationById(UUID notificationId);
+
+
+    @Select("""
+        DELETE FROM notifications
+        WHERE receiver_id = #{userId}
+    """)
+    void deleteAllNotifications(UUID userId);
 }

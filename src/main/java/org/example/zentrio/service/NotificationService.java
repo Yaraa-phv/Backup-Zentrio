@@ -14,4 +14,6 @@ public interface NotificationService {
     HashSet<Notification> getNotificationsForUser(UUID userId);
 
     void deleteNotificationByUserId(UUID notificationId);
+
+    void deleteAllNotifications();
 }
