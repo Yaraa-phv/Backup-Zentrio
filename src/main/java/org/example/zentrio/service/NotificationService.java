@@ -12,4 +12,6 @@ public interface NotificationService {
     void sendPushNotificationToUser(String receiverId, UUID taskId, String message) throws JsonProcessingException;
 
     HashSet<Notification> getNotificationsForUser(UUID userId);
+
+    void deleteNotificationByUserId(UUID notificationId);
 }
