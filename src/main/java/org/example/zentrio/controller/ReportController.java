@@ -10,6 +10,7 @@ import org.example.zentrio.dto.response.ChecklistResponse;
 import org.example.zentrio.model.AllMember;
 import org.example.zentrio.model.AllTasks;
 import org.example.zentrio.model.Report;
+import org.example.zentrio.repository.MemberRepository;
 import org.example.zentrio.service.ReportService;
 import org.example.zentrio.service.impl.PdfService;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +30,7 @@ import java.util.*;
 public class ReportController {
     private final ReportService reportService;
     private final PdfService   pdfService;
-
+    private  final MemberRepository memberRepository;
     @GetMapping("/boards/{board-id}")
     @Operation(summary = "Get report by board id")
     public ResponseEntity<ApiResponse<Report>> getReportByBoardId(@PathVariable("board-id") UUID boardId) {
@@ -105,13 +106,17 @@ public class ReportController {
 @Operation(summary = "Generate report as pdf file by board id")
 public ResponseEntity<byte[]> generateProjectReport(@PathVariable("board-id") UUID boardId) {
     Report report = reportService.getReportByBoardId(boardId); // You parse JSON into this DTO
+    String teamLead = memberRepository.getPmData(boardId);
 
     Map<String, Object> data = new HashMap<>();
+
+    data.put("teamLead", teamLead);
     data.put("boardName", report.getBoardName());
-    data.put("creationDate", report.getCreationDate());
+    data.put("creationDate", report.getBoardData().getCreatedAt());
     data.put("version", report.getVersion());
     data.put("allMembers", report.getAllMembers());
     data.put("allTasks", report.getAllTasks());
+    data.put("taskCount", report.getAllTasks().size());
 
     byte[] pdf = pdfService.generatePdf("project-report", data); // Use your pdfService like before
 
