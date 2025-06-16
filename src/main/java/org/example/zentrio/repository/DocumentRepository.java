@@ -108,4 +108,12 @@ public interface DocumentRepository {
         """)
     @ResultMap("folderMapper")
     Document getDocumentByDocumentId(UUID documentId);
+
+
+    @Select("""
+            SELECT  * FROM  documents  
+            WHERE  board_id= #{boardId}
+            """)
+    @ResultMap("folderMapper")
+    List<Document> getAllDocumentsAllUser(UUID boardId);
 }
