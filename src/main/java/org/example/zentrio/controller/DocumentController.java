@@ -59,7 +59,7 @@ public class DocumentController {
     }
 
 
-    @GetMapping("/boards/{board-id}/alluser")
+    @GetMapping("/boards/{board-id}/all-user")
     @Operation(summary = "Get all documents  from all user by board id")
     public ResponseEntity<ApiResponse<List<Document>>>  getAllDocumentsAllUser(@PathVariable("board-id") UUID boardId) {
         // Call the DriveService to get the folders
