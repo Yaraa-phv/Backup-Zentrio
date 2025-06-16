@@ -33,6 +33,8 @@ public interface BoardRepository {
             @Result(property = "cover", column = "cover"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at"),
+            @Result(property = "createdBy", column = "workspace_id",
+            one = @One(select = "getPmByWorkspaceId")),
             @Result(property = "isFavourite", column = "is_favourite"),
             @Result(property = "workspaceId", column = "workspace_id")
     })
@@ -266,5 +268,5 @@ public interface BoardRepository {
             @Result(property = "imageUrl", column = "image"),
             @Result(property = "username", column = "name"),
     })
-    MemberResponseData getMemberByUserId(UUID workspaceId);
+    MemberResponseData getPmByWorkspaceId(UUID workspaceId);
 }
