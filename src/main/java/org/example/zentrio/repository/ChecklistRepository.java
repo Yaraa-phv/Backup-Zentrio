@@ -119,7 +119,7 @@ public interface ChecklistRepository {
     @Select("""
                 SELECT COUNT(*) FROM checklists
                 WHERE task_id = #{taskId}
-                AND status != 'COMPLETED'
+                AND status != 'DONE'
             """)
     long countIncompleteByTaskId(UUID taskId);
 
@@ -218,5 +218,14 @@ public interface ChecklistRepository {
                     AND checklist_order BETWEEN #{oldOrder} AND #{newOrder};
         """)
     void moveChecklistOrderUp(int oldOrder, int newOrder, int till, UUID taskId);
+
+
+    @Select("""
+        SELECT COUNT(*) FROM task_assignments
+        WHERE task_id = #{taskId}
+    """)
+    int getTaskAssignIdByTaskId(UUID taskId);
+
+
 
 }
