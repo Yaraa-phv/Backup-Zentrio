@@ -8,6 +8,7 @@ import org.example.zentrio.dto.request.ChecklistRequest;
 import org.example.zentrio.enums.ChecklistStatus;
 import org.example.zentrio.enums.ImageExtension;
 import org.example.zentrio.enums.RoleName;
+import org.example.zentrio.enums.Status;
 import org.example.zentrio.exception.BadRequestException;
 import org.example.zentrio.exception.ForbiddenException;
 import org.example.zentrio.exception.NotFoundException;
@@ -102,9 +103,9 @@ ChecklistServiceImpl implements ChecklistService {
             }
 
             // Validate that the leader created the task
-            if (!task.getCreatedBy().equals(leaderMemberId)) {
-                throw new ForbiddenException("Team Leader can only manage checklists for tasks they created.");
-            }
+//            if (!task.getCreatedBy().equals(leaderMemberId)) {
+//                throw new ForbiddenException("Team Leader can only manage checklists for tasks they created.");
+//            }
 
             return;
         }
@@ -154,7 +155,16 @@ ChecklistServiceImpl implements ChecklistService {
             throw new ForbiddenException("You're not a Manger or Leader in this board, can't create checklist");
         }
 
-        return checklistRepository.createChecklist(checklistRequest, task.getTaskId(), memberId);
+        Checklist checklist = checklistRepository.createChecklist(checklistRequest, task.getTaskId(), memberId);
+
+
+        boolean isHasLeader = checklistRepository.getTaskAssignIdByTaskId(checklistRequest.getTaskId()) > 0;
+        if(isHasLeader){
+            checklistRepository.updateStatusOfChecklistById(checklist.getChecklistId(), ChecklistStatus.IN_PROGRESS.toString());
+        }
+
+        return checklist;
+
     }
 
     @Override
